@@ -7,6 +7,7 @@ services:
       - MONGO_URI=mongodb://mongodb:27017
     depends_on:
       - mongodb
+    restart: unless-stopped
 
   frontend:
     build: ./frontend
@@ -16,9 +17,10 @@ services:
       - API_URL=http://backend:8000
     depends_on:
       - backend
+    restart: unless-stopped
 
   mongodb:
-    image: mongodb-raspberrypi4-unofficial-r7.0.8:latest
+    image: mongodb/mongodb-community-server:latest
     container_name: mongodb
     ports:
       - "27017:27017"

@@ -64,6 +64,8 @@ def overall_stats_page():
     stats = get_stats()
     if stats:
         df = pd.DataFrame(stats)
+        goal_difference = df['total_goals_scored'] - df['total_goals_conceded']
+        df['goal_difference'] = goal_difference
         df = df.drop(columns=['id'])  # Remove the 'id' column
         df = df.sort_values('points', ascending=False)
         st.dataframe(df)
