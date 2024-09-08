@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 from itertools import groupby
-from operator import itemgetter
 from typing import Dict, List, Optional, Union
 
 from bson import ObjectId
@@ -393,6 +392,10 @@ async def update_match(match_id: str, match_update: MatchUpdate):
     if not match:
         raise HTTPException(status_code=404, detail="Match not found")
 
+    # Calculate the changes in goals
+    player1_goals_diff = match_update.player1_goals - match["player1_goals"]
+    player2_goals_diff = match_update.player2_goals - match["player2_goals"]
+
     # Update match
     update_result = await db.matches.update_one(
         {"_id": ObjectId(match_id)},
@@ -407,9 +410,64 @@ async def update_match(match_id: str, match_update: MatchUpdate):
     if update_result.modified_count == 0:
         raise HTTPException(status_code=400, detail="Match update failed")
 
+    # Update player stats
+    for player_id, goals_diff, opponent_goals_diff in [
+        (match["player1_id"], player1_goals_diff, player2_goals_diff),
+        (match["player2_id"], player2_goals_diff, player1_goals_diff),
+    ]:
+        player = await db.players.find_one({"_id": ObjectId(player_id)})
+
+        # Calculate win/loss/draw changes
+        old_result = get_result(
+            match["player1_goals"],
+            match["player2_goals"],
+            player_id == match["player1_id"],
+        )
+        new_result = get_result(
+            match_update.player1_goals,
+            match_update.player2_goals,
+            player_id == match["player1_id"],
+        )
+
+        wins_diff = new_result["win"] - old_result["win"]
+        losses_diff = new_result["loss"] - old_result["loss"]
+        draws_diff = new_result["draw"] - old_result["draw"]
+
+        # Update player stats
+        await db.players.update_one(
+            {"_id": ObjectId(player_id)},
+            {
+                "$inc": {
+                    "total_goals_scored": goals_diff,
+                    "total_goals_conceded": opponent_goals_diff,
+                    "wins": wins_diff,
+                    "losses": losses_diff,
+                    "draws": draws_diff,
+                    "points": wins_diff * 3 + draws_diff,
+                }
+            },
+        )
+
     # Fetch updated match
     updated_match = await db.matches.find_one({"_id": ObjectId(match_id)})
     return Match(**await match_helper(updated_match))
+
+
+def get_result(player1_goals, player2_goals, is_player1):
+    if is_player1:
+        if player1_goals > player2_goals:
+            return {"win": 1, "loss": 0, "draw": 0}
+        elif player1_goals < player2_goals:
+            return {"win": 0, "loss": 1, "draw": 0}
+        else:
+            return {"win": 0, "loss": 0, "draw": 1}
+    else:
+        if player2_goals > player1_goals:
+            return {"win": 1, "loss": 0, "draw": 0}
+        elif player2_goals < player1_goals:
+            return {"win": 0, "loss": 1, "draw": 0}
+        else:
+            return {"win": 0, "loss": 0, "draw": 1}
 
 
 @app.delete("/matches/{match_id}", response_model=dict)
