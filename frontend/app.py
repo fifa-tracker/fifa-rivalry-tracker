@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -181,8 +181,8 @@ def individual_player_stats_page():
                 opponent, losses = list(stats["highest_losses_against"].items())[0]
                 st.info(f"Most losses against: {opponent} ({losses} losses)")
 
-            # Winrate over time graph
-            st.subheader("Winrate Over Time")
+            # Daily Winrate graph
+            st.subheader("Daily Winrate Over Time")
             fig = go.Figure()
             dates = [
                 datetime.fromisoformat(item["date"])
@@ -190,10 +190,12 @@ def individual_player_stats_page():
             ]
             winrates = [item["winrate"] for item in stats["winrate_over_time"]]
             fig.add_trace(
-                go.Scatter(x=dates, y=winrates, mode="lines+markers", name="Winrate")
+                go.Scatter(
+                    x=dates, y=winrates, mode="lines+markers", name="Daily Winrate"
+                )
             )
             fig.update_layout(
-                title="Winrate Over Time",
+                title="Daily Winrate Over Time",
                 xaxis_title="Date",
                 yaxis_title="Winrate",
                 yaxis_tickformat=".0%",

@@ -1,5 +1,7 @@
 import os
 from datetime import datetime
+from itertools import groupby
+from operator import itemgetter
 from typing import Dict, List, Optional, Union
 
 from bson import ObjectId
@@ -326,24 +328,28 @@ async def get_player_detailed_stats(player_id: str):
         max(losses_against.items(), key=lambda x: x[1]) if losses_against else None
     )
 
-    # Calculate winrate over time
+    # Calculate winrate over time (per day)
     total_matches = 0
     total_wins = 0
-    winrate_over_time = []
+    daily_winrate = []
 
-    for match in matches:
-        total_matches += 1
-        is_player1 = match["player1_id"] == player_id
-        player_goals = match["player1_goals"] if is_player1 else match["player2_goals"]
-        opponent_goals = (
-            match["player2_goals"] if is_player1 else match["player1_goals"]
-        )
+    for date, day_matches in groupby(matches, key=lambda x: x["date"].date()):
+        day_matches = list(day_matches)
+        for match in day_matches:
+            total_matches += 1
+            is_player1 = match["player1_id"] == player_id
+            player_goals = (
+                match["player1_goals"] if is_player1 else match["player2_goals"]
+            )
+            opponent_goals = (
+                match["player2_goals"] if is_player1 else match["player1_goals"]
+            )
 
-        if player_goals > opponent_goals:
-            total_wins += 1
+            if player_goals > opponent_goals:
+                total_wins += 1
 
         winrate = total_wins / total_matches if total_matches > 0 else 0
-        winrate_over_time.append({"date": match["date"], "winrate": winrate})
+        daily_winrate.append({"date": date, "winrate": winrate})
 
     stats = player_helper(player)
     stats.update(
@@ -369,7 +375,7 @@ async def get_player_detailed_stats(player_id: str):
             "highest_losses_against": (
                 {highest_losses[0]: highest_losses[1]} if highest_losses else None
             ),
-            "winrate_over_time": winrate_over_time,
+            "winrate_over_time": daily_winrate,
         }
     )
 
