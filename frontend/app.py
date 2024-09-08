@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 
 import pandas as pd
+import plotly.graph_objects as go
 import requests
 import streamlit as st
 
@@ -179,6 +180,26 @@ def individual_player_stats_page():
             if stats["highest_losses_against"]:
                 opponent, losses = list(stats["highest_losses_against"].items())[0]
                 st.info(f"Most losses against: {opponent} ({losses} losses)")
+
+            # Winrate over time graph
+            st.subheader("Winrate Over Time")
+            fig = go.Figure()
+            dates = [
+                datetime.fromisoformat(item["date"])
+                for item in stats["winrate_over_time"]
+            ]
+            winrates = [item["winrate"] for item in stats["winrate_over_time"]]
+            fig.add_trace(
+                go.Scatter(x=dates, y=winrates, mode="lines+markers", name="Winrate")
+            )
+            fig.update_layout(
+                title="Winrate Over Time",
+                xaxis_title="Date",
+                yaxis_title="Winrate",
+                yaxis_tickformat=".0%",
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
         else:
             st.warning("No stats available for this player.")
 

@@ -1,7 +1,6 @@
-import asyncio
 import os
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from bson import ObjectId
 from fastapi import FastAPI, HTTPException
@@ -58,6 +57,10 @@ class HeadToHeadStats(BaseModel):
     draws: int
     player1_goals: int
     player2_goals: int
+    player1_win_rate: float
+    player2_win_rate: float
+    player1_avg_goals: float
+    player2_avg_goals: float
 
 
 class PlayerDetailedStats(BaseModel):
@@ -75,6 +78,7 @@ class PlayerDetailedStats(BaseModel):
     average_goals_conceded: float
     highest_wins_against: Optional[Dict[str, int]]
     highest_losses_against: Optional[Dict[str, int]]
+    winrate_over_time: List[Dict[str, Union[datetime, float]]]
 
 
 # Helper functions
@@ -246,6 +250,28 @@ async def get_head_to_head_stats(player1_id: str, player2_id: str):
             else:
                 stats["draws"] += 1
 
+    # Calculate win rates and average goals
+    stats["player1_win_rate"] = (
+        stats["player1_wins"] / stats["total_matches"]
+        if stats["total_matches"] > 0
+        else 0
+    )
+    stats["player2_win_rate"] = (
+        stats["player2_wins"] / stats["total_matches"]
+        if stats["total_matches"] > 0
+        else 0
+    )
+    stats["player1_avg_goals"] = (
+        stats["player1_goals"] / stats["total_matches"]
+        if stats["total_matches"] > 0
+        else 0
+    )
+    stats["player2_avg_goals"] = (
+        stats["player2_goals"] / stats["total_matches"]
+        if stats["total_matches"] > 0
+        else 0
+    )
+
     return HeadToHeadStats(**stats)
 
 
@@ -255,9 +281,13 @@ async def get_player_detailed_stats(player_id: str):
     if not player:
         raise HTTPException(status_code=404, detail="Player not found")
 
-    matches = await db.matches.find(
-        {"$or": [{"player1_id": player_id}, {"player2_id": player_id}]}
-    ).to_list(1000)
+    matches = (
+        await db.matches.find(
+            {"$or": [{"player1_id": player_id}, {"player2_id": player_id}]}
+        )
+        .sort("date", 1)
+        .to_list(1000)
+    )
 
     wins_against = {}
     losses_against = {}
@@ -296,6 +326,25 @@ async def get_player_detailed_stats(player_id: str):
         max(losses_against.items(), key=lambda x: x[1]) if losses_against else None
     )
 
+    # Calculate winrate over time
+    total_matches = 0
+    total_wins = 0
+    winrate_over_time = []
+
+    for match in matches:
+        total_matches += 1
+        is_player1 = match["player1_id"] == player_id
+        player_goals = match["player1_goals"] if is_player1 else match["player2_goals"]
+        opponent_goals = (
+            match["player2_goals"] if is_player1 else match["player1_goals"]
+        )
+
+        if player_goals > opponent_goals:
+            total_wins += 1
+
+        winrate = total_wins / total_matches if total_matches > 0 else 0
+        winrate_over_time.append({"date": match["date"], "winrate": winrate})
+
     stats = player_helper(player)
     stats.update(
         {
@@ -320,6 +369,7 @@ async def get_player_detailed_stats(player_id: str):
             "highest_losses_against": (
                 {highest_losses[0]: highest_losses[1]} if highest_losses else None
             ),
+            "winrate_over_time": winrate_over_time,
         }
     )
 
