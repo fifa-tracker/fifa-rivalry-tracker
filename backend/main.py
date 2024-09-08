@@ -1,21 +1,26 @@
+import asyncio
+import os
+from datetime import datetime
+from typing import Dict, List, Optional
+
+from bson import ObjectId
 from fastapi import FastAPI, HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
-from bson import ObjectId
-from typing import List, Dict
-import asyncio
-from datetime import datetime
-import os
 
 app = FastAPI()
 
 # MongoDB connection
-client = AsyncIOMotorClient(os.getenv("MONGO_URI", "mongodb://mongodb:27017/fifa_rivalry"))
+client = AsyncIOMotorClient(
+    os.getenv("MONGO_URI", "mongodb://mongodb:27017/fifa_rivalry")
+)
 db = client.fifa_rivalry
+
 
 # Pydantic models
 class PlayerCreate(BaseModel):
     name: str
+
 
 class Player(PlayerCreate):
     id: str
@@ -27,11 +32,13 @@ class Player(PlayerCreate):
     draws: int = 0
     points: int = 0
 
+
 class MatchCreate(BaseModel):
     player1_id: str
     player2_id: str
     player1_goals: int
     player2_goals: int
+
 
 class Match(BaseModel):
     id: str
@@ -40,6 +47,7 @@ class Match(BaseModel):
     player1_goals: int
     player2_goals: int
     date: datetime
+
 
 class HeadToHeadStats(BaseModel):
     player1_name: str
@@ -50,6 +58,24 @@ class HeadToHeadStats(BaseModel):
     draws: int
     player1_goals: int
     player2_goals: int
+
+
+class PlayerDetailedStats(BaseModel):
+    id: str
+    name: str
+    total_matches: int
+    total_goals_scored: int
+    total_goals_conceded: int
+    wins: int
+    losses: int
+    draws: int
+    points: int
+    win_rate: float
+    average_goals_scored: float
+    average_goals_conceded: float
+    highest_wins_against: Optional[Dict[str, int]]
+    highest_losses_against: Optional[Dict[str, int]]
+
 
 # Helper functions
 def player_helper(player) -> dict:
@@ -62,8 +88,9 @@ def player_helper(player) -> dict:
         "wins": player["wins"],
         "losses": player["losses"],
         "draws": player["draws"],
-        "points": player["points"]
+        "points": player["points"],
     }
+
 
 async def match_helper(match) -> dict:
     player1 = await db.players.find_one({"_id": ObjectId(match["player1_id"])})
@@ -74,28 +101,34 @@ async def match_helper(match) -> dict:
         "player2_name": player2["name"],
         "player1_goals": match["player1_goals"],
         "player2_goals": match["player2_goals"],
-        "date": match["date"]
+        "date": match["date"],
     }
+
 
 @app.post("/players", response_model=Player)
 async def register_player(player: PlayerCreate):
     existing_player = await db.players.find_one({"name": player.name})
     if existing_player:
-        raise HTTPException(status_code=400, detail="A player with this name already exists")
-    
+        raise HTTPException(
+            status_code=400, detail="A player with this name already exists"
+        )
+
     player_data = player.dict()
-    player_data.update({
-        "total_matches": 0,
-        "total_goals_scored": 0,
-        "total_goals_conceded": 0,
-        "wins": 0,
-        "losses": 0,
-        "draws": 0,
-        "points": 0
-    })
+    player_data.update(
+        {
+            "total_matches": 0,
+            "total_goals_scored": 0,
+            "total_goals_conceded": 0,
+            "wins": 0,
+            "losses": 0,
+            "draws": 0,
+            "points": 0,
+        }
+    )
     new_player = await db.players.insert_one(player_data)
     created_player = await db.players.find_one({"_id": new_player.inserted_id})
     return player_helper(created_player)
+
 
 @app.post("/matches", response_model=Match)
 async def record_match(match: MatchCreate):
@@ -112,7 +145,7 @@ async def record_match(match: MatchCreate):
     # Update player stats
     for player, goals_scored, goals_conceded in [
         (player1, match.player1_goals, match.player2_goals),
-        (player2, match.player2_goals, match.player1_goals)
+        (player2, match.player2_goals, match.player1_goals),
     ]:
         update = {
             "$inc": {
@@ -122,7 +155,11 @@ async def record_match(match: MatchCreate):
                 "wins": 1 if goals_scored > goals_conceded else 0,
                 "losses": 1 if goals_scored < goals_conceded else 0,
                 "draws": 1 if goals_scored == goals_conceded else 0,
-                "points": 3 if goals_scored > goals_conceded else (1 if goals_scored == goals_conceded else 0)
+                "points": (
+                    3
+                    if goals_scored > goals_conceded
+                    else (1 if goals_scored == goals_conceded else 0)
+                ),
             }
         }
         await db.players.update_one({"_id": player["_id"]}, update)
@@ -130,27 +167,36 @@ async def record_match(match: MatchCreate):
     created_match = await db.matches.find_one({"_id": new_match.inserted_id})
     return Match(**await match_helper(created_match))
 
+
 @app.get("/players", response_model=List[Player])
 async def get_players():
     players = await db.players.find().to_list(1000)
     return [player_helper(player) for player in players]
+
 
 @app.get("/stats", response_model=List[Player])
 async def get_stats():
     players = await db.players.find().sort("points", -1).to_list(1000)
     return [player_helper(player) for player in players]
 
+
 @app.get("/matches", response_model=List[Match])
 async def get_matches():
     matches = await db.matches.find().sort("date", -1).to_list(1000)
     return [Match(**await match_helper(match)) for match in matches]
 
+
 @app.get("/player/{player_id}/matches", response_model=List[Match])
 async def get_player_matches(player_id: str):
-    matches = await db.matches.find(
-        {"$or": [{"player1_id": player_id}, {"player2_id": player_id}]}
-    ).sort("date", -1).to_list(1000)
+    matches = (
+        await db.matches.find(
+            {"$or": [{"player1_id": player_id}, {"player2_id": player_id}]}
+        )
+        .sort("date", -1)
+        .to_list(1000)
+    )
     return [Match(**await match_helper(match)) for match in matches]
+
 
 @app.get("/head-to-head/{player1_id}/{player2_id}", response_model=HeadToHeadStats)
 async def get_head_to_head_stats(player1_id: str, player2_id: str):
@@ -160,12 +206,14 @@ async def get_head_to_head_stats(player1_id: str, player2_id: str):
     if not player1 or not player2:
         raise HTTPException(status_code=404, detail="One or both players not found")
 
-    matches = await db.matches.find({
-        "$or": [
-            {"player1_id": player1_id, "player2_id": player2_id},
-            {"player1_id": player2_id, "player2_id": player1_id}
-        ]
-    }).to_list(1000)
+    matches = await db.matches.find(
+        {
+            "$or": [
+                {"player1_id": player1_id, "player2_id": player2_id},
+                {"player1_id": player2_id, "player2_id": player1_id},
+            ]
+        }
+    ).to_list(1000)
 
     stats = {
         "player1_name": player1["name"],
@@ -175,7 +223,7 @@ async def get_head_to_head_stats(player1_id: str, player2_id: str):
         "player2_wins": 0,
         "draws": 0,
         "player1_goals": 0,
-        "player2_goals": 0
+        "player2_goals": 0,
     }
 
     for match in matches:
@@ -200,6 +248,85 @@ async def get_head_to_head_stats(player1_id: str, player2_id: str):
 
     return HeadToHeadStats(**stats)
 
+
+@app.get("/player/{player_id}/stats", response_model=PlayerDetailedStats)
+async def get_player_detailed_stats(player_id: str):
+    player = await db.players.find_one({"_id": ObjectId(player_id)})
+    if not player:
+        raise HTTPException(status_code=404, detail="Player not found")
+
+    matches = await db.matches.find(
+        {"$or": [{"player1_id": player_id}, {"player2_id": player_id}]}
+    ).to_list(1000)
+
+    wins_against = {}
+    losses_against = {}
+
+    for match in matches:
+        opponent_id = (
+            match["player2_id"]
+            if match["player1_id"] == player_id
+            else match["player1_id"]
+        )
+        opponent = await db.players.find_one({"_id": ObjectId(opponent_id)})
+
+        if match["player1_id"] == player_id:
+            if match["player1_goals"] > match["player2_goals"]:
+                wins_against[opponent["name"]] = (
+                    wins_against.get(opponent["name"], 0) + 1
+                )
+            elif match["player1_goals"] < match["player2_goals"]:
+                losses_against[opponent["name"]] = (
+                    losses_against.get(opponent["name"], 0) + 1
+                )
+        else:
+            if match["player2_goals"] > match["player1_goals"]:
+                wins_against[opponent["name"]] = (
+                    wins_against.get(opponent["name"], 0) + 1
+                )
+            elif match["player2_goals"] < match["player1_goals"]:
+                losses_against[opponent["name"]] = (
+                    losses_against.get(opponent["name"], 0) + 1
+                )
+
+    highest_wins = (
+        max(wins_against.items(), key=lambda x: x[1]) if wins_against else None
+    )
+    highest_losses = (
+        max(losses_against.items(), key=lambda x: x[1]) if losses_against else None
+    )
+
+    stats = player_helper(player)
+    stats.update(
+        {
+            "win_rate": (
+                player["wins"] / player["total_matches"]
+                if player["total_matches"] > 0
+                else 0
+            ),
+            "average_goals_scored": (
+                player["total_goals_scored"] / player["total_matches"]
+                if player["total_matches"] > 0
+                else 0
+            ),
+            "average_goals_conceded": (
+                player["total_goals_conceded"] / player["total_matches"]
+                if player["total_matches"] > 0
+                else 0
+            ),
+            "highest_wins_against": (
+                {highest_wins[0]: highest_wins[1]} if highest_wins else None
+            ),
+            "highest_losses_against": (
+                {highest_losses[0]: highest_losses[1]} if highest_losses else None
+            ),
+        }
+    )
+
+    return PlayerDetailedStats(**stats)
+
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)
