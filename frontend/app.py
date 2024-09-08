@@ -22,6 +22,7 @@ def main():
             "Record Match",
             "Overall Stats",
             "Head-to-Head Stats",
+            "Individual Player Stats",
             "Match History",
             "Edit Match History",
         ],
@@ -39,6 +40,8 @@ def main():
         match_history_page()
     elif page == "Edit Match History":
         edit_match_history_page()
+    elif page == "Individual Player Stats":
+        individual_player_stats_page()
 
 
 def register_player_page():
