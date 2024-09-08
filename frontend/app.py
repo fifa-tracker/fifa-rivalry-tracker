@@ -23,7 +23,7 @@ def main():
             "Overall Stats",
             "Head-to-Head Stats",
             "Match History",
-            "Individual Player Stats",
+            "Edit Match History",
         ],
     )
 
@@ -37,8 +37,8 @@ def main():
         head_to_head_stats_page()
     elif page == "Match History":
         match_history_page()
-    elif page == "Individual Player Stats":
-        individual_player_stats_page()
+    elif page == "Edit Match History":
+        edit_match_history_page()
 
 
 def register_player_page():
@@ -229,6 +229,77 @@ def get_head_to_head_stats(player1_id, player2_id):
 def get_player_stats(player_id):
     response = requests.get(f"{API_URL}/player/{player_id}/stats")
     return response.json() if response.status_code == 200 else None
+
+
+def edit_match_history_page():
+    st.header("Edit Match History")
+
+    matches = get_matches()
+    if not matches:
+        st.warning("No matches found.")
+        return
+
+    selected_match = st.selectbox(
+        "Select a match to edit",
+        options=matches,
+        format_func=lambda x: f"{x['player1_name']} vs {x['player2_name']} ({x['player1_goals']}-{x['player2_goals']}) on {x['date']}",
+    )
+
+    if selected_match:
+        st.subheader(
+            f"Editing match: {selected_match['player1_name']} vs {selected_match['player2_name']}"
+        )
+
+        col1, col2 = st.columns(2)
+        with col1:
+            player1_goals = st.number_input(
+                f"{selected_match['player1_name']} Goals",
+                min_value=0,
+                value=selected_match["player1_goals"],
+            )
+        with col2:
+            player2_goals = st.number_input(
+                f"{selected_match['player2_name']} Goals",
+                min_value=0,
+                value=selected_match["player2_goals"],
+            )
+
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Update Match"):
+                updated_match = update_match(
+                    selected_match["id"], player1_goals, player2_goals
+                )
+                if updated_match:
+                    st.success("Match updated successfully!")
+                else:
+                    st.error("Failed to update match. Please try again.")
+
+        with col2:
+            delete_confirmation = st.checkbox(
+                "I confirm that I want to delete this match"
+            )
+            if st.button(
+                "Delete Match", type="secondary", disabled=not delete_confirmation
+            ):
+                if delete_match(selected_match["id"]):
+                    st.success("Match deleted successfully!")
+                    st.rerun()
+                else:
+                    st.error("Failed to delete match. Please try again.")
+
+
+def update_match(match_id, player1_goals, player2_goals):
+    response = requests.put(
+        f"{API_URL}/matches/{match_id}",
+        json={"player1_goals": player1_goals, "player2_goals": player2_goals},
+    )
+    return response.json() if response.status_code == 200 else None
+
+
+def delete_match(match_id):
+    response = requests.delete(f"{API_URL}/matches/{match_id}")
+    return response.status_code == 200
 
 
 if __name__ == "__main__":

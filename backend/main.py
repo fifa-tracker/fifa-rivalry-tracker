@@ -382,6 +382,51 @@ async def get_player_detailed_stats(player_id: str):
     return PlayerDetailedStats(**stats)
 
 
+class MatchUpdate(BaseModel):
+    player1_goals: int
+    player2_goals: int
+
+
+@app.put("/matches/{match_id}", response_model=Match)
+async def update_match(match_id: str, match_update: MatchUpdate):
+    match = await db.matches.find_one({"_id": ObjectId(match_id)})
+    if not match:
+        raise HTTPException(status_code=404, detail="Match not found")
+
+    # Update match
+    update_result = await db.matches.update_one(
+        {"_id": ObjectId(match_id)},
+        {
+            "$set": {
+                "player1_goals": match_update.player1_goals,
+                "player2_goals": match_update.player2_goals,
+            }
+        },
+    )
+
+    if update_result.modified_count == 0:
+        raise HTTPException(status_code=400, detail="Match update failed")
+
+    # Fetch updated match
+    updated_match = await db.matches.find_one({"_id": ObjectId(match_id)})
+    return Match(**await match_helper(updated_match))
+
+
+@app.delete("/matches/{match_id}", response_model=dict)
+async def delete_match(match_id: str):
+    match = await db.matches.find_one({"_id": ObjectId(match_id)})
+    if not match:
+        raise HTTPException(status_code=404, detail="Match not found")
+
+    # Delete match
+    delete_result = await db.matches.delete_one({"_id": ObjectId(match_id)})
+
+    if delete_result.deleted_count == 0:
+        raise HTTPException(status_code=400, detail="Match deletion failed")
+
+    return {"message": "Match deleted successfully"}
+
+
 if __name__ == "__main__":
     import uvicorn
 
