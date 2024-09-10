@@ -22,6 +22,7 @@ class Player(PlayerCreate):
     total_matches: int = 0
     total_goals_scored: int = 0
     total_goals_conceded: int = 0
+    goal_difference: int = 0
     wins: int = 0
     losses: int = 0
     draws: int = 0
@@ -59,6 +60,7 @@ def player_helper(player) -> dict:
         "total_matches": player["total_matches"],
         "total_goals_scored": player["total_goals_scored"],
         "total_goals_conceded": player["total_goals_conceded"],
+        "goal_difference": player["goal_difference"],
         "wins": player["wins"],
         "losses": player["losses"],
         "draws": player["draws"],
@@ -88,6 +90,7 @@ async def register_player(player: PlayerCreate):
         "total_matches": 0,
         "total_goals_scored": 0,
         "total_goals_conceded": 0,
+        "goal_difference": 0,
         "wins": 0,
         "losses": 0,
         "draws": 0,
@@ -119,6 +122,7 @@ async def record_match(match: MatchCreate):
                 "total_matches": 1,
                 "total_goals_scored": goals_scored,
                 "total_goals_conceded": goals_conceded,
+                "goal_difference" : goals_scored - goals_conceded,
                 "wins": 1 if goals_scored > goals_conceded else 0,
                 "losses": 1 if goals_scored < goals_conceded else 0,
                 "draws": 1 if goals_scored == goals_conceded else 0,
@@ -137,7 +141,10 @@ async def get_players():
 
 @app.get("/stats", response_model=List[Player])
 async def get_stats():
-    players = await db.players.find().sort("points", -1).to_list(1000)
+    #players = await db.players.find().sort("points", -1).to_list(1000)
+    players = await db.players.find().sort([("points", -1), ("goal_difference", -1)]).to_list(1000)
+    print([player_helper(player) for player in players])
+
     return [player_helper(player) for player in players]
 
 @app.get("/matches", response_model=List[Match])

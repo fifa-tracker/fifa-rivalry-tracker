@@ -62,12 +62,13 @@ def record_match_page():
 def overall_stats_page():
     st.header("Overall Player Stats")
     stats = get_stats()
+    print(stats)
     if stats:
         df = pd.DataFrame(stats)
-        goal_difference = df['total_goals_scored'] - df['total_goals_conceded']
-        df['goal_difference'] = goal_difference
+        #goal_difference = df['total_goals_scored'] - df['total_goals_conceded']
+        #df['goal_difference'] = goal_difference
         df = df.drop(columns=['id'])  # Remove the 'id' column
-        df = df.sort_values('points', ascending=False)
+        #df = df.sort_values('points', ascending=False)
         st.dataframe(df)
     else:
         st.warning("No stats available.")
