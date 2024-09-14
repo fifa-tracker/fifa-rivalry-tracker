@@ -92,7 +92,6 @@ def record_match_page():
 def overall_stats_page():
     st.header("Overall Player Stats")
     stats = get_stats()
-    print(stats)
     if stats:
         df = pd.DataFrame(stats)
         df = df.drop(columns=['id'])  # Remove the 'id' column

@@ -183,7 +183,6 @@ async def get_players():
 
 @app.get("/stats", response_model=List[Player])
 async def get_stats():
-    #players = await db.players.find().sort("points", -1).to_list(1000)
     players = await db.players.find().sort([("points", -1), ("goal_difference", -1)]).to_list(1000)
     print([player_helper(player) for player in players])
 
