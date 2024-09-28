@@ -18,13 +18,13 @@ def main():
     page = st.sidebar.radio(
         "Navigate",
         [
-            "Register Player",
             "Record Match",
             "Overall Stats",
             "Head-to-Head Stats",
             "Individual Player Stats",
             "Match History",
             "Edit Match History",
+            "Register Player",
         ],
     )
 
@@ -66,7 +66,7 @@ def record_match_page():
         "Player 1", options=players, format_func=lambda x: x["name"], key="record_p1"
     )
     player2 = st.selectbox(
-        "Player 2", options=players, format_func=lambda x: x["name"], key="record_p2"
+        "Player 2", options=[p for p in players if p != player1], format_func=lambda x: x["name"], key="record_p2"
     )
     player1_goals = st.number_input("Player 1 Goals", min_value=0, step=1)
     player2_goals = st.number_input("Player 2 Goals", min_value=0, step=1)
