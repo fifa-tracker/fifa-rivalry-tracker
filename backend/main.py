@@ -3,10 +3,14 @@ from datetime import datetime
 from itertools import groupby
 from typing import Dict, List, Optional, Union
 
-from bson import ObjectId # type: ignore
-from fastapi import FastAPI, HTTPException # type: ignore
-from motor.motor_asyncio import AsyncIOMotorClient # type: ignore
-from pydantic import BaseModel # type: ignore
+from bson import ObjectId 
+from fastapi import FastAPI, HTTPException
+from motor.motor_asyncio import AsyncIOMotorClient
+from pydantic import BaseModel
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -188,7 +192,7 @@ async def get_players():
 @app.get("/stats", response_model=List[Player])
 async def get_stats():
     players = await db.players.find().sort([("points", -1), ("goal_difference", -1)]).to_list(1000)
-    #print([player_helper(player) for player in players])
+    logger.info([player_helper(player) for player in players])
 
     return [player_helper(player) for player in players]
 
