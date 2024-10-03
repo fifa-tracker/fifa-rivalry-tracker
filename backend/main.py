@@ -3,10 +3,14 @@ from datetime import datetime
 from itertools import groupby
 from typing import Dict, List, Optional, Union
 
-from bson import ObjectId
+from bson import ObjectId 
 from fastapi import FastAPI, HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -39,6 +43,8 @@ class MatchCreate(BaseModel):
     player2_id: str
     player1_goals: int
     player2_goals: int
+    team1: str
+    team2: str
 
 
 class Match(BaseModel):
@@ -109,6 +115,8 @@ async def match_helper(match) -> dict:
         "player1_goals": match["player1_goals"],
         "player2_goals": match["player2_goals"],
         "date": match["date"],
+        "team1": match["team1"],
+        "team2": match["team2"],
     }
 
 
@@ -184,7 +192,7 @@ async def get_players():
 @app.get("/stats", response_model=List[Player])
 async def get_stats():
     players = await db.players.find().sort([("points", -1), ("goal_difference", -1)]).to_list(1000)
-    print([player_helper(player) for player in players])
+    logger.info([player_helper(player) for player in players])
 
     return [player_helper(player) for player in players]
 
