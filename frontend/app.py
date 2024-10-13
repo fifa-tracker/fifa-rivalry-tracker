@@ -10,6 +10,10 @@ import streamlit as st
 API_URL = os.getenv("API_URL", "http://backend:8000")
 
 
+def add_common_header():
+    st.header("Season 1 Victor: Ajay Krishnan")
+
+
 def main():
     st.set_page_config(page_title="FIFA Rivalry Tracker", layout="wide")
     st.title("FIFA Rivalry Tracker")
@@ -45,6 +49,7 @@ def main():
 
 
 def register_player_page():
+    add_common_header()
     st.header("Register New Player")
     player_name = st.text_input("Player Name")
     if st.button("Register"):
@@ -60,6 +65,7 @@ def register_player_page():
 
 
 def record_match_page():
+    add_common_header()
     st.header("Record Match")
     players = get_players()
     player1 = st.selectbox(
@@ -70,6 +76,8 @@ def record_match_page():
     )
     player1_goals = st.number_input("Player 1 Goals", min_value=0, step=1)
     player2_goals = st.number_input("Player 2 Goals", min_value=0, step=1)
+    player1_team = st.text_input("Player 1 Team", key="record_p1_team")
+    player2_team = st.text_input("Player 2 Team", key="record_p2_team")
     if st.button("Record Match"):
         if player1["id"] == player2["id"]:
             st.error("Players must be different. Please select two different players.")
@@ -81,6 +89,8 @@ def record_match_page():
                     "player2_id": player2["id"],
                     "player1_goals": player1_goals,
                     "player2_goals": player2_goals,
+                    "team1": player1_team,
+                    "team2": player2_team,
                 },
             )
             if response.status_code == 200:
@@ -90,6 +100,7 @@ def record_match_page():
 
 
 def overall_stats_page():
+    add_common_header()
     st.header("Overall Player Stats")
     stats = get_stats()
     if stats:
@@ -101,6 +112,7 @@ def overall_stats_page():
 
 
 def head_to_head_stats_page():
+    add_common_header()
     st.header("Head-to-Head Stats")
     players = get_players()
     player1 = st.selectbox(
@@ -128,6 +140,7 @@ def head_to_head_stats_page():
 
 
 def match_history_page():
+    add_common_header()
     st.header("Match History")
     matches = get_matches()
     if matches:
@@ -143,6 +156,7 @@ def match_history_page():
 
 
 def individual_player_stats_page():
+    add_common_header()
     st.header("Individual Player Stats")
     players = get_players()
     selected_player = st.selectbox(
@@ -232,6 +246,7 @@ def get_player_stats(player_id):
 
 
 def edit_match_history_page():
+    add_common_header()
     st.header("Edit Match History")
 
     matches = get_matches()

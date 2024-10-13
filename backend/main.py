@@ -115,8 +115,8 @@ async def match_helper(match) -> dict:
         "player1_goals": match["player1_goals"],
         "player2_goals": match["player2_goals"],
         "date": match["date"],
-        "team1": match["team1"],
-        "team2": match["team2"],
+        "team1": match.get("team1", None),
+        "team2": match.get("team2", None),
     }
 
 
