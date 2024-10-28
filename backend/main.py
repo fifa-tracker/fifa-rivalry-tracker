@@ -497,7 +497,29 @@ async def delete_match(match_id: str):
     return {"message": "Match deleted successfully"}
 
 
+@app.get("/")
+async def home():
+    return {"message": "Hello, World!"}
+
 if __name__ == "__main__":
     import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    
+    # Check if we're in development mode
+    is_development = os.getenv("ENVIRONMENT", "development") == "development"
+    
+    if is_development:
+        # Run without SSL in development
+        uvicorn.run(
+            app, 
+            host="0.0.0.0", 
+            port=8000
+        )
+    else:
+        # Run with SSL in production
+        uvicorn.run(
+            app, 
+            host="0.0.0.0", 
+            port=8000,
+            ssl_certfile="../certificate.pem",
+            ssl_keyfile="../private_key.pem"
+        )
