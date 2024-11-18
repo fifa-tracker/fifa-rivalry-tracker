@@ -392,6 +392,48 @@ async def get_player_detailed_stats(player_id: str):
 
     return PlayerDetailedStats(**stats)
 
+@app.delete("/player/{player_id}", response_model=dict)
+async def delete_player(player_id: str):
+    # Check if player exists
+    player = await db.players.find_one({"_id": ObjectId(player_id)})
+    if not player:
+        raise HTTPException(status_code=404, detail="Player not found")
+
+    # Delete all matches involving this player
+    await db.matches.delete_many({
+        "$or": [
+            {"player1_id": player_id},
+            {"player2_id": player_id}
+        ]
+    })
+
+    # Delete the player
+    delete_result = await db.players.delete_one({"_id": ObjectId(player_id)})
+    
+    if delete_result.deleted_count == 0:
+        raise HTTPException(status_code=400, detail="Player deletion failed")
+
+    return {"message": "Player and associated matches deleted successfully"}
+
+@app.put("/player/{player_id}", response_model=Player)
+async def update_player(player_id: str, player: PlayerCreate):
+    # Check if player exists
+    existing_player = await db.players.find_one({"_id": ObjectId(player_id)})
+    if not existing_player:
+        raise HTTPException(status_code=404, detail="Player not found")
+
+    # Update player name
+    update_result = await db.players.update_one(
+        {"_id": ObjectId(player_id)},
+        {"$set": {"name": player.name}}
+    )
+
+    if update_result.modified_count == 0:
+        raise HTTPException(status_code=400, detail="Player update failed")
+
+    # Get updated player
+    updated_player = await db.players.find_one({"_id": ObjectId(player_id)})
+    return Player(**player_helper(updated_player))
 
 class MatchUpdate(BaseModel):
     player1_goals: int
