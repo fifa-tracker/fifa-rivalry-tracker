@@ -394,26 +394,38 @@ async def get_player_detailed_stats(player_id: str):
 
 @app.delete("/player/{player_id}", response_model=dict)
 async def delete_player(player_id: str):
-    # Check if player exists
-    player = await db.players.find_one({"_id": ObjectId(player_id)})
-    if not player:
-        raise HTTPException(status_code=404, detail="Player not found")
+    try:
+        logger.debug(f"Attempting to delete player with ID: {player_id}")
+        
+        # Check if player exists
+        player = await db.players.find_one({"_id": ObjectId(player_id)})
+        logger.debug(f"Found player: {player}")
+        
+        if not player:
+            raise HTTPException(status_code=404, detail="Player not found")
 
-    # Delete all matches involving this player
-    await db.matches.delete_many({
-        "$or": [
-            {"player1_id": player_id},
-            {"player2_id": player_id}
-        ]
-    })
+        # Delete all matches involving this player
+        delete_matches = await db.matches.delete_many({
+            "$or": [
+                {"player1_id": player_id},
+                {"player2_id": player_id}
+            ]
+        })
+        logger.debug(f"Deleted {delete_matches.deleted_count} matches")
 
-    # Delete the player
-    delete_result = await db.players.delete_one({"_id": ObjectId(player_id)})
-    
-    if delete_result.deleted_count == 0:
-        raise HTTPException(status_code=400, detail="Player deletion failed")
+        # Delete the player
+        delete_result = await db.players.delete_one({"_id": ObjectId(player_id)})
+        logger.debug(f"Delete result: {delete_result.deleted_count}")
+        
+        if delete_result.deleted_count == 0:
+            raise HTTPException(status_code=400, detail="Player deletion failed")
 
-    return {"message": "Player and associated matches deleted successfully"}
+        return {"message": "Player and associated matches deleted successfully"}
+    except Exception as e:
+        logger.error(f"Error deleting player: {str(e)}")
+        if "Invalid ObjectId" in str(e):
+            raise HTTPException(status_code=400, detail="Invalid player ID format")
+        raise
 
 @app.put("/player/{player_id}", response_model=Player)
 async def update_player(player_id: str, player: PlayerCreate):

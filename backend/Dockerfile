@@ -30,4 +30,4 @@ COPY . /app
 RUN mkdir -p /app/certs && chmod 755 /app/certs
 
 # Run the application with SSL
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--ssl-keyfile", "/app/certs/key.pem", "--ssl-certfile", "/app/certs/cert.pem"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
