@@ -45,6 +45,7 @@ class MatchCreate(BaseModel):
     player2_goals: int
     team1: str
     team2: str
+    tournament_id: Optional[str] = None
 
 
 class Match(BaseModel):
@@ -54,6 +55,7 @@ class Match(BaseModel):
     player1_goals: int
     player2_goals: int
     date: datetime
+    tournament_name: Optional[str] = None
 
 
 class HeadToHeadStats(BaseModel):
@@ -89,6 +91,18 @@ class PlayerDetailedStats(BaseModel):
     winrate_over_time: List[Dict[str, Union[datetime, float]]]
 
 
+class TournamentCreate(BaseModel):
+    name: str
+    start_date: datetime
+    end_date: datetime
+    description: Optional[str] = None
+
+
+class Tournament(TournamentCreate):
+    id: str
+    matches_count: int = 0
+
+
 # Helper functions
 def player_helper(player) -> dict:
     return {
@@ -108,7 +122,8 @@ def player_helper(player) -> dict:
 async def match_helper(match) -> dict:
     player1 = await db.players.find_one({"_id": ObjectId(match["player1_id"])})
     player2 = await db.players.find_one({"_id": ObjectId(match["player2_id"])})
-    return {
+    
+    result = {
         "id": str(match["_id"]),
         "player1_name": player1["name"],
         "player2_name": player2["name"],
@@ -118,6 +133,13 @@ async def match_helper(match) -> dict:
         "team1": match.get("team1", None),
         "team2": match.get("team2", None),
     }
+    
+    if match.get("tournament_id"):
+        tournament = await db.tournaments.find_one({"_id": ObjectId(match["tournament_id"])})
+        if tournament:
+            result["tournament_name"] = tournament["name"]
+    
+    return result
 
 
 @app.post("/players", response_model=Player)
@@ -395,11 +417,9 @@ async def get_player_detailed_stats(player_id: str):
 @app.delete("/player/{player_id}", response_model=dict)
 async def delete_player(player_id: str):
     try:
-        logger.debug(f"Attempting to delete player with ID: {player_id}")
         
         # Check if player exists
         player = await db.players.find_one({"_id": ObjectId(player_id)})
-        logger.debug(f"Found player: {player}")
         
         if not player:
             raise HTTPException(status_code=404, detail="Player not found")
@@ -411,11 +431,9 @@ async def delete_player(player_id: str):
                 {"player2_id": player_id}
             ]
         })
-        logger.debug(f"Deleted {delete_matches.deleted_count} matches")
 
         # Delete the player
         delete_result = await db.players.delete_one({"_id": ObjectId(player_id)})
-        logger.debug(f"Delete result: {delete_result.deleted_count}")
         
         if delete_result.deleted_count == 0:
             raise HTTPException(status_code=400, detail="Player deletion failed")
@@ -549,6 +567,32 @@ async def delete_match(match_id: str):
         raise HTTPException(status_code=400, detail="Match deletion failed")
 
     return {"message": "Match deleted successfully"}
+
+
+@app.post("/tournaments", response_model=Tournament)
+async def create_tournament(tournament: TournamentCreate):
+    tournament_dict = tournament.dict()
+    new_tournament = await db.tournaments.insert_one(tournament_dict)
+    created_tournament = await db.tournaments.find_one({"_id": new_tournament.inserted_id})
+    return {
+        "id": str(created_tournament["_id"]),
+        **{k: v for k, v in created_tournament.items() if k != "_id"}
+    }
+
+
+@app.get("/tournaments", response_model=List[Tournament])
+async def get_tournaments():
+    tournaments = await db.tournaments.find().to_list(1000)
+    return [{
+        "id": str(t["_id"]),
+        **{k: v for k, v in t.items() if k != "_id"}
+    } for t in tournaments]
+
+
+@app.get("/tournaments/{tournament_id}/matches", response_model=List[Match])
+async def get_tournament_matches(tournament_id: str):
+    matches = await db.matches.find({"tournament_id": tournament_id}).sort("date", -1).to_list(1000)
+    return [Match(**await match_helper(match)) for match in matches]
 
 
 @app.get("/")
