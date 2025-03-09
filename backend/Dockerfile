@@ -14,20 +14,25 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
-RUN pip install --no-cache-dir poetry
+RUN pip install poetry==1.8.2
 
-# Copy only requirements to cache them in docker layer
-COPY poetry.lock pyproject.toml /app/
+# Copy poetry configuration files
+COPY pyproject.toml ./
 
-# Project initialization
-RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi
+# Configure poetry to not use a virtual environment
+RUN poetry config virtualenvs.create false
 
-# Copy project
-COPY . /app
+# Generate a fresh lock file and install dependencies
+RUN poetry lock --no-update && poetry install --no-interaction --no-ansi
+
+# Copy application code
+COPY . .
 
 # Set permissions for certs directory
 RUN mkdir -p /app/certs && chmod 755 /app/certs
+
+# Expose the port the app runs on
+EXPOSE 8000
 
 # Run the application with SSL
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
