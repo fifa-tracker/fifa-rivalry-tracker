@@ -2,24 +2,49 @@ import os
 from datetime import datetime
 from itertools import groupby
 from typing import Dict, List, Optional, Union
+import pathlib
 
 from bson import ObjectId 
 from fastapi import FastAPI, HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 import logging
+from dotenv import load_dotenv
 
-logging.basicConfig(level=logging.DEBUG)
+# Load environment variables from .env file
+env_path = pathlib.Path(__file__).parent / '.env'
+load_dotenv(dotenv_path=env_path)
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Disable pymongo debug logs
+logging.getLogger("pymongo").setLevel(logging.WARNING)
+logging.getLogger("motor").setLevel(logging.WARNING)
 
 app = FastAPI()
 
-# MongoDB connection
-client = AsyncIOMotorClient(
-    os.getenv("MONGO_URI", "mongodb://mongodb:27017/fifa_rivalry")
-)
+# Determine environment
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+logger.info(f"Running in {ENVIRONMENT} environment")
+
+# MongoDB connection URIs
+MONGODB_URI = {
+    "development": "mongodb://localhost:27017/fifa_rivalry",
+    "production": "mongodb://mongodb:27017/fifa_rivalry",
+}
+
+# Get the appropriate MongoDB URI based on environment
+mongo_uri = os.getenv(f"MONGO_URI_{ENVIRONMENT.upper()}", os.getenv("MONGO_URI", MONGODB_URI[ENVIRONMENT]))
+logger.info(f"Using MongoDB URI: {mongo_uri}")
+
+# Connect to MongoDB
+client = AsyncIOMotorClient(mongo_uri)
 db = client.fifa_rivalry
 
+# Log connection status
+logger.info(f"Connected to MongoDB at {client.address if client else 'Not connected'}")
 
 # Pydantic models
 class PlayerCreate(BaseModel):
@@ -55,6 +80,8 @@ class Match(BaseModel):
     player1_goals: int
     player2_goals: int
     date: datetime
+    team1: Optional[str] = None
+    team2: Optional[str] = None
     tournament_name: Optional[str] = None
 
 
@@ -120,26 +147,60 @@ def player_helper(player) -> dict:
 
 
 async def match_helper(match) -> dict:
-    player1 = await db.players.find_one({"_id": ObjectId(match["player1_id"])})
-    player2 = await db.players.find_one({"_id": ObjectId(match["player2_id"])})
-    
-    result = {
-        "id": str(match["_id"]),
-        "player1_name": player1["name"],
-        "player2_name": player2["name"],
-        "player1_goals": match["player1_goals"],
-        "player2_goals": match["player2_goals"],
-        "date": match["date"],
-        "team1": match.get("team1", None),
-        "team2": match.get("team2", None),
-    }
-    
-    if match.get("tournament_id"):
-        tournament = await db.tournaments.find_one({"_id": ObjectId(match["tournament_id"])})
-        if tournament:
-            result["tournament_name"] = tournament["name"]
-    
-    return result
+    try:
+        # Get player information
+        player1_id = match.get("player1_id")
+        player2_id = match.get("player2_id")
+        
+        if not player1_id or not player2_id:
+            logger.error(f"Match missing player IDs: {match.get('_id')}")
+            return {
+                "id": str(match["_id"]),
+                "player1_name": "Unknown Player",
+                "player2_name": "Unknown Player",
+                "player1_goals": match.get("player1_goals", 0),
+                "player2_goals": match.get("player2_goals", 0),
+                "date": match.get("date", datetime.now()),
+                "team1": match.get("team1", "Unknown"),
+                "team2": match.get("team2", "Unknown"),
+            }
+        
+        # Find players
+        player1 = await db.players.find_one({"_id": ObjectId(player1_id)})
+        player2 = await db.players.find_one({"_id": ObjectId(player2_id)})
+        
+        player1_name = player1["name"] if player1 else "Unknown Player"
+        player2_name = player2["name"] if player2 else "Unknown Player"
+        
+        result = {
+            "id": str(match["_id"]),
+            "player1_name": player1_name,
+            "player2_name": player2_name,
+            "player1_goals": match.get("player1_goals", 0),
+            "player2_goals": match.get("player2_goals", 0),
+            "date": match.get("date", datetime.now()),
+            "team1": match.get("team1", "Unknown"),
+            "team2": match.get("team2", "Unknown"),
+        }
+        
+        # Add tournament info if available
+        if match.get("tournament_id"):
+            tournament = await db.tournaments.find_one({"_id": ObjectId(match["tournament_id"])})
+            if tournament:
+                result["tournament_name"] = tournament["name"]
+        
+        return result
+    except Exception as e:
+        logger.error(f"Error in match_helper: {str(e)}")
+        # Return a minimal valid response
+        return {
+            "id": str(match.get("_id", "unknown")),
+            "player1_name": "Error",
+            "player2_name": "Error",
+            "player1_goals": 0,
+            "player2_goals": 0,
+            "date": datetime.now(),
+        }
 
 
 @app.post("/players", response_model=Player)
@@ -472,69 +533,110 @@ class MatchUpdate(BaseModel):
 
 @app.put("/matches/{match_id}", response_model=Match)
 async def update_match(match_id: str, match_update: MatchUpdate):
-    match = await db.matches.find_one({"_id": ObjectId(match_id)})
-    if not match:
-        raise HTTPException(status_code=404, detail="Match not found")
+    try:
+        # Validate match_id format
+        if not ObjectId.is_valid(match_id):
+            logger.error(f"Invalid match ID format: {match_id}")
+            raise HTTPException(status_code=400, detail="Invalid match ID format")
 
-    # Calculate the changes in goals
-    player1_goals_diff = match_update.player1_goals - match["player1_goals"]
-    player2_goals_diff = match_update.player2_goals - match["player2_goals"]
+        # Find the match
+        match = await db.matches.find_one({"_id": ObjectId(match_id)})
+        
+        if not match:
+            logger.error(f"Match not found: {match_id}")
+            raise HTTPException(status_code=404, detail="Match not found")
 
-    # Update match
-    update_result = await db.matches.update_one(
-        {"_id": ObjectId(match_id)},
-        {
-            "$set": {
-                "player1_goals": match_update.player1_goals,
-                "player2_goals": match_update.player2_goals,
-            }
-        },
-    )
+        # Validate goals are non-negative
+        if match_update.player1_goals < 0 or match_update.player2_goals < 0:
+            raise HTTPException(status_code=400, detail="Goals cannot be negative")
 
-    if update_result.modified_count == 0:
-        raise HTTPException(status_code=400, detail="Match update failed")
+        # Calculate the changes in goals
+        player1_goals_diff = match_update.player1_goals - match["player1_goals"]
+        player2_goals_diff = match_update.player2_goals - match["player2_goals"]
 
-    # Update player stats
-    for player_id, goals_diff, opponent_goals_diff in [
-        (match["player1_id"], player1_goals_diff, player2_goals_diff),
-        (match["player2_id"], player2_goals_diff, player1_goals_diff),
-    ]:
-        player = await db.players.find_one({"_id": ObjectId(player_id)})
+        # Check if there are any actual changes
+        if player1_goals_diff == 0 and player2_goals_diff == 0:
+            # Return the current match data without updating
+            return Match(**await match_helper(match))
 
-        # Calculate win/loss/draw changes
-        old_result = get_result(
-            match["player1_goals"],
-            match["player2_goals"],
-            player_id == match["player1_id"],
-        )
-        new_result = get_result(
-            match_update.player1_goals,
-            match_update.player2_goals,
-            player_id == match["player1_id"],
-        )
-
-        wins_diff = new_result["win"] - old_result["win"]
-        losses_diff = new_result["loss"] - old_result["loss"]
-        draws_diff = new_result["draw"] - old_result["draw"]
-
-        # Update player stats
-        await db.players.update_one(
-            {"_id": ObjectId(player_id)},
+        # Update match
+        update_result = await db.matches.update_one(
+            {"_id": ObjectId(match_id)},
             {
-                "$inc": {
-                    "total_goals_scored": goals_diff,
-                    "total_goals_conceded": opponent_goals_diff,
-                    "wins": wins_diff,
-                    "losses": losses_diff,
-                    "draws": draws_diff,
-                    "points": wins_diff * 3 + draws_diff,
+                "$set": {
+                    "player1_goals": match_update.player1_goals,
+                    "player2_goals": match_update.player2_goals,
                 }
             },
         )
 
-    # Fetch updated match
-    updated_match = await db.matches.find_one({"_id": ObjectId(match_id)})
-    return Match(**await match_helper(updated_match))
+        if update_result.matched_count == 0:
+            logger.error(f"Match update failed: {update_result}")
+            raise HTTPException(status_code=400, detail="Match update failed - match not found")
+
+        # Update player stats
+        for player_id, goals_diff, opponent_goals_diff in [
+            (match["player1_id"], player1_goals_diff, player2_goals_diff),
+            (match["player2_id"], player2_goals_diff, player1_goals_diff),
+        ]:
+            if not ObjectId.is_valid(player_id):
+                logger.error(f"Invalid player ID format: {player_id}")
+                continue
+
+            player = await db.players.find_one({"_id": ObjectId(player_id)})
+            if not player:
+                logger.error(f"Player not found: {player_id}")
+                continue
+
+            # Calculate win/loss/draw changes
+            old_result = get_result(
+                match["player1_goals"],
+                match["player2_goals"],
+                player_id == match["player1_id"],
+            )
+            new_result = get_result(
+                match_update.player1_goals,
+                match_update.player2_goals,
+                player_id == match["player1_id"],
+            )
+
+            wins_diff = new_result["win"] - old_result["win"]
+            losses_diff = new_result["loss"] - old_result["loss"]
+            draws_diff = new_result["draw"] - old_result["draw"]
+
+            # Skip player update if there are no changes
+            if goals_diff == 0 and opponent_goals_diff == 0 and wins_diff == 0 and losses_diff == 0 and draws_diff == 0:
+                continue
+
+            # Update player stats
+            await db.players.update_one(
+                {"_id": ObjectId(player_id)},
+                {
+                    "$inc": {
+                        "total_goals_scored": goals_diff,
+                        "total_goals_conceded": opponent_goals_diff,
+                        "goal_difference": goals_diff - opponent_goals_diff,
+                        "wins": wins_diff,
+                        "losses": losses_diff,
+                        "draws": draws_diff,
+                        "points": wins_diff * 3 + draws_diff,
+                    }
+                },
+            )
+
+        # Fetch updated match
+        updated_match = await db.matches.find_one({"_id": ObjectId(match_id)})
+        if not updated_match:
+            logger.error(f"Updated match not found")
+            raise HTTPException(status_code=404, detail="Updated match not found")
+        
+        return Match(**await match_helper(updated_match))
+
+    except Exception as e:
+        logger.error(f"Error updating match: {str(e)}")
+        if "Invalid ObjectId" in str(e):
+            raise HTTPException(status_code=400, detail="Invalid ID format")
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 def get_result(player1_goals, player2_goals, is_player1):
