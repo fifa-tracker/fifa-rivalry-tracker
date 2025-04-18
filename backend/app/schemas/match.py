@@ -1,26 +1,50 @@
 from dataclasses import dataclass
 from typing import Optional
 from datetime import datetime
+from pydantic import BaseModel, validator
+from bson import ObjectId
 
-@dataclass
-class MatchCreate:
+class MatchCreate(BaseModel):
     player1_id: str
     player2_id: str
     player1_goals: int
     player2_goals: int
     team1: str
     team2: str
-    tournament_id: Optional[str] = None
+    # tournament_id: Optional[str] = None
+    tournament_id: str
 
-    def __post_init__(self):
-        if not self.player1_id or not self.player2_id:
+    @validator('player1_id', 'player2_id')
+    def player_ids_must_not_be_empty(cls, v):
+        if not v:
             raise ValueError("Player IDs cannot be empty")
-        if self.player1_id == self.player2_id:
+        return v
+
+    @validator('player2_id')
+    def players_must_be_different(cls, v, values):
+        if 'player1_id' in values and v == values['player1_id']:
             raise ValueError("Players must be different")
-        if self.player1_goals < 0 or self.player2_goals < 0:
+        return v
+
+    @validator('player1_goals', 'player2_goals')
+    def goals_must_not_be_negative(cls, v):
+        if v < 0:
             raise ValueError("Goals cannot be negative")
-        if not self.team1 or not self.team2:
+        return v
+
+    @validator('team1', 'team2')
+    def team_names_must_not_be_empty(cls, v):
+        if not v:
             raise ValueError("Team names cannot be empty")
+        return v
+
+    @validator('tournament_id')
+    def tournament_id_must_be_valid(cls, v):
+        if not v:
+            raise ValueError("Tournament ID cannot be empty")
+        if not ObjectId.is_valid(v):
+            raise ValueError("Invalid tournament ID format")
+        return v
 
 @dataclass
 class Match:

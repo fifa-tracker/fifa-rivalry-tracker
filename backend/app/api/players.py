@@ -42,6 +42,13 @@ async def get_stats():
     players = await players_collection.find().sort([("points", -1), ("goal_difference", -1)]).to_list(1000)
     return [player_helper(player) for player in players]
 
+@router.get("/{player_id}")
+async def get_player(player_id: str):
+    player = await players_collection.find_one({"_id": ObjectId(player_id)})
+    if not player:
+        raise HTTPException(status_code=404, detail="Player not found")
+    return player_helper(player)
+
 @router.get("/{player_id}/stats", response_model=PlayerDetailedStats)
 async def get_player_detailed_stats(player_id: str):
     player = await players_collection.find_one({"_id": ObjectId(player_id)})

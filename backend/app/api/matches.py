@@ -2,20 +2,28 @@ from fastapi import APIRouter, HTTPException
 from bson import ObjectId
 from typing import List
 from ..schemas.match import Match, MatchCreate, MatchUpdate, HeadToHeadStats
-from ..core.database import matches_collection, players_collection
+from ..core.database import matches_collection, players_collection, tournaments_collection
 from ..utils.helpers import match_helper, get_result
+from datetime import datetime
 
 router = APIRouter()
 
 @router.post("/", response_model=Match)
 async def record_match(match: MatchCreate):
+    # Validate players exist
     player1 = await players_collection.find_one({"_id": ObjectId(match.player1_id)})
     player2 = await players_collection.find_one({"_id": ObjectId(match.player2_id)})
 
     if not player1 or not player2:
         raise HTTPException(status_code=404, detail="One or both players not found")
 
-    match_dict = match.dict()
+    # Validate tournament exists
+    if match.tournament_id:
+        tournament = await tournaments_collection.find_one({"_id": ObjectId(match.tournament_id)})
+        if not tournament:
+            raise HTTPException(status_code=404, detail="Tournament not found")
+
+    match_dict = match.model_dump()
     match_dict["date"] = datetime.now()
     new_match = await matches_collection.insert_one(match_dict)
 
