@@ -1,14 +1,4 @@
-
 services:
-  mongodb:
-    image: mongo:latest
-    ports:
-      - "27018:27017"
-    volumes:
-      - mongodb_data:/data/db
-    networks:
-      - app-network
-
   backend:
     build:
       context: ./backend
@@ -17,15 +7,10 @@ services:
       - "8000:8000"
     environment:
       - ENVIRONMENT=production
-      - MONGO_URI=mongodb://mongodb:27017/fifa_rivalry
-    depends_on:
-      - mongodb
+      - MONGO_URI=${MONGO_URI}
     networks:
       - app-network
 
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  mongodb_data:

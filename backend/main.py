@@ -7,36 +7,38 @@ import pathlib
 from bson import ObjectId 
 from fastapi import FastAPI, HTTPException
 from motor.motor_asyncio import AsyncIOMotorClient
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import logging
-from dotenv import load_dotenv
+from dotenv import dotenv_values
+
+# Import models from the new models package
+from app.models import (
+    PlayerCreate, Player, PlayerDetailedStats,
+    MatchCreate, Match, MatchUpdate, HeadToHeadStats,
+    TournamentCreate, Tournament
+)
 
 # Load environment variables from .env file
 env_path = pathlib.Path(__file__).parent / '.env'
-load_dotenv(dotenv_path=env_path)
+config = dotenv_values(env_path)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Disable pymongo debug logs
-logging.getLogger("pymongo").setLevel(logging.WARNING)
-logging.getLogger("motor").setLevel(logging.WARNING)
+# logging.getLogger("pymongo").setLevel(logging.WARNING)
+# logging.getLogger("motor").setLevel(logging.WARNING)
 
 app = FastAPI()
 
-# Determine environment
-ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+# Determine environment from .env file
+ENVIRONMENT = config.get("ENVIRONMENT", "development")
 logger.info(f"Running in {ENVIRONMENT} environment")
 
-# MongoDB connection URIs
-MONGODB_URI = {
-    "development": "mongodb://localhost:27017/fifa_rivalry",
-    "production": "mongodb://mongodb:27017/fifa_rivalry",
-}
 
-# Get the appropriate MongoDB URI based on environment
-mongo_uri = os.getenv(f"MONGO_URI_{ENVIRONMENT.upper()}", os.getenv("MONGO_URI", MONGODB_URI[ENVIRONMENT]))
+# Get MongoDB URI from .env file or use default based on environment
+mongo_uri = config.get("MONGO_URI") or config.get(f"MONGO_URI_{ENVIRONMENT.upper()}")
 logger.info(f"Using MongoDB URI: {mongo_uri}")
 
 # Connect to MongoDB
@@ -46,89 +48,20 @@ db = client.fifa_rivalry
 # Log connection status
 logger.info(f"Connected to MongoDB at {client.address if client else 'Not connected'}")
 
-# Pydantic models
-class PlayerCreate(BaseModel):
-    name: str
-
-
-class Player(PlayerCreate):
-    id: str
-    total_matches: int = 0
-    total_goals_scored: int = 0
-    total_goals_conceded: int = 0
-    goal_difference: int = 0
-    wins: int = 0
-    losses: int = 0
-    draws: int = 0
-    points: int = 0
-
-
-class MatchCreate(BaseModel):
-    player1_id: str
-    player2_id: str
-    player1_goals: int
-    player2_goals: int
-    team1: str
-    team2: str
-    tournament_id: Optional[str] = None
-
-
-class Match(BaseModel):
-    id: str
-    player1_name: str
-    player2_name: str
-    player1_goals: int
-    player2_goals: int
-    date: datetime
-    team1: Optional[str] = None
-    team2: Optional[str] = None
-    tournament_name: Optional[str] = None
-
-
-class HeadToHeadStats(BaseModel):
-    player1_name: str
-    player2_name: str
-    total_matches: int
-    player1_wins: int
-    player2_wins: int
-    draws: int
-    player1_goals: int
-    player2_goals: int
-    player1_win_rate: float
-    player2_win_rate: float
-    player1_avg_goals: float
-    player2_avg_goals: float
-
-
-class PlayerDetailedStats(BaseModel):
-    id: str
-    name: str
-    total_matches: int
-    total_goals_scored: int
-    total_goals_conceded: int
-    wins: int
-    losses: int
-    draws: int
-    points: int
-    win_rate: float
-    average_goals_scored: float
-    average_goals_conceded: float
-    highest_wins_against: Optional[Dict[str, int]]
-    highest_losses_against: Optional[Dict[str, int]]
-    winrate_over_time: List[Dict[str, Union[datetime, float]]]
-
-
-class TournamentCreate(BaseModel):
-    name: str
-    start_date: datetime
-    end_date: datetime
-    description: Optional[str] = None
-
-
-class Tournament(TournamentCreate):
-    id: str
-    matches_count: int = 0
-
+# Test the actual connection
+@app.on_event("startup")
+async def startup_event():
+    try:
+        # This will actually test the connection
+        await client.admin.command('ping')
+        logger.info("✅ MongoDB Atlas connection successful!")
+    except Exception as e:
+        logger.error(f"❌ MongoDB Atlas connection failed: {str(e)}")
+        logger.error("Please check:")
+        logger.error("1. Your internet connection")
+        logger.error("2. MongoDB Atlas IP whitelist settings")
+        logger.error("3. Username and password in connection string")
+        logger.error("4. Database name in connection string")
 
 # Helper functions
 def player_helper(player) -> dict:
@@ -270,6 +203,19 @@ async def record_match(match: MatchCreate):
 async def get_players():
     players = await db.players.find().to_list(1000)
     return [player_helper(player) for player in players]
+
+
+@app.get("/players/{player_id}", response_model=Player)
+async def get_player(player_id: str):
+    try:
+        player = await db.players.find_one({"_id": ObjectId(player_id)})
+        if not player:
+            raise HTTPException(status_code=404, detail="Player not found")
+        return Player(**player_helper(player))
+    except Exception as e:
+        if "Invalid ObjectId" in str(e):
+            raise HTTPException(status_code=400, detail="Invalid player ID format")
+        raise HTTPException(status_code=404, detail="Player not found")
 
 
 @app.get("/stats", response_model=List[Player])
@@ -525,11 +471,6 @@ async def update_player(player_id: str, player: PlayerCreate):
     # Get updated player
     updated_player = await db.players.find_one({"_id": ObjectId(player_id)})
     return Player(**player_helper(updated_player))
-
-class MatchUpdate(BaseModel):
-    player1_goals: int
-    player2_goals: int
-
 
 @app.put("/matches/{match_id}", response_model=Match)
 async def update_match(match_id: str, match_update: MatchUpdate):
