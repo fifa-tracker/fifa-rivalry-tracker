@@ -6,7 +6,7 @@ from datetime import datetime
 
 from app.models import MatchCreate, Match, MatchUpdate
 from app.api.dependencies import get_database
-from app.utils.helpers import match_helper
+from app.utils.helpers import match_helper, get_result
 
 
 logger = logging.getLogger(__name__)
@@ -174,20 +174,3 @@ async def delete_match(match_id: str):
         raise HTTPException(status_code=400, detail="Match deletion failed")
 
     return {"message": "Match deleted successfully"}
-
-
-def get_result(player1_goals, player2_goals, is_player1):
-    if is_player1:
-        if player1_goals > player2_goals:
-            return {"win": 1, "loss": 0, "draw": 0}
-        elif player1_goals < player2_goals:
-            return {"win": 0, "loss": 1, "draw": 0}
-        else:
-            return {"win": 0, "loss": 0, "draw": 1}
-    else:   
-        if player2_goals > player1_goals:
-            return {"win": 1, "loss": 0, "draw": 0}
-        elif player2_goals < player1_goals:
-            return {"win": 0, "loss": 1, "draw": 0}
-        else:
-            return {"win": 0, "loss": 0, "draw": 1}

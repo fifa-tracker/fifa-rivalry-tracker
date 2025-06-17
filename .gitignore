@@ -1,4 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+
+# Environment
 .venv
-__pycache__
-mongo-backup
 .env
+
+# Database and backups
+mongo-backup
+
+# Test cache
+.pytest_cache/
+
+# macOS
+.DS_Store
+
+# Certificates (generated or sensitive)
+certs/
