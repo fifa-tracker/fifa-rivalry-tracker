@@ -1,0 +1,6 @@
+python:
+  package_manager: uv
+  install_command: uv pip install {package}
+  install_requirements_command: uv pip install -r {requirements}
+  install_dev_command: uv pip install {package}
+  install_all_extras_command: uv pip install --all-extras . 

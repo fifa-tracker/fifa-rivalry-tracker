@@ -1,10 +1,11 @@
 from datetime import datetime
 from bson import ObjectId
 import logging
+from app.models import Player, Match, Tournament
 
 logger = logging.getLogger(__name__)
 
-def player_helper(player) -> dict:
+def player_helper(player : Player) -> dict:
     """Convert player document to dict format"""
     return {
         "id": str(player["_id"]),
@@ -20,7 +21,7 @@ def player_helper(player) -> dict:
     }
 
 
-async def match_helper(match, db) -> dict:
+async def match_helper(match : Match, db) -> dict:
     """Convert match document to dict format with player names"""
     try:
         # Get player information
@@ -41,11 +42,11 @@ async def match_helper(match, db) -> dict:
             }
         
         # Find players
-        player1 = await db.players.find_one({"_id": ObjectId(player1_id)})
-        player2 = await db.players.find_one({"_id": ObjectId(player2_id)})
+        player1 : Player = await db.players.find_one({"_id": ObjectId(player1_id)})
+        player2 : Player = await db.players.find_one({"_id": ObjectId(player2_id)})
         
-        player1_name = player1["name"] if player1 else "Unknown Player"
-        player2_name = player2["name"] if player2 else "Unknown Player"
+        player1_name = player1.name if player1 else "Unknown Player"
+        player2_name = player2.name if player2 else "Unknown Player"
         
         result = {
             "id": str(match["_id"]),
@@ -60,7 +61,7 @@ async def match_helper(match, db) -> dict:
         
         # Add tournament info if available
         if match.get("tournament_id"):
-            tournament = await db.tournaments.find_one({"_id": ObjectId(match["tournament_id"])})
+            tournament : Tournament = await db.tournaments.find_one({"_id": ObjectId(match["tournament_id"])})
             if tournament:
                 result["tournament_name"] = tournament["name"]
         

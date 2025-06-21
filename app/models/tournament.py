@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel, Field
 
 
@@ -8,6 +8,7 @@ class TournamentCreate(BaseModel):
     start_date: datetime = Field(default_factory=datetime.now)
     end_date: Optional[datetime] = None
     description: Optional[str] = None
+    player_ids: List[str] = Field(default_factory=list)
 
 
 class Tournament(TournamentCreate):

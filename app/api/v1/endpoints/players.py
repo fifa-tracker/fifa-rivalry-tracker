@@ -4,7 +4,7 @@ from bson import ObjectId
 from itertools import groupby
 from datetime import datetime
 
-from app.models import PlayerCreate, Player, PlayerDetailedStats
+from app.models import PlayerCreate, Player, PlayerDetailedStats, Match
 from app.api.dependencies import get_database
 from app.utils.helpers import player_helper
 
@@ -118,12 +118,12 @@ async def delete_player(player_id: str):
 async def get_player_detailed_stats(player_id: str):
     """Get detailed statistics for a specific player"""
     db = await get_database()
-    player = await db.players.find_one({"_id": ObjectId(player_id)})
+    player : Player = await db.players.find_one({"_id": ObjectId(player_id)})
     if not player:
         raise HTTPException(status_code=404, detail="Player not found")
     
     # Get all matches for this player
-    matches = await db.matches.find({
+    matches: List[Match] = await db.matches.find({
         "$or": [
             {"player1_id": player_id},
             {"player2_id": player_id}
@@ -139,7 +139,7 @@ async def get_player_detailed_stats(player_id: str):
             if match["player1_id"] == player_id
             else match["player1_id"]
         )
-        opponent = await db.players.find_one({"_id": ObjectId(opponent_id)})
+        opponent : Player = await db.players.find_one({"_id": ObjectId(opponent_id)})
 
         if match["player1_id"] == player_id:
             if match["player1_goals"] > match["player2_goals"]:
@@ -233,6 +233,12 @@ async def get_player_detailed_stats(player_id: str):
 async def get_player_matches(player_id: str):
     """Get all matches for a specific player"""
     db = await get_database()
+    
+    # Get player info
+    player : Player = await db.players.find_one({"_id": ObjectId(player_id)})
+    if not player:
+        raise HTTPException(status_code=404, detail="Player not found")
+    
     matches = (
         await db.matches.find(
             {"$or": [{"player1_id": player_id}, {"player2_id": player_id}]}
@@ -241,93 +247,10 @@ async def get_player_matches(player_id: str):
         .to_list(1000)
     )
 
-
-    wins_against = {}
-    losses_against = {}
-
+    # Return matches with player names
+    matches_with_names = []
     for match in matches:
-        opponent_id = (
-            match["player2_id"]
-            if match["player1_id"] == player_id
-            else match["player1_id"]
-        )
-        opponent = await db.players.find_one({"_id": ObjectId(opponent_id)})
+        match_data = await match_helper(match, db)
+        matches_with_names.append(match_data)
 
-        if match["player1_id"] == player_id:
-            if match["player1_goals"] > match["player2_goals"]:
-                wins_against[opponent["name"]] = (
-                    wins_against.get(opponent["name"], 0) + 1
-                )
-            elif match["player1_goals"] < match["player2_goals"]:
-                losses_against[opponent["name"]] = (
-                    losses_against.get(opponent["name"], 0) + 1
-                )
-        else:
-            if match["player2_goals"] > match["player1_goals"]:
-                wins_against[opponent["name"]] = (
-                    wins_against.get(opponent["name"], 0) + 1
-                )
-            elif match["player2_goals"] < match["player1_goals"]:
-                losses_against[opponent["name"]] = (
-                    losses_against.get(opponent["name"], 0) + 1
-                )
-
-    highest_wins = (
-        max(wins_against.items(), key=lambda x: x[1]) if wins_against else None
-    )
-    highest_losses = (
-        max(losses_against.items(), key=lambda x: x[1]) if losses_against else None
-    )
-
-    # Calculate winrate over time (per day)
-    total_matches = 0
-    total_wins = 0
-    daily_winrate = []
-
-    for date, day_matches in groupby(matches, key=lambda x: x["date"].date()):
-        day_matches = list(day_matches)
-        for match in day_matches:
-            total_matches += 1
-            is_player1 = match["player1_id"] == player_id
-            player_goals = (
-                match["player1_goals"] if is_player1 else match["player2_goals"]
-            )
-            opponent_goals = (
-                match["player2_goals"] if is_player1 else match["player1_goals"]
-            )
-
-            if player_goals > opponent_goals:
-                total_wins += 1
-
-        winrate = total_wins / total_matches if total_matches > 0 else 0
-        daily_winrate.append({"date": date, "winrate": winrate})
-
-    stats = player_helper(player)
-    stats.update(
-        {
-            "win_rate": (
-                player["wins"] / player["total_matches"]
-                if player["total_matches"] > 0
-                else 0
-            ),
-            "average_goals_scored": (
-                player["total_goals_scored"] / player["total_matches"]
-                if player["total_matches"] > 0
-                else 0
-            ),
-            "average_goals_conceded": (
-                player["total_goals_conceded"] / player["total_matches"]
-                if player["total_matches"] > 0
-                else 0
-            ),
-            "highest_wins_against": (
-                {highest_wins[0]: highest_wins[1]} if highest_wins else None
-            ),
-            "highest_losses_against": (
-                {highest_losses[0]: highest_losses[1]} if highest_losses else None
-            ),
-            "winrate_over_time": daily_winrate,
-        }
-    )
-
-    return PlayerDetailedStats(**stats)
+    return matches_with_names

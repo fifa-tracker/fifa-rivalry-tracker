@@ -18,9 +18,12 @@ TEST_DB_NAME = "fifa_rivalry_test"
 @pytest.fixture(scope="session")
 def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
     """Create an instance of the default event loop for each test case."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
     yield loop
-    loop.close()
+    # Don't close the loop here as it might be reused
 
 @pytest.fixture
 def client() -> TestClient:
@@ -52,8 +55,28 @@ def sample_tournament_data():
     return {
         "name": "Test Tournament",
         "start_date": "2024-03-20",
-        "end_date": "2024-03-25"
+        "end_date": "2024-03-25",
+        "description": "A test tournament for testing purposes",
+        "player_ids": []
     }
+
+@pytest_asyncio.fixture
+async def created_players(client, sample_player_data):
+    """Create test players and return them"""
+    players = []
+    for i in range(2):
+        player_data = {**sample_player_data, "name": f"Test Player {i+1}"}
+        response = client.post("/api/v1/players/", json=player_data)
+        assert response.status_code == 200
+        players.append(response.json())
+    return players
+
+@pytest_asyncio.fixture
+async def created_tournament(client, sample_tournament_data):
+    """Create a test tournament and return it"""
+    response = client.post("/api/v1/tournaments/", json=sample_tournament_data)
+    assert response.status_code == 200
+    return response.json()
 
 @pytest_asyncio.fixture(autouse=True)
 async def setup_test_database() -> AsyncGenerator:

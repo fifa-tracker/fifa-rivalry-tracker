@@ -4,7 +4,7 @@ from bson import ObjectId
 import logging
 from datetime import datetime
 
-from app.models import MatchCreate, Match, MatchUpdate
+from app.models import MatchCreate, Match, MatchUpdate, Player
 from app.api.dependencies import get_database
 from app.utils.helpers import match_helper, get_result
 
@@ -17,13 +17,13 @@ router = APIRouter()
 async def record_match(match: MatchCreate):
     """Record a new match"""
     db = await get_database()
-    player1 = await db.players.find_one({"_id": ObjectId(match.player1_id)})
-    player2 = await db.players.find_one({"_id": ObjectId(match.player2_id)})
+    player1 : Player = await db.players.find_one({"_id": ObjectId(match.player1_id)})
+    player2 : Player = await db.players.find_one({"_id": ObjectId(match.player2_id)})
 
     if not player1 or not player2:
         raise HTTPException(status_code=404, detail="One or both players not found")
     
-    match_dict = match.dict()
+    match_dict = match.model_dump()
     match_dict["date"] = datetime.now()
     new_match = await db.matches.insert_one(match_dict)
 
@@ -65,19 +65,18 @@ async def update_match(match_id: str, match_update: MatchUpdate):
     """Update a match"""
     try:
         db = await get_database()
-        match = await db.matches.find_one({"_id": ObjectId(match_id)})
+        match : Match = await db.matches.find_one({"_id": ObjectId(match_id)})
         if not match:
             raise HTTPException(status_code=404, detail="Match not found")
         
-        match = await db.matches.find_one({"_id": ObjectId(match_id)})
         if not match:
             raise HTTPException(status_code=404, detail="Match not found")
-        
+
         # Validate goals are non-negative
         if match_update.player1_goals < 0 or match_update.player2_goals < 0:
             raise HTTPException(status_code=400, detail="Goals cannot be negative")
         
-        player1_goals_diff = match_update.player1_goals - match["player1_goals"]
+        player1_goals_diff  = match_update.player1_goals - match["player1_goals"]
         player2_goals_diff = match_update.player2_goals - match["player2_goals"]
         
         # Check if there are any actual changes
@@ -106,7 +105,7 @@ async def update_match(match_id: str, match_update: MatchUpdate):
             if not ObjectId.is_valid(player_id):
                 continue
             
-            player = await db.players.find_one({"_id": ObjectId(player_id)})
+            player : Player = await db.players.find_one({"_id": ObjectId(player_id)})
             if not player:
                 continue
             
@@ -165,7 +164,7 @@ async def update_match(match_id: str, match_update: MatchUpdate):
 async def delete_match(match_id: str):
     """Delete a match"""
     db = await get_database()
-    match = await db.matches.find_one({"_id": ObjectId(match_id)})
+    match : Match = await db.matches.find_one({"_id": ObjectId(match_id)})
     if not match:
         raise HTTPException(status_code=404, detail="Match not found")
 
