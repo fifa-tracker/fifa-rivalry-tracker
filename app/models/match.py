@@ -8,9 +8,9 @@ class MatchCreate(BaseModel):
     player2_id: str
     player1_goals: int
     player2_goals: int
+    tournament_id: str
     team1: str
     team2: str
-    tournament_id: Optional[str] = None
 
 
 class Match(BaseModel):

@@ -6,7 +6,7 @@ from datetime import datetime
 
 from app.models import PlayerCreate, Player, PlayerDetailedStats, Match
 from app.api.dependencies import get_database
-from app.utils.helpers import player_helper
+from app.utils.helpers import player_helper, match_helper
 
 router = APIRouter()
 

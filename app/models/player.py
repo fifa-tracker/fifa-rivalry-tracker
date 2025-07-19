@@ -9,6 +9,7 @@ class PlayerCreate(BaseModel):
 
 class Player(PlayerCreate):
     id: str
+    name: str
     total_matches: int = 0
     total_goals_scored: int = 0
     total_goals_conceded: int = 0

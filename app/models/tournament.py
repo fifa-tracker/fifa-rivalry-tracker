@@ -13,4 +13,5 @@ class TournamentCreate(BaseModel):
 
 class Tournament(TournamentCreate):
     id: str
+    matches: List[str] = Field(default_factory=list)
     matches_count: int = 0

@@ -2,6 +2,7 @@ from datetime import datetime
 from bson import ObjectId
 import logging
 from app.models import Player, Match, Tournament
+from typing import List
 
 logger = logging.getLogger(__name__)
 
@@ -45,8 +46,8 @@ async def match_helper(match : Match, db) -> dict:
         player1 : Player = await db.players.find_one({"_id": ObjectId(player1_id)})
         player2 : Player = await db.players.find_one({"_id": ObjectId(player2_id)})
         
-        player1_name = player1.name if player1 else "Unknown Player"
-        player2_name = player2.name if player2 else "Unknown Player"
+        player1_name = player1["name"] if player1 else "Unknown Player"
+        player2_name = player2["name"] if player2 else "Unknown Player"
         
         result = {
             "id": str(match["_id"]),
@@ -95,3 +96,56 @@ def get_result(player1_goals, player2_goals, is_player1):
             return {"win": 0, "loss": 1, "draw": 0}
         else:
             return {"win": 0, "loss": 0, "draw": 1}
+
+
+def calculate_tournament_stats(player_id: str, matches: List[dict]) -> dict:
+    """Calculate tournament statistics for a specific player based on match data"""
+    stats = {
+        "total_matches": 0,
+        "total_goals_scored": 0,
+        "total_goals_conceded": 0,
+        "wins": 0,
+        "losses": 0,
+        "draws": 0,
+        "points": 0
+    }
+    
+    for match in matches:
+        player1_id = match.get("player1_id")
+        player2_id = match.get("player2_id")
+        player1_goals = match.get("player1_goals", 0)
+        player2_goals = match.get("player2_goals", 0)
+        
+        # Convert ObjectIds to strings for comparison
+        player1_id_str = str(player1_id) if player1_id else None
+        player2_id_str = str(player2_id) if player2_id else None
+        
+        # Skip matches where this player is not involved
+        if player_id not in [player1_id_str, player2_id_str]:
+            continue
+            
+        stats["total_matches"] += 1
+        
+        # Determine if this player is player1 or player2
+        is_player1 = player_id == player1_id_str
+        
+        if is_player1:
+            stats["total_goals_scored"] += player1_goals
+            stats["total_goals_conceded"] += player2_goals
+            result = get_result(player1_goals, player2_goals, True)
+        else:
+            stats["total_goals_scored"] += player2_goals
+            stats["total_goals_conceded"] += player1_goals
+            result = get_result(player1_goals, player2_goals, False)
+        
+        stats["wins"] += result["win"]
+        stats["losses"] += result["loss"]
+        stats["draws"] += result["draw"]
+        
+        # Calculate points (3 for win, 1 for draw, 0 for loss)
+        stats["points"] += (result["win"] * 3) + (result["draw"] * 1)
+    
+    # Calculate goal difference
+    stats["goal_difference"] = stats["total_goals_scored"] - stats["total_goals_conceded"]
+    
+    return stats

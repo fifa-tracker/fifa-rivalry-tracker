@@ -3,6 +3,10 @@ import logging
 from fastapi import FastAPI
 from app.api.v1.router import api_router
 from app.api.dependencies import client
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -17,6 +21,13 @@ app = FastAPI(
 
 # Include API router
 app.include_router(api_router, prefix="/api/v1")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Your frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Test the actual connection
 @app.on_event("startup")

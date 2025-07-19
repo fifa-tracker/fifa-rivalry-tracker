@@ -4,7 +4,7 @@ from bson import ObjectId
 import logging
 from datetime import datetime
 
-from app.models import MatchCreate, Match, MatchUpdate, Player
+from app.models import MatchCreate, Match, MatchUpdate, Player, Tournament
 from app.api.dependencies import get_database
 from app.utils.helpers import match_helper, get_result
 
@@ -26,6 +26,19 @@ async def record_match(match: MatchCreate):
     match_dict = match.model_dump()
     match_dict["date"] = datetime.now()
     new_match = await db.matches.insert_one(match_dict)
+
+    tournament : Tournament = await db.tournaments.find_one({"_id": ObjectId(match.tournament_id)})
+    if not tournament:
+        raise HTTPException(status_code=404, detail="Tournament not found")
+
+    # Initialize matches field if it doesn't exist (for backward compatibility)
+    if "matches" not in tournament:
+        tournament["matches"] = []
+    if "matches_count" not in tournament:
+        tournament["matches_count"] = 0
+
+    tournament["matches"].append(new_match.inserted_id)
+    await db.tournaments.update_one({"_id": ObjectId(match.tournament_id)}, {"$set": {"matches": tournament["matches"], "matches_count": tournament["matches_count"] + 1}})
 
     # Update player stats
     for player, goals_scored, goals_conceded in [
@@ -58,6 +71,7 @@ async def get_matches():
     """Get all matches"""
     db = await get_database()
     matches = await db.matches.find().sort("date", -1).to_list(1000)
+    print(matches)
     return [Match(**await match_helper(match, db)) for match in matches]
 
 @router.put("/{match_id}", response_model=Match)
