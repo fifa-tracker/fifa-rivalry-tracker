@@ -1,27 +1,44 @@
 from typing import List
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from bson import ObjectId
 from itertools import groupby
 from datetime import datetime
 
-from app.models import PlayerCreate, Player, PlayerDetailedStats, Match
+from app.models import Player, PlayerDetailedStats, Match
+from app.models.auth import UserInDB, UserCreate
 from app.api.dependencies import get_database
-from app.utils.helpers import player_helper, match_helper
+from app.utils.helpers import match_helper
+from app.utils.auth import get_current_active_user, user_helper
 
 router = APIRouter()
 
 @router.post("/", response_model=Player)
-async def register_player(player: PlayerCreate):
-    """Register a new player"""
+async def register_player(player: UserCreate, current_user: UserInDB = Depends(get_current_active_user)):
+    """Register a new player (user)"""
     db = await get_database()
-    existing_player = await db.players.find_one({"name": player.name})
+    existing_player = await db.users.find_one({"username": player.username})
     if existing_player:
         raise HTTPException(
-            status_code=400, detail="A player with this name already exists"
+            status_code=400, detail="A player with this username already exists"
         )
 
+    # Check if email already exists
+    existing_email = await db.users.find_one({"email": player.email})
+    if existing_email:
+        raise HTTPException(
+            status_code=400, detail="Email already registered"
+        )
+
+    from datetime import datetime
+    from app.utils.auth import get_password_hash
+    
     player_data = player.dict()
     player_data.update({
+        "hashed_password": get_password_hash(player.password),
+        "is_active": True,
+        "is_superuser": False,
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow(),
         "total_matches": 0,
         "total_goals_scored": 0,
         "total_goals_conceded": 0,
@@ -31,28 +48,32 @@ async def register_player(player: PlayerCreate):
         "draws": 0,
         "points": 0
     })
-    new_player = await db.players.insert_one(player_data)
-    created_player = await db.players.find_one({"_id": new_player.inserted_id})
-    return player_helper(created_player)
+    
+    # Remove plain password from data
+    del player_data["password"]
+    
+    new_player = await db.users.insert_one(player_data)
+    created_player = await db.users.find_one({"_id": new_player.inserted_id})
+    return user_helper(created_player)
 
 
 @router.get("/", response_model=List[Player])
-async def get_players():
+async def get_players(current_user: UserInDB = Depends(get_current_active_user)):
     """Get all players"""
     db = await get_database()
-    players = await db.players.find().to_list(1000)
-    return [player_helper(player) for player in players]
+    players = await db.users.find().to_list(1000)
+    return [user_helper(player) for player in players]
 
 
 @router.get("/{player_id}", response_model=Player)
-async def get_player(player_id: str):
+async def get_player(player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Get a specific player by ID"""
     db = await get_database()
     try:
-        player = await db.players.find_one({"_id": ObjectId(player_id)})
+        player = await db.users.find_one({"_id": ObjectId(player_id)})
         if not player:
             raise HTTPException(status_code=404, detail="Player not found")
-        return player_helper(player)
+        return user_helper(player)
     except Exception as e:
         if "Invalid ObjectId" in str(e):
             raise HTTPException(status_code=400, detail="Invalid player ID format")
@@ -60,35 +81,54 @@ async def get_player(player_id: str):
 
 
 @router.put("/{player_id}", response_model=Player)
-async def update_player(player_id: str, player: PlayerCreate):
-    """Update a player's name"""
+async def update_player(player_id: str, player: UserCreate, current_user: UserInDB = Depends(get_current_active_user)):
+    """Update a player's username and email"""
     db = await get_database()
     # Check if player exists
-    existing_player = await db.players.find_one({"_id": ObjectId(player_id)})
+    existing_player = await db.users.find_one({"_id": ObjectId(player_id)})
     if not existing_player:
         raise HTTPException(status_code=404, detail="Player not found")
 
-    # Update player name
-    update_result = await db.players.update_one(
+    # Check if new username already exists (if different from current)
+    if player.username != existing_player.get("username"):
+        existing_username = await db.users.find_one({"username": player.username})
+        if existing_username:
+            raise HTTPException(status_code=400, detail="Username already exists")
+
+    # Check if new email already exists (if different from current)
+    if player.email != existing_player.get("email"):
+        existing_email = await db.users.find_one({"email": player.email})
+        if existing_email:
+            raise HTTPException(status_code=400, detail="Email already exists")
+
+    # Update player data
+    update_data = {
+        "username": player.username,
+        "email": player.email,
+        "full_name": player.full_name,
+        "updated_at": datetime.utcnow()
+    }
+    
+    update_result = await db.users.update_one(
         {"_id": ObjectId(player_id)},
-        {"$set": {"name": player.name}}
+        {"$set": update_data}
     )
 
     if update_result.modified_count == 0:
         raise HTTPException(status_code=400, detail="Player update failed")
 
     # Get updated player
-    updated_player = await db.players.find_one({"_id": ObjectId(player_id)})
-    return player_helper(updated_player)
+    updated_player = await db.users.find_one({"_id": ObjectId(player_id)})
+    return user_helper(updated_player)
 
 
 @router.delete("/{player_id}", response_model=dict)
-async def delete_player(player_id: str):
+async def delete_player(player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Delete a player and all their matches"""
     db = await get_database()
     try:
         # Check if player exists
-        player = await db.players.find_one({"_id": ObjectId(player_id)})
+        player = await db.users.find_one({"_id": ObjectId(player_id)})
         
         if not player:
             raise HTTPException(status_code=404, detail="Player not found")
@@ -102,7 +142,7 @@ async def delete_player(player_id: str):
         })
 
         # Delete the player
-        delete_result = await db.players.delete_one({"_id": ObjectId(player_id)})
+        delete_result = await db.users.delete_one({"_id": ObjectId(player_id)})
         
         if delete_result.deleted_count == 0:
             raise HTTPException(status_code=400, detail="Player deletion failed")
@@ -115,10 +155,10 @@ async def delete_player(player_id: str):
 
 
 @router.get("/{player_id}/stats", response_model=PlayerDetailedStats)
-async def get_player_detailed_stats(player_id: str):
+async def get_player_detailed_stats(player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Get detailed statistics for a specific player"""
     db = await get_database()
-    player : Player = await db.players.find_one({"_id": ObjectId(player_id)})
+    player : Player = await db.users.find_one({"_id": ObjectId(player_id)})
     if not player:
         raise HTTPException(status_code=404, detail="Player not found")
     
@@ -139,25 +179,25 @@ async def get_player_detailed_stats(player_id: str):
             if match["player1_id"] == player_id
             else match["player1_id"]
         )
-        opponent : Player = await db.players.find_one({"_id": ObjectId(opponent_id)})
+        opponent : Player = await db.users.find_one({"_id": ObjectId(opponent_id)})
 
         if match["player1_id"] == player_id:
             if match["player1_goals"] > match["player2_goals"]:
-                wins_against[opponent["name"]] = (
-                    wins_against.get(opponent["name"], 0) + 1
+                wins_against[opponent["username"]] = (
+                    wins_against.get(opponent["username"], 0) + 1
                 )
             elif match["player1_goals"] < match["player2_goals"]:
-                losses_against[opponent["name"]] = (
-                    losses_against.get(opponent["name"], 0) + 1
+                losses_against[opponent["username"]] = (
+                    losses_against.get(opponent["username"], 0) + 1
                 )
         else:
             if match["player2_goals"] > match["player1_goals"]:
-                wins_against[opponent["name"]] = (
-                    wins_against.get(opponent["name"], 0) + 1
+                wins_against[opponent["username"]] = (
+                    wins_against.get(opponent["username"], 0) + 1
                 )
             elif match["player2_goals"] < match["player1_goals"]:
-                losses_against[opponent["name"]] = (
-                    losses_against.get(opponent["name"], 0) + 1
+                losses_against[opponent["username"]] = (
+                    losses_against.get(opponent["username"], 0) + 1
                 )
 
     highest_wins = (
@@ -198,7 +238,7 @@ async def get_player_detailed_stats(player_id: str):
         date_dt = datetime.combine(date, datetime.min.time())
         daily_winrate.append({"date": date_dt, "winrate": winrate})
 
-    stats = player_helper(player)
+    stats = user_helper(player)
     stats.update(
         {
             "win_rate": (
@@ -230,12 +270,12 @@ async def get_player_detailed_stats(player_id: str):
 
 
 @router.get("/{player_id}/matches")
-async def get_player_matches(player_id: str):
+async def get_player_matches(player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Get all matches for a specific player"""
     db = await get_database()
     
     # Get player info
-    player : Player = await db.players.find_one({"_id": ObjectId(player_id)})
+    player : Player = await db.users.find_one({"_id": ObjectId(player_id)})
     if not player:
         raise HTTPException(status_code=404, detail="Player not found")
     

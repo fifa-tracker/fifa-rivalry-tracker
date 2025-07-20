@@ -22,8 +22,8 @@ class TestMatchEndpoints:
         
         assert response.status_code == 200
         data = response.json()
-        assert data["player1_name"] == player1["name"]
-        assert data["player2_name"] == player2["name"]
+        assert data["player1_name"] == player1["username"]
+        assert data["player2_name"] == player2["username"]
         assert data["player1_goals"] == match_data["player1_goals"]
         assert data["player2_goals"] == match_data["player2_goals"]
         assert data["team1"] == match_data["team1"]

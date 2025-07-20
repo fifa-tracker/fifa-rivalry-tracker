@@ -1,11 +1,17 @@
 from fastapi import APIRouter
 
-from .endpoints import players, matches, tournaments, stats
+from .endpoints import players, matches, tournaments, stats, auth
 
 # Create the main API v1 router
 api_router = APIRouter()
 
 # Include all endpoint routers with their prefixes
+api_router.include_router(
+    auth.router, 
+    prefix="/auth", 
+    tags=["authentication"]
+)
+
 api_router.include_router(
     players.router, 
     prefix="/players", 

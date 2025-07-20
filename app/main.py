@@ -1,5 +1,6 @@
 import logging
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.router import api_router
 from app.api.dependencies import client
 
@@ -12,6 +13,15 @@ app = FastAPI(
     title="FIFA Rivalry Tracker API",
     description="API for tracking FIFA match results and player statistics",
     version="1.0.0"
+)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Configure this properly for production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Include API router
@@ -32,11 +42,16 @@ async def startup_event():
         logger.error("3. Username and password in connection string")
         logger.error("4. Database name in connection string")
 
-# Root endpoint
+# Root endpoint (public - no authentication required)
 @app.get("/")
 async def root():
     return {
         "message": "FIFA Rivalry Tracker API", 
         "version": "1.0.0",
-        "docs": "/docs"
+        "docs": "/docs",
+        "authentication": {
+            "register": "/api/v1/auth/register",
+            "login": "/api/v1/auth/login",
+            "login_json": "/api/v1/auth/login-json"
+        }
     }

@@ -34,7 +34,10 @@ def client() -> TestClient:
 def sample_player_data():
     """Sample player data for testing"""
     return {
-        "name": "Test Player"
+        "username": "testplayer",
+        "email": "test@example.com",
+        "full_name": "Test Player",
+        "password": "testpassword123"
     }
 
 @pytest.fixture
@@ -65,7 +68,7 @@ async def created_players(client, sample_player_data):
     """Create test players and return them"""
     players = []
     for i in range(2):
-        player_data = {**sample_player_data, "name": f"Test Player {i+1}"}
+        player_data = {**sample_player_data, "username": f"testplayer{i+1}", "email": f"test{i+1}@example.com"}
         response = client.post("/api/v1/players/", json=player_data)
         assert response.status_code == 200
         players.append(response.json())
@@ -91,7 +94,7 @@ async def setup_test_database() -> AsyncGenerator:
     db = client[TEST_DB_NAME]
 
     # Clear all collections before each test
-    await db.players.delete_many({})
+    await db.users.delete_many({})
     await db.matches.delete_many({})
     await db.tournaments.delete_many({})
 
@@ -101,7 +104,7 @@ async def setup_test_database() -> AsyncGenerator:
     yield db
 
     # Cleanup after tests - just clear collections instead of dropping database
-    await db.players.delete_many({})
+    await db.users.delete_many({})
     await db.matches.delete_many({})
     await db.tournaments.delete_many({})
     client.close() 

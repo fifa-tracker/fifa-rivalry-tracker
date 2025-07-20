@@ -1,12 +1,14 @@
 from typing import List
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from bson import ObjectId
 import logging
 from datetime import datetime
 
 from app.models import MatchCreate, Match, MatchUpdate, Player, Tournament
+from app.models.auth import UserInDB
 from app.api.dependencies import get_database
 from app.utils.helpers import match_helper, get_result
+from app.utils.auth import get_current_active_user
 
 
 logger = logging.getLogger(__name__)
@@ -14,11 +16,11 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 @router.post("/", response_model=Match)
-async def record_match(match: MatchCreate):
+async def record_match(match: MatchCreate, current_user: UserInDB = Depends(get_current_active_user)):
     """Record a new match"""
     db = await get_database()
-    player1 : Player = await db.players.find_one({"_id": ObjectId(match.player1_id)})
-    player2 : Player = await db.players.find_one({"_id": ObjectId(match.player2_id)})
+    player1 : Player = await db.users.find_one({"_id": ObjectId(match.player1_id)})
+    player2 : Player = await db.users.find_one({"_id": ObjectId(match.player2_id)})
 
     if not player1 or not player2:
         raise HTTPException(status_code=404, detail="One or both players not found")
@@ -61,13 +63,13 @@ async def record_match(match: MatchCreate):
                 ),
             }
         }
-        await db.players.update_one({"_id": player["_id"]}, update)
+        await db.users.update_one({"_id": player["_id"]}, update)
 
     created_match = await db.matches.find_one({"_id": new_match.inserted_id})
     return Match(**await match_helper(created_match, db))
 
 @router.get("/", response_model=List[Match])
-async def get_matches():
+async def get_matches(current_user: UserInDB = Depends(get_current_active_user)):
     """Get all matches"""
     db = await get_database()
     matches = await db.matches.find().sort("date", -1).to_list(1000)
@@ -75,7 +77,7 @@ async def get_matches():
     return [Match(**await match_helper(match, db)) for match in matches]
 
 @router.put("/{match_id}", response_model=Match)
-async def update_match(match_id: str, match_update: MatchUpdate):
+async def update_match(match_id: str, match_update: MatchUpdate, current_user: UserInDB = Depends(get_current_active_user)):
     """Update a match"""
     try:
         db = await get_database()
@@ -119,7 +121,7 @@ async def update_match(match_id: str, match_update: MatchUpdate):
             if not ObjectId.is_valid(player_id):
                 continue
             
-            player : Player = await db.players.find_one({"_id": ObjectId(player_id)})
+            player : Player = await db.users.find_one({"_id": ObjectId(player_id)})
             if not player:
                 continue
             
@@ -157,7 +159,7 @@ async def update_match(match_id: str, match_update: MatchUpdate):
                     ),
                 }
             }
-            update_result = await db.players.update_one({"_id": player["_id"]}, update)
+            update_result = await db.users.update_one({"_id": player["_id"]}, update)
             if update_result.modified_count == 0:
                 raise HTTPException(status_code=400, detail="Player update failed")
 
@@ -175,7 +177,7 @@ async def update_match(match_id: str, match_update: MatchUpdate):
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.delete("/{match_id}", response_model=dict)
-async def delete_match(match_id: str):
+async def delete_match(match_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Delete a match"""
     db = await get_database()
     match : Match = await db.matches.find_one({"_id": ObjectId(match_id)})

@@ -6,20 +6,7 @@ from typing import List
 
 logger = logging.getLogger(__name__)
 
-def player_helper(player : Player) -> dict:
-    """Convert player document to dict format"""
-    return {
-        "id": str(player["_id"]),
-        "name": player["name"],
-        "total_matches": player["total_matches"],
-        "total_goals_scored": player["total_goals_scored"],
-        "total_goals_conceded": player["total_goals_conceded"],
-        "goal_difference": player["goal_difference"],
-        "wins": player["wins"],
-        "losses": player["losses"],
-        "draws": player["draws"],
-        "points": player["points"],
-    }
+
 
 
 async def match_helper(match : Match, db) -> dict:
@@ -43,11 +30,11 @@ async def match_helper(match : Match, db) -> dict:
             }
         
         # Find players
-        player1 : Player = await db.players.find_one({"_id": ObjectId(player1_id)})
-        player2 : Player = await db.players.find_one({"_id": ObjectId(player2_id)})
+        player1 : Player = await db.users.find_one({"_id": ObjectId(player1_id)})
+        player2 : Player = await db.users.find_one({"_id": ObjectId(player2_id)})
         
-        player1_name = player1["name"] if player1 else "Unknown Player"
-        player2_name = player2["name"] if player2 else "Unknown Player"
+        player1_name = player1["username"] if player1 else "Unknown Player"
+        player2_name = player2["username"] if player2 else "Unknown Player"
         
         result = {
             "id": str(match["_id"]),

@@ -1,12 +1,14 @@
 from typing import List
 import logging
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from bson import ObjectId
 from pydantic import BaseModel
 
 from app.models import TournamentCreate, Tournament, Match, Player
+from app.models.auth import UserInDB
 from app.api.dependencies import get_database
-from app.utils.helpers import match_helper, player_helper, calculate_tournament_stats
+from app.utils.helpers import match_helper, calculate_tournament_stats
+from app.utils.auth import get_current_active_user
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +34,7 @@ class PlayerIdRequest(BaseModel):
     player_id: str
 
 @router.post("/", response_model=Tournament)
-async def create_tournament(tournament: TournamentCreate):
+async def create_tournament(tournament: TournamentCreate, current_user: UserInDB = Depends(get_current_active_user)):
     """Create a new tournament"""
     db = await get_database()
     # Convert to dict with default values
@@ -44,21 +46,21 @@ async def create_tournament(tournament: TournamentCreate):
     return Tournament(**tournament_helper(created_tournament))
 
 @router.get("/", response_model=List[Tournament])
-async def get_tournaments():
+async def get_tournaments(current_user: UserInDB = Depends(get_current_active_user)):
     """Get all tournaments"""
     db = await get_database()
     tournaments : List[Tournament] = await db.tournaments.find().to_list(1000)
     return [Tournament(**tournament_helper(t)) for t in tournaments]
 
 @router.get("/{tournament_id}/matches", response_model=List[Match])
-async def get_tournament_matches(tournament_id: str):
+async def get_tournament_matches(tournament_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Get all matches for a specific tournament"""
     db = await get_database()
     matches : List[Match] = await db.matches.find({"tournament_id": tournament_id}).sort("date", -1).to_list(1000)
     return [Match(**await match_helper(match, db)) for match in matches]
 
 @router.get("/{tournament_id}/", response_model=Tournament)
-async def get_tournament(tournament_id: str):
+async def get_tournament(tournament_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Get a specific tournament"""
     db = await get_database()
     tournament : Tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
@@ -67,7 +69,7 @@ async def get_tournament(tournament_id: str):
     return Tournament(**tournament_helper(tournament))
 
 @router.post("/{tournament_id}/players", response_model=Tournament)
-async def add_player_to_tournament(tournament_id: str, player_request: PlayerIdRequest):
+async def add_player_to_tournament(tournament_id: str, player_request: PlayerIdRequest, current_user: UserInDB = Depends(get_current_active_user)):
     """Add a player to a tournament"""
     db = await get_database()
     logger.info(f"Adding player {player_request.player_id} to tournament {tournament_id}")
@@ -88,7 +90,7 @@ async def add_player_to_tournament(tournament_id: str, player_request: PlayerIdR
     return Tournament(**tournament_helper(tournament))
 
 @router.delete("/{tournament_id}/players/{player_id}", response_model=Tournament)
-async def remove_player_from_tournament(tournament_id: str, player_id: str):
+async def remove_player_from_tournament(tournament_id: str, player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Remove a player from a tournament"""
     db = await get_database()
     tournament : Tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
@@ -106,7 +108,7 @@ async def remove_player_from_tournament(tournament_id: str, player_id: str):
     return Tournament(**tournament_helper(tournament))
 
 @router.get("/{tournament_id}/stats", response_model=List[Player])
-async def get_tournament_stats(tournament_id: str):
+async def get_tournament_stats(tournament_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Get tournament stats"""
     db = await get_database()
     tournament : Tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
@@ -125,7 +127,7 @@ async def get_tournament_stats(tournament_id: str):
     # Convert string IDs to ObjectIds for database query
     try:
         player_object_ids = [ObjectId(pid) if isinstance(pid, str) else pid for pid in player_ids]
-        players : List[Player] = await db.players.find({"_id": {"$in": player_object_ids}}).to_list(1000)
+        players : List[Player] = await db.users.find({"_id": {"$in": player_object_ids}}).to_list(1000)
         logger.info(f"Found {len(players)} players in database")
     except Exception as e:
         logger.error(f"Error converting player IDs: {e}")
@@ -145,7 +147,9 @@ async def get_tournament_stats(tournament_id: str):
         for player in players:
             player_stats = {
                 "id": str(player["_id"]),
-                "name": player["name"],
+                "username": player["username"],
+                "email": player["email"],
+                "full_name": player.get("full_name"),
                 "total_matches": 0,
                 "total_goals_scored": 0,
                 "total_goals_conceded": 0,
@@ -162,13 +166,15 @@ async def get_tournament_stats(tournament_id: str):
     tournament_stats = []
     for player in players:
         player_id = str(player["_id"])
-        logger.info(f"Calculating stats for player {player['name']} (ID: {player_id})")
+        logger.info(f"Calculating stats for player {player['username']} (ID: {player_id})")
         stats = calculate_tournament_stats(player_id, matches)
         
         # Create player stats object with tournament-specific data
         player_stats = {
             "id": player_id,
-            "name": player["name"],
+            "username": player["username"],
+            "email": player["email"],
+            "full_name": player.get("full_name"),
             "total_matches": stats["total_matches"],
             "total_goals_scored": stats["total_goals_scored"],
             "total_goals_conceded": stats["total_goals_conceded"],
@@ -180,7 +186,7 @@ async def get_tournament_stats(tournament_id: str):
         }
         
         tournament_stats.append(player_stats)
-        logger.info(f"Player {player['name']} tournament stats: {stats}")
+        logger.info(f"Player {player['username']} tournament stats: {stats}")
 
     # Sort by points in descending order (highest points first)
     tournament_stats.sort(key=lambda x: x["points"], reverse=True)
@@ -188,7 +194,7 @@ async def get_tournament_stats(tournament_id: str):
     return tournament_stats
 
 @router.post("/tournament/{tournament_id}/match", response_model=Tournament)
-async def add_match_to_tournament(tournament_id: str, match: Match):
+async def add_match_to_tournament(tournament_id: str, match: Match, current_user: UserInDB = Depends(get_current_active_user)):
     """Add a match to a tournament"""
     db = await get_database()
     tournament : Tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})

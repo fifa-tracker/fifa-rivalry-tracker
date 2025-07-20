@@ -1,11 +1,11 @@
 # Models package - Export all models for easy importing
-from .player import PlayerCreate, Player, PlayerDetailedStats
+from .player import Player, PlayerDetailedStats
 from .match import MatchCreate, Match, MatchUpdate, HeadToHeadStats
 from .tournament import TournamentCreate, Tournament
+from .auth import UserCreate, User, UserLogin, Token, TokenData, UserInDB
 
 __all__ = [
     # Player models
-    "PlayerCreate",
     "Player", 
     "PlayerDetailedStats",
     
@@ -18,4 +18,12 @@ __all__ = [
     # Tournament models
     "TournamentCreate",
     "Tournament",
+    
+    # Auth models
+    "UserCreate",
+    "User",
+    "UserLogin",
+    "Token",
+    "TokenData",
+    "UserInDB",
 ]
