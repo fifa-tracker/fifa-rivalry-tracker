@@ -74,6 +74,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     
     db = await get_database()
     user = await db.users.find_one({"username": token_data.username})
+    print(f"User: {user}")
     
     if user is None:
         raise HTTPException(
@@ -87,7 +88,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         "id": str(user["_id"]),
         "username": user["username"],
         "email": user["email"],
-        "full_name": user.get("full_name"),
+        "name": user.get("name"),
         "is_active": user.get("is_active", True),
         "is_superuser": user.get("is_superuser", False),
         "created_at": user.get("created_at", datetime.utcnow()),
@@ -133,7 +134,7 @@ def user_helper(user: dict) -> dict:
         "id": str(user["_id"]),
         "username": user["username"],
         "email": user["email"],
-        "full_name": user.get("full_name"),
+        "name": user.get("name"),
         "is_active": user.get("is_active", True),
         "is_superuser": user.get("is_superuser", False),
         "created_at": user.get("created_at", datetime.utcnow()),

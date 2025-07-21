@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from bson import ObjectId
 from pydantic import BaseModel
 
-from app.models import TournamentCreate, Tournament, Match, Player
+from app.models import TournamentCreate, Tournament, Match, Player, TournamentPlayerStats
 from app.models.auth import UserInDB
 from app.api.dependencies import get_database
 from app.utils.helpers import match_helper, calculate_tournament_stats
@@ -41,6 +41,7 @@ async def create_tournament(tournament: TournamentCreate, current_user: UserInDB
     tournament_dict = tournament.model_dump()
     tournament_dict["matches"] = []
     tournament_dict["matches_count"] = 0
+    tournament_dict["completed"] = False
     new_tournament = await db.tournaments.insert_one(tournament_dict)
     created_tournament = await db.tournaments.find_one({"_id": new_tournament.inserted_id})
     return Tournament(**tournament_helper(created_tournament))
@@ -107,7 +108,7 @@ async def remove_player_from_tournament(tournament_id: str, player_id: str, curr
     await db.tournaments.update_one({"_id": ObjectId(tournament_id)}, {"$set": {"player_ids": tournament["player_ids"]}})
     return Tournament(**tournament_helper(tournament))
 
-@router.get("/{tournament_id}/stats", response_model=List[Player])
+@router.get("/{tournament_id}/stats", response_model=List[TournamentPlayerStats])
 async def get_tournament_stats(tournament_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Get tournament stats"""
     db = await get_database()
@@ -145,20 +146,20 @@ async def get_tournament_stats(tournament_id: str, current_user: UserInDB = Depe
         # Return players with zero stats
         tournament_stats = []
         for player in players:
-            player_stats = {
-                "id": str(player["_id"]),
-                "username": player["username"],
-                "email": player["email"],
-                "full_name": player.get("full_name"),
-                "total_matches": 0,
-                "total_goals_scored": 0,
-                "total_goals_conceded": 0,
-                "goal_difference": 0,
-                "wins": 0,
-                "losses": 0,
-                "draws": 0,
-                "points": 0
-            }
+            player_stats = TournamentPlayerStats(
+                id=str(player["_id"]),
+                username=player["username"],
+                email=player["email"],
+                name=player.get("name"),
+                total_matches=0,
+                total_goals_scored=0,
+                total_goals_conceded=0,
+                goal_difference=0,
+                wins=0,
+                losses=0,
+                draws=0,
+                points=0
+            )
             tournament_stats.append(player_stats)
         return tournament_stats
 
@@ -170,26 +171,26 @@ async def get_tournament_stats(tournament_id: str, current_user: UserInDB = Depe
         stats = calculate_tournament_stats(player_id, matches)
         
         # Create player stats object with tournament-specific data
-        player_stats = {
-            "id": player_id,
-            "username": player["username"],
-            "email": player["email"],
-            "full_name": player.get("full_name"),
-            "total_matches": stats["total_matches"],
-            "total_goals_scored": stats["total_goals_scored"],
-            "total_goals_conceded": stats["total_goals_conceded"],
-            "goal_difference": stats["goal_difference"],
-            "wins": stats["wins"],
-            "losses": stats["losses"],
-            "draws": stats["draws"],
-            "points": stats["points"]
-        }
+        player_stats = TournamentPlayerStats(
+            id=player_id,
+            username=player["username"],
+            email=player["email"],
+            name=player.get("name"),
+            total_matches=stats["total_matches"],
+            total_goals_scored=stats["total_goals_scored"],
+            total_goals_conceded=stats["total_goals_conceded"],
+            goal_difference=stats["goal_difference"],
+            wins=stats["wins"],
+            losses=stats["losses"],
+            draws=stats["draws"],
+            points=stats["points"]
+        )
         
         tournament_stats.append(player_stats)
         logger.info(f"Player {player['username']} tournament stats: {stats}")
 
     # Sort by points in descending order (highest points first)
-    tournament_stats.sort(key=lambda x: x["points"], reverse=True)
+    tournament_stats.sort(key=lambda x: x.points, reverse=True)
     
     return tournament_stats
 

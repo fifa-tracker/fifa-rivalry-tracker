@@ -6,7 +6,7 @@ from datetime import datetime
 class UserBase(BaseModel):
     username: str
     email: EmailStr
-    full_name: Optional[str] = None
+    name: Optional[str] = None
 
 
 class UserCreate(UserBase):
@@ -46,7 +46,7 @@ class UserDetailedStats(BaseModel):
     id: str
     username: str
     email: EmailStr
-    full_name: Optional[str] = None
+    name: Optional[str] = None
     total_matches: int
     total_goals_scored: int
     total_goals_conceded: int
