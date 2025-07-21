@@ -74,21 +74,66 @@ async def add_player_to_tournament(tournament_id: str, player_request: PlayerIdR
     """Add a player to a tournament"""
     db = await get_database()
     logger.info(f"Adding player {player_request.player_id} to tournament {tournament_id}")
+    
+    # Validate tournament exists
     tournament : Tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
     if not tournament:
         raise HTTPException(status_code=404, detail="Tournament not found")
+    
+    # Validate player exists
+    try:
+        player = await db.users.find_one({"_id": ObjectId(player_request.player_id)})
+        if not player:
+            raise HTTPException(status_code=404, detail="Player not found")
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid player ID format")
     
     # Initialize player_ids if it doesn't exist
     if "player_ids" not in tournament:
         tournament["player_ids"] = []
     
-    # Check if player is already in tournament
-    if player_request.player_id in tournament["player_ids"]:
+    # Check if player is already in tournament (convert to string for comparison)
+    player_id_str = str(player_request.player_id)
+    if player_id_str in [str(pid) for pid in tournament["player_ids"]]:
         raise HTTPException(status_code=400, detail="Player already in tournament")
     
-    tournament["player_ids"].append(player_request.player_id)
+    # Add player ID as string to maintain consistency
+    tournament["player_ids"].append(player_id_str)
     await db.tournaments.update_one({"_id": ObjectId(tournament_id)}, {"$set": {"player_ids": tournament["player_ids"]}})
     return Tournament(**tournament_helper(tournament))
+
+@router.get("/{tournament_id}/players", response_model=List[Player])
+async def get_tournament_players(tournament_id: str, current_user: UserInDB = Depends(get_current_active_user)):
+    """Get all players in a tournament"""
+    db = await get_database()
+    tournament : Tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
+    if not tournament:
+        raise HTTPException(status_code=404, detail="Tournament not found")
+    
+    # Handle player_ids - they might be stored as strings or ObjectIds
+    player_ids = tournament.get("player_ids", [])
+    
+    if not player_ids:
+        return []
+    
+    # Convert string IDs to ObjectIds for database query
+    try:
+        player_object_ids = [ObjectId(pid) if isinstance(pid, str) else pid for pid in player_ids]
+        players = await db.users.find({"_id": {"$in": player_object_ids}}).to_list(1000)
+        
+        # Convert to Player objects with proper ID conversion
+        result = []
+        for player in players:
+            player_dict = {
+                "id": str(player["_id"]),
+                **{k: v for k, v in player.items() if k != "_id"}
+            }
+            result.append(Player(**player_dict))
+        
+        return result
+    except Exception as e:
+        logger.error(f"Error fetching tournament players: {e}")
+        raise HTTPException(status_code=500, detail="Error fetching tournament players")
 
 @router.delete("/{tournament_id}/players/{player_id}", response_model=Tournament)
 async def remove_player_from_tournament(tournament_id: str, player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
@@ -102,9 +147,13 @@ async def remove_player_from_tournament(tournament_id: str, player_id: str, curr
     if "player_ids" not in tournament:
         tournament["player_ids"] = []
     
-    if player_id not in tournament["player_ids"]:
+    # Check if player is in tournament (convert to string for comparison)
+    player_id_str = str(player_id)
+    if player_id_str not in [str(pid) for pid in tournament["player_ids"]]:
         raise HTTPException(status_code=404, detail="Player not found in tournament")
-    tournament["player_ids"].remove(player_id)
+    
+    # Remove player ID
+    tournament["player_ids"] = [str(pid) for pid in tournament["player_ids"] if str(pid) != player_id_str]
     await db.tournaments.update_one({"_id": ObjectId(tournament_id)}, {"$set": {"player_ids": tournament["player_ids"]}})
     return Tournament(**tournament_helper(tournament))
 

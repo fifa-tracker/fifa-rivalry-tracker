@@ -33,8 +33,16 @@ async def match_helper(match : Match, db) -> dict:
         player1 : Player = await db.users.find_one({"_id": ObjectId(player1_id)})
         player2 : Player = await db.users.find_one({"_id": ObjectId(player2_id)})
         
-        player1_name = player1["username"] if player1 else "Unknown Player"
-        player2_name = player2["username"] if player2 else "Unknown Player"
+        # Handle deleted players
+        if player1 and player1.get("is_deleted", False):
+            player1_name = "Deleted Player"
+        else:
+            player1_name = player1["username"] if player1 else "Unknown Player"
+            
+        if player2 and player2.get("is_deleted", False):
+            player2_name = "Deleted Player"
+        else:
+            player2_name = player2["username"] if player2 else "Unknown Player"
         
         result = {
             "id": str(match["_id"]),

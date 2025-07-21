@@ -91,8 +91,10 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         "name": user.get("name"),
         "is_active": user.get("is_active", True),
         "is_superuser": user.get("is_superuser", False),
+        "is_deleted": user.get("is_deleted", False),
         "created_at": user.get("created_at", datetime.utcnow()),
         "updated_at": user.get("updated_at", datetime.utcnow()),
+        "deleted_at": user.get("deleted_at"),
         "hashed_password": user["hashed_password"],
         # Player statistics fields
         "total_matches": user.get("total_matches", 0),
@@ -115,6 +117,14 @@ async def get_current_active_user(current_user: UserInDB = Depends(get_current_u
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Inactive user"
         )
+    
+    # Check if user is deleted
+    if hasattr(current_user, 'is_deleted') and current_user.is_deleted:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User account has been deleted"
+        )
+    
     return current_user
 
 
@@ -130,15 +140,20 @@ async def get_current_superuser(current_user: UserInDB = Depends(get_current_use
 
 def user_helper(user: dict) -> dict:
     """Helper function to format user data"""
+    # Check if user is deleted
+    is_deleted = user.get("is_deleted", False)
+    
     return {
         "id": str(user["_id"]),
-        "username": user["username"],
-        "email": user["email"],
+        "username": "Deleted Player" if is_deleted else user["username"],
+        "email": user["email"] if not is_deleted else "deleted@example.com",
         "name": user.get("name"),
         "is_active": user.get("is_active", True),
         "is_superuser": user.get("is_superuser", False),
+        "is_deleted": is_deleted,
         "created_at": user.get("created_at", datetime.utcnow()),
         "updated_at": user.get("updated_at", datetime.utcnow()),
+        "deleted_at": user.get("deleted_at"),
         # Player statistics fields
         "total_matches": user.get("total_matches", 0),
         "total_goals_scored": user.get("total_goals_scored", 0),

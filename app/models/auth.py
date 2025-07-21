@@ -13,6 +13,12 @@ class UserCreate(UserBase):
     password: str
 
 
+class UserUpdate(BaseModel):
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+    name: Optional[str] = None
+
+
 class UserLogin(BaseModel):
     username: str
     password: str
@@ -22,8 +28,10 @@ class User(UserBase):
     id: str
     is_active: bool = True
     is_superuser: bool = False
+    is_deleted: Optional[bool] = False
     created_at: datetime
     updated_at: datetime
+    deleted_at: Optional[datetime] = None
     # Player statistics fields
     total_matches: int = 0
     total_goals_scored: int = 0
@@ -33,6 +41,10 @@ class User(UserBase):
     losses: int = 0
     draws: int = 0
     points: int = 0
+    # ELO rating and tournament fields
+    elo_rating: int = 1200  # Default ELO rating
+    tournaments_played: int = 0
+    tournament_ids: List[str] = []  # List of tournament IDs the user has participated in
 
     class Config:
         from_attributes = True
@@ -60,6 +72,10 @@ class UserDetailedStats(BaseModel):
     highest_wins_against: Optional[Dict[str, int]]
     highest_losses_against: Optional[Dict[str, int]]
     winrate_over_time: List[Dict[str, Union[datetime, float]]]
+    # ELO rating and tournament fields
+    elo_rating: int
+    tournaments_played: int
+    tournament_ids: List[str]
 
 
 class Token(BaseModel):

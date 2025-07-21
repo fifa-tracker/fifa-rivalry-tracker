@@ -2,6 +2,7 @@ from datetime import timedelta
 from fastapi import APIRouter, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 from bson import ObjectId
+from pydantic import BaseModel
 
 from app.models.auth import UserCreate, User, UserLogin, Token
 from app.utils.auth import (
@@ -15,6 +16,24 @@ from app.utils.auth import (
 from app.api.dependencies import get_database
 
 router = APIRouter()
+
+
+class UsernameCheck(BaseModel):
+    username: str
+
+
+@router.post("/check-username")
+async def check_username_exists(username_data: UsernameCheck):
+    """Check if a username already exists"""
+    db = await get_database()
+    
+    # Check if username already exists
+    existing_user = await db.users.find_one({"username": username_data.username})
+    
+    return {
+        "username": username_data.username,
+        "exists": existing_user is not None
+    }
 
 
 @router.post("/register", response_model=User)
@@ -99,6 +118,13 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
             detail="Inactive user"
         )
     
+    # Check if user is deleted
+    if user.get("is_deleted", False):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User account has been deleted"
+        )
+    
     # Create access token
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
@@ -142,6 +168,13 @@ async def login_with_json(user_data: UserLogin):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Inactive user"
+        )
+    
+    # Check if user is deleted
+    if user.get("is_deleted", False):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User account has been deleted"
         )
     
     # Create access token

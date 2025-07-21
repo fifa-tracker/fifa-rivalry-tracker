@@ -13,9 +13,9 @@ router = APIRouter()
 
 @router.get("/", response_model=List[Player])
 async def get_stats(current_user: UserInDB = Depends(get_current_active_user)):
-    """Get player stats/leaderboard"""
+    """Get player stats/leaderboard (excluding deleted players)"""
     db = await get_database()
-    players = await db.users.find().sort([("points", -1), ("goal_difference", -1)]).to_list(1000)
+    players = await db.users.find({"is_deleted": {"$ne": True}}).sort([("points", -1), ("goal_difference", -1)]).to_list(1000)
     return [user_helper(player) for player in players]
 
 @router.get("/head-to-head/{player1_id}/{player2_id}", response_model=HeadToHeadStats)

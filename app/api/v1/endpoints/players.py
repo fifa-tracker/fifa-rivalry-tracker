@@ -5,10 +5,10 @@ from itertools import groupby
 from datetime import datetime
 
 from app.models import Player, PlayerDetailedStats, Match
-from app.models.auth import UserInDB, UserCreate
+from app.models.auth import UserInDB, UserCreate, UserUpdate
 from app.api.dependencies import get_database
 from app.utils.helpers import match_helper
-from app.utils.auth import get_current_active_user, user_helper
+from app.utils.auth import get_current_active_user, user_helper, get_password_hash
 
 router = APIRouter()
 
@@ -59,15 +59,15 @@ async def register_player(player: UserCreate, current_user: UserInDB = Depends(g
 
 @router.get("/", response_model=List[Player])
 async def get_players(current_user: UserInDB = Depends(get_current_active_user)):
-    """Get all players"""
+    """Get all active players (excluding deleted ones)"""
     db = await get_database()
-    players = await db.users.find().to_list(1000)
+    players = await db.users.find({"is_deleted": {"$ne": True}}).to_list(1000)
     return [user_helper(player) for player in players]
 
 
 @router.get("/{player_id}", response_model=Player)
 async def get_player(player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
-    """Get a specific player by ID"""
+    """Get a specific player by ID (including deleted players)"""
     db = await get_database()
     try:
         player = await db.users.find_one({"_id": ObjectId(player_id)})
@@ -81,33 +81,44 @@ async def get_player(player_id: str, current_user: UserInDB = Depends(get_curren
 
 
 @router.put("/{player_id}", response_model=Player)
-async def update_player(player_id: str, player: UserCreate, current_user: UserInDB = Depends(get_current_active_user)):
-    """Update a player's username and email"""
+async def update_player(player_id: str, player: UserUpdate, current_user: UserInDB = Depends(get_current_active_user)):
+    """Update a player's information (partial update - only provided fields will be updated)"""
     db = await get_database()
     # Check if player exists
     existing_player = await db.users.find_one({"_id": ObjectId(player_id)})
     if not existing_player:
         raise HTTPException(status_code=404, detail="Player not found")
+    
+    # Check if player is deleted
+    if existing_player.get("is_deleted", False):
+        raise HTTPException(status_code=400, detail="Cannot update a deleted player")
 
     # Check if new username already exists (if different from current)
-    if player.username != existing_player.get("username"):
+    if player.username is not None and player.username != existing_player.get("username"):
         existing_username = await db.users.find_one({"username": player.username})
         if existing_username:
             raise HTTPException(status_code=400, detail="Username already exists")
 
     # Check if new email already exists (if different from current)
-    if player.email != existing_player.get("email"):
+    if player.email is not None and player.email != existing_player.get("email"):
         existing_email = await db.users.find_one({"email": player.email})
         if existing_email:
             raise HTTPException(status_code=400, detail="Email already exists")
 
     # Update player data
-    update_data = {
-        "username": player.username,
-        "email": player.email,
-        "full_name": player.full_name,
-        "updated_at": datetime.utcnow()
-    }
+    update_data = {}
+    if player.username is not None:
+        update_data["username"] = player.username
+    if player.email is not None:
+        update_data["email"] = player.email
+    if player.name is not None:
+        update_data["name"] = player.name
+
+    # Check if any fields are being updated
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields to update")
+
+    update_data["updated_at"] = datetime.utcnow()
     
     update_result = await db.users.update_one(
         {"_id": ObjectId(player_id)},
@@ -124,7 +135,7 @@ async def update_player(player_id: str, player: UserCreate, current_user: UserIn
 
 @router.delete("/{player_id}", response_model=dict)
 async def delete_player(player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
-    """Delete a player and all their matches"""
+    """Mark a player as deleted instead of actually deleting them"""
     db = await get_database()
     try:
         # Check if player exists
@@ -133,21 +144,23 @@ async def delete_player(player_id: str, current_user: UserInDB = Depends(get_cur
         if not player:
             raise HTTPException(status_code=404, detail="Player not found")
 
-        # Delete all matches involving this player
-        await db.matches.delete_many({
-            "$or": [
-                {"player1_id": player_id},
-                {"player2_id": player_id}
-            ]
-        })
-
-        # Delete the player
-        delete_result = await db.users.delete_one({"_id": ObjectId(player_id)})
+        # Mark player as deleted instead of actually deleting
+        update_data = {
+            "is_active": False,
+            "is_deleted": True,
+            "deleted_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
         
-        if delete_result.deleted_count == 0:
+        update_result = await db.users.update_one(
+            {"_id": ObjectId(player_id)},
+            {"$set": update_data}
+        )
+        
+        if update_result.modified_count == 0:
             raise HTTPException(status_code=400, detail="Player deletion failed")
 
-        return {"message": "Player and associated matches deleted successfully"}
+        return {"message": "Player marked as deleted successfully"}
     except Exception as e:
         if "Invalid ObjectId" in str(e):
             raise HTTPException(status_code=400, detail="Invalid player ID format")
@@ -156,7 +169,7 @@ async def delete_player(player_id: str, current_user: UserInDB = Depends(get_cur
 
 @router.get("/{player_id}/stats", response_model=PlayerDetailedStats)
 async def get_player_detailed_stats(player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
-    """Get detailed statistics for a specific player"""
+    """Get detailed statistics for a specific player (including deleted players)"""
     db = await get_database()
     player : Player = await db.users.find_one({"_id": ObjectId(player_id)})
     if not player:
@@ -271,7 +284,7 @@ async def get_player_detailed_stats(player_id: str, current_user: UserInDB = Dep
 
 @router.get("/{player_id}/matches")
 async def get_player_matches(player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
-    """Get all matches for a specific player"""
+    """Get all matches for a specific player (including deleted players)"""
     db = await get_database()
     
     # Get player info
