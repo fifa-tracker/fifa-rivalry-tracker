@@ -11,19 +11,17 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Poetry
-RUN pip install poetry==1.8.2
+# Install uv
+RUN pip install uv
 
-# Copy poetry configuration files
-COPY pyproject.toml ./
+# Copy pyproject.toml and uv.lock files
+COPY pyproject.toml uv.lock* ./
 
-# Configure poetry to not use a virtual environment
-RUN poetry config virtualenvs.create false
-
-# Generate a fresh lock file and install dependencies
-RUN poetry lock --no-update && poetry install --no-interaction --no-ansi
+# Install Python dependencies using uv
+RUN uv sync --frozen
 
 # Copy application code
 COPY . .
@@ -34,5 +32,5 @@ RUN mkdir -p /app/certs && chmod 755 /app/certs
 # Expose the port the app runs on
 EXPOSE 8000
 
-# Run the application with SSL
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run the application using uv
+CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

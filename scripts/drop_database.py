@@ -12,14 +12,17 @@ Use with extreme caution!
 """
 
 import asyncio
-import logging
 from motor.motor_asyncio import AsyncIOMotorClient
 import pathlib
 from dotenv import dotenv_values
+import sys
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Add the app directory to the Python path
+sys.path.append(str(pathlib.Path(__file__).parent))
+
+from app.utils.logging import get_logger
+
+logger = get_logger(__name__)
 
 def load_config():
     """Load configuration from .env file"""
@@ -62,12 +65,12 @@ async def drop_all_collections():
             return
         
         # Confirm with user
-        print("\n" + "="*60)
-        print("🚨 WARNING: This will permanently delete ALL data! 🚨")
-        print("="*60)
-        print(f"Database: fifa_rivalry")
-        print(f"Collections to drop: {', '.join(collections)}")
-        print("="*60)
+        logger.warning("\n" + "="*60)
+        logger.warning("🚨 WARNING: This will permanently delete ALL data! 🚨")
+        logger.warning("="*60)
+        logger.warning(f"Database: fifa_rivalry")
+        logger.warning(f"Collections to drop: {', '.join(collections)}")
+        logger.warning("="*60)
         
         confirmation = input("\nType 'DROP' to confirm collection deletion: ")
         
@@ -106,8 +109,8 @@ async def drop_all_collections():
 
 def main():
     """Main function"""
-    print("🗑️  FIFA Rivalry Tracker Collection Dropper")
-    print("="*50)
+    logger.info("🗑️  FIFA Rivalry Tracker Collection Dropper")
+    logger.info("="*50)
     
     try:
         asyncio.run(drop_all_collections())

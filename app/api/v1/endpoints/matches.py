@@ -1,7 +1,6 @@
 from typing import List
 from fastapi import APIRouter, HTTPException, Depends
 from bson import ObjectId
-import logging
 from datetime import datetime
 
 from app.models import MatchCreate, Match, MatchUpdate, Player, Tournament
@@ -9,9 +8,9 @@ from app.models.auth import UserInDB
 from app.api.dependencies import get_database
 from app.utils.helpers import match_helper, get_result
 from app.utils.auth import get_current_active_user
+from app.utils.logging import get_logger
 
-
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 router = APIRouter()
 
@@ -73,7 +72,7 @@ async def get_matches(current_user: UserInDB = Depends(get_current_active_user))
     """Get all matches"""
     db = await get_database()
     matches = await db.matches.find().sort("date", -1).to_list(1000)
-    print(matches)
+    logger.debug(f"Retrieved {len(matches)} matches")
     return [Match(**await match_helper(match, db)) for match in matches]
 
 @router.put("/{match_id}", response_model=Match)

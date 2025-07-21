@@ -8,11 +8,16 @@ from bson import ObjectId
 
 from app.models.auth import TokenData, UserInDB
 from app.api.dependencies import get_database
+from app.utils.logging import get_logger
+
+logger = get_logger(__name__)
 
 # Security configuration
-SECRET_KEY = "your-secret-key-here-change-in-production"  # Change this in production!
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+from app.config import settings
+
+SECRET_KEY = settings.SECRET_KEY
+ALGORITHM = settings.ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -74,7 +79,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     
     db = await get_database()
     user = await db.users.find_one({"username": token_data.username})
-    print(f"User: {user}")
+    logger.debug(f"User found: {user}")
     
     if user is None:
         raise HTTPException(
@@ -105,6 +110,10 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         "losses": user.get("losses", 0),
         "draws": user.get("draws", 0),
         "points": user.get("points", 0),
+        # ELO rating and tournament fields
+        "elo_rating": user.get("elo_rating", 1200),
+        "tournaments_played": user.get("tournaments_played", 0),
+        "tournament_ids": user.get("tournament_ids", []),
     }
     
     return UserInDB(**user_data)
@@ -163,4 +172,8 @@ def user_helper(user: dict) -> dict:
         "losses": user.get("losses", 0),
         "draws": user.get("draws", 0),
         "points": user.get("points", 0),
+        # ELO rating and tournament fields
+        "elo_rating": user.get("elo_rating", 1200),
+        "tournaments_played": user.get("tournaments_played", 0),
+        "tournament_ids": user.get("tournament_ids", []),
     } 

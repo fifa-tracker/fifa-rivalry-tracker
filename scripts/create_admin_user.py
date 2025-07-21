@@ -14,7 +14,10 @@ sys.path.append(str(Path(__file__).parent))
 
 from app.api.dependencies import get_database
 from app.utils.auth import get_password_hash
+from app.utils.logging import get_logger
 from datetime import datetime
+
+logger = get_logger(__name__)
 
 
 async def create_admin_user():
@@ -24,7 +27,7 @@ async def create_admin_user():
     # Check if admin user already exists
     existing_admin = await db.users.find_one({"username": "admin"})
     if existing_admin:
-        print("✅ Admin user already exists!")
+        logger.info("✅ Admin user already exists!")
         return
     
     # Create admin user data
@@ -52,12 +55,12 @@ async def create_admin_user():
     result = await db.users.insert_one(admin_data)
     
     if result.inserted_id:
-        print("✅ Admin user created successfully!")
-        print("Username: admin")
-        print("Password: admin123")
-        print("⚠️  Please change the password in production!")
+        logger.info("✅ Admin user created successfully!")
+        logger.info("Username: admin")
+        logger.info("Password: admin123")
+        logger.warning("⚠️  Please change the password in production!")
     else:
-        print("❌ Failed to create admin user")
+        logger.error("❌ Failed to create admin user")
 
 
 async def create_test_user():
@@ -67,7 +70,7 @@ async def create_test_user():
     # Check if test user already exists
     existing_user = await db.users.find_one({"username": "testuser"})
     if existing_user:
-        print("✅ Test user already exists!")
+        logger.info("✅ Test user already exists!")
         return
     
     # Create test user data
@@ -95,29 +98,29 @@ async def create_test_user():
     result = await db.users.insert_one(test_user_data)
     
     if result.inserted_id:
-        print("✅ Test user created successfully!")
-        print("Username: testuser")
-        print("Password: test123")
+        logger.info("✅ Test user created successfully!")
+        logger.info("Username: testuser")
+        logger.info("Password: test123")
     else:
-        print("❌ Failed to create test user")
+        logger.error("❌ Failed to create test user")
 
 
 async def main():
     """Main function"""
-    print("🚀 Creating default users for FIFA Rivalry Tracker...")
+    logger.info("🚀 Creating default users for FIFA Rivalry Tracker...")
     
     try:
         await create_admin_user()
         await create_test_user()
-        print("\n🎉 User creation completed!")
-        print("\nYou can now:")
-        print("1. Login at /api/v1/auth/login")
-        print("2. Register new users at /api/v1/auth/register")
-        print("3. Access protected endpoints with JWT tokens")
+        logger.info("🎉 User creation completed!")
+        logger.info("You can now:")
+        logger.info("1. Login at /api/v1/auth/login")
+        logger.info("2. Register new users at /api/v1/auth/register")
+        logger.info("3. Access protected endpoints with JWT tokens")
         
     except Exception as e:
-        print(f"❌ Error creating users: {str(e)}")
-        print("Make sure your MongoDB connection is working and .env file is configured.")
+        logger.error(f"❌ Error creating users: {str(e)}")
+        logger.error("Make sure your MongoDB connection is working and .env file is configured.")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,4 @@
 from typing import List
-import logging
 from fastapi import APIRouter, HTTPException, Depends
 from bson import ObjectId
 from pydantic import BaseModel
@@ -9,8 +8,9 @@ from app.models.auth import UserInDB
 from app.api.dependencies import get_database
 from app.utils.helpers import match_helper, calculate_tournament_stats
 from app.utils.auth import get_current_active_user
+from app.utils.logging import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 router = APIRouter()
 

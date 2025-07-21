@@ -74,7 +74,11 @@ async def register_user(user: UserCreate):
         "wins": 0,
         "losses": 0,
         "draws": 0,
-        "points": 0
+        "points": 0,
+        # ELO rating and tournament fields
+        "elo_rating": 1200,
+        "tournaments_played": 0,
+        "tournament_ids": []
     })
     
     # Remove plain password from data

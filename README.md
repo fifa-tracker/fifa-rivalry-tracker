@@ -45,10 +45,22 @@ pip install -r requirements.txt
 Create a `.env` file in the root directory:
 
 ```env
+# Environment
+ENVIRONMENT=development
+
+# Database
 MONGO_URI=your-mongodb-connection-string
+
+# JWT Authentication
 SECRET_KEY=your-super-secret-key-change-this-in-production
 ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# Logging (optional)
+LOG_LEVEL=INFO
+LOG_FILE=logs/app.log
 ```
+
+For detailed configuration options, see [CONFIGURATION.md](CONFIGURATION.md).
 
 ### 4. Create Default Users
 
@@ -184,6 +196,20 @@ Or using `pip`:
 ```bash
 pytest
 ```
+
+## Logging
+
+The application uses centralized logging configuration. You can control log levels and output through environment variables:
+
+```bash
+# Debug logging to console
+LOG_LEVEL=DEBUG uvicorn main:app --reload
+
+# Info logging to file
+LOG_LEVEL=INFO LOG_FILE=logs/app.log uvicorn main:app --reload
+```
+
+For detailed logging configuration, see [CONFIGURATION.md](CONFIGURATION.md).
 
 ## Development
 

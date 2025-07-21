@@ -46,7 +46,11 @@ async def register_player(player: UserCreate, current_user: UserInDB = Depends(g
         "wins": 0,
         "losses": 0,
         "draws": 0,
-        "points": 0
+        "points": 0,
+        # ELO rating and tournament fields
+        "elo_rating": 1200,
+        "tournaments_played": 0,
+        "tournament_ids": []
     })
     
     # Remove plain password from data
@@ -251,6 +255,18 @@ async def get_player_detailed_stats(player_id: str, current_user: UserInDB = Dep
         date_dt = datetime.combine(date, datetime.min.time())
         daily_winrate.append({"date": date_dt, "winrate": winrate})
 
+    # Calculate tournament participation
+    tournaments_played = 0
+    tournament_ids = []
+    
+    # Find all tournaments where this player is a participant
+    tournaments = await db.tournaments.find({
+        "player_ids": {"$in": [player_id]}
+    }).to_list(1000)
+    
+    tournaments_played = len(tournaments)
+    tournament_ids = [str(t["_id"]) for t in tournaments]
+    
     stats = user_helper(player)
     stats.update(
         {
@@ -276,6 +292,8 @@ async def get_player_detailed_stats(player_id: str, current_user: UserInDB = Dep
                 {highest_losses[0]: highest_losses[1]} if highest_losses else None
             ),
             "winrate_over_time": daily_winrate,
+            "tournaments_played": tournaments_played,
+            "tournament_ids": tournament_ids,
         }
     )
 

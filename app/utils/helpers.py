@@ -1,10 +1,10 @@
 from datetime import datetime
 from bson import ObjectId
-import logging
 from app.models import Player, Match, Tournament
 from typing import List
+from app.utils.logging import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 
