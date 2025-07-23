@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "3000:3000"
     environment:
       - ENVIRONMENT=production
       - MONGO_URI=${MONGO_URI}
