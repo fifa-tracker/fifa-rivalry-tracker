@@ -19,9 +19,22 @@ app = FastAPI(
 
 # Include API router
 app.include_router(api_router, prefix=settings.API_V1_STR)
+
+# Log CORS configuration for debugging
+logger.info(f"CORS Origins configured: {settings.CORS_ORIGINS}")
+
+# Ensure CORS origins are clean (no duplicates, no wildcards mixed with specific origins)
+clean_origins = []
+for origin in settings.CORS_ORIGINS:
+    if origin and origin != "*":
+        if origin not in clean_origins:
+            clean_origins.append(origin)
+
+logger.info(f"Clean CORS Origins: {clean_origins}")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=clean_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -49,9 +62,24 @@ async def root():
         "message": settings.PROJECT_NAME, 
         "version": settings.PROJECT_VERSION,
         "docs": "/docs",
+        "cors_origins": settings.CORS_ORIGINS,
         "authentication": {
             "register": f"{settings.API_V1_STR}/auth/register",
             "login": f"{settings.API_V1_STR}/auth/login",
             "login_json": f"{settings.API_V1_STR}/auth/login-json"
         }
     }
+
+# CORS debug endpoint
+@app.get("/cors-debug")
+async def cors_debug():
+    return {
+        "cors_origins": settings.CORS_ORIGINS,
+        "environment": settings.ENVIRONMENT,
+        "debug": settings.DEBUG
+    }
+
+# Simple CORS test endpoint
+@app.get("/cors-test")
+async def cors_test():
+    return {"message": "CORS is working!", "timestamp": "2024-01-01T00:00:00Z"}

@@ -40,7 +40,14 @@ class Settings:
     # Allow CORS origins to be overridden by environment variable
     _cors_origins_env = get_env_var("CORS_ORIGINS")
     if _cors_origins_env:
-        CORS_ORIGINS = [origin.strip() for origin in _cors_origins_env.split(",")]
+        # Parse CORS origins from environment variable, filtering out wildcards
+        origins = []
+        for origin in _cors_origins_env.split(","):
+            origin = origin.strip()
+            if origin and origin != "*":
+                origins.append(origin)
+        if origins:
+            CORS_ORIGINS = origins
     
     # Logging
     LOG_LEVEL: str = get_env_var("LOG_LEVEL", "INFO")
