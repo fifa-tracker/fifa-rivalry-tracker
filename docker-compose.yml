@@ -1,17 +1,4 @@
 services:
-  mongodb:
-    image: mongo:7.0
-    container_name: fifa-mongodb
-    restart: unless-stopped
-    ports:
-      - "27017:27017"
-    environment:
-      - MONGO_INITDB_DATABASE=fifa_rivalry
-    volumes:
-      - mongodb_data:/data/db
-    networks:
-      - app-network
-
   backend:
     build:
       context: .
@@ -20,18 +7,13 @@ services:
       - "3000:3000"
     environment:
       - ENVIRONMENT=development
-      - MONGO_URI=mongodb://mongodb:27017/fifa_rivalry
+      - MONGO_URI=mongodb+srv://roshan:l5ppwgpgN5MryQAk@fifa-tracker.eqz1vaw.mongodb.net/fifa_rivalry
       - SECRET_KEY=your-super-secret-key-change-this-in-production
       - ACCESS_TOKEN_EXPIRE_MINUTES=30
       - LOG_LEVEL=INFO
-    depends_on:
-      - mongodb
     networks:
       - app-network
 
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  mongodb_data:
