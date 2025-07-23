@@ -33,7 +33,7 @@ jobs:
           
           # Stop and remove ALL existing containers, networks, and volumes
           echo "Stopping and removing ALL existing containers..."
-          docker-compose down --remove-orphans --volumes --rmi all || true
+          docker compose down --remove-orphans --volumes --rmi all || true
           
           # Force stop and remove any containers that might still be running
           echo "Force stopping any remaining containers..."
@@ -50,7 +50,7 @@ jobs:
           
           # Build and start the application with force rebuild and no cache
           echo "Building and starting application with fresh build..."
-          docker-compose up -d --build --force-recreate --no-deps
+          docker compose up -d --build --force-recreate --no-deps
           
           # Wait a moment for the application to start
           sleep 20
@@ -60,13 +60,13 @@ jobs:
           if curl -f http://localhost:3000/ > /dev/null 2>&1; then
             echo "✅ Application deployed successfully!"
             echo "Container status:"
-            docker-compose ps
+            docker compose ps
           else
             echo "❌ Application deployment failed!"
             echo "Container logs:"
-            docker-compose logs
+            docker compose logs
             echo "Container status:"
-            docker-compose ps
+            docker compose ps
             echo "All running containers:"
             docker ps -a
             exit 1
