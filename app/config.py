@@ -33,8 +33,7 @@ class Settings:
         "http://localhost:8000",  # FastAPI development server
         "http://127.0.0.1:3000",
         "http://127.0.0.1:8000",
-        "https://fifa-tracker-qcdulk1cy-roshan-johns-projects.vercel.app",  # Vercel deployment
-        "https://fifa-tracker.vercel.app",  # Custom domain (if you have one)
+        "https://fifa-tracker-web-five.vercel.app",  # New Vercel deployment
     ]
     
     # Allow CORS origins to be overridden by environment variable

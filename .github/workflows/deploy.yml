@@ -31,27 +31,47 @@ jobs:
             git clone https://github.com/${{ github.repository }}.git .
           fi
           
-          # Stop existing containers if running
-          echo "Stopping existing containers..."
-          docker-compose down || true
+          # Stop and remove ALL existing containers, networks, and volumes
+          echo "Stopping and removing ALL existing containers..."
+          docker-compose down --remove-orphans --volumes --rmi all || true
           
-          # Build and start the application
-          echo "Building and starting application..."
-          docker-compose up -d --build
+          # Force stop and remove any containers that might still be running
+          echo "Force stopping any remaining containers..."
+          docker stop $(docker ps -aq) 2>/dev/null || true
+          docker rm $(docker ps -aq) 2>/dev/null || true
+          
+          # Remove all unused containers, networks, images, and volumes
+          echo "Cleaning up all unused Docker resources..."
+          docker system prune -a --volumes -f || true
+          
+          # Remove any dangling images specifically
+          echo "Removing dangling images..."
+          docker image prune -a -f || true
+          
+          # Build and start the application with force rebuild and no cache
+          echo "Building and starting application with fresh build..."
+          docker-compose up -d --build --force-recreate --no-deps
           
           # Wait a moment for the application to start
-          sleep 10
+          sleep 20
           
           # Check if the application is running
           echo "Checking application status..."
           if curl -f http://localhost:3000/ > /dev/null 2>&1; then
             echo "✅ Application deployed successfully!"
+            echo "Container status:"
+            docker-compose ps
           else
             echo "❌ Application deployment failed!"
+            echo "Container logs:"
             docker-compose logs
+            echo "Container status:"
+            docker-compose ps
+            echo "All running containers:"
+            docker ps -a
             exit 1
           fi
           
-          # Clean up old images to save space
-          echo "Cleaning up old Docker images..."
+          # Final cleanup of old images to save space
+          echo "Final cleanup of old Docker images..."
           docker image prune -f 
