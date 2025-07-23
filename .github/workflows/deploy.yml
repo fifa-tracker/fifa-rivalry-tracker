@@ -1,0 +1,57 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: 46.62.134.177
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.SSH_PORT }}
+        script: |
+          # Navigate to the project directory (create if it doesn't exist)
+          cd ~/fifa-rivalry-tracker || mkdir -p ~/fifa-rivalry-tracker && cd ~/fifa-rivalry-tracker
+          
+          # Clone or pull the latest code
+          if [ -d ".git" ]; then
+            echo "Repository exists, pulling latest changes..."
+            git fetch origin
+            git reset --hard origin/main
+          else
+            echo "Cloning repository..."
+            git clone https://github.com/${{ github.repository }}.git .
+          fi
+          
+          # Stop existing containers if running
+          echo "Stopping existing containers..."
+          docker-compose down || true
+          
+          # Build and start the application
+          echo "Building and starting application..."
+          docker-compose up -d --build
+          
+          # Wait a moment for the application to start
+          sleep 10
+          
+          # Check if the application is running
+          echo "Checking application status..."
+          if curl -f http://localhost:3000/ > /dev/null 2>&1; then
+            echo "✅ Application deployed successfully!"
+          else
+            echo "❌ Application deployment failed!"
+            docker-compose logs
+            exit 1
+          fi
+          
+          # Clean up old images to save space
+          echo "Cleaning up old Docker images..."
+          docker image prune -f 
