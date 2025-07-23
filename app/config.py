@@ -33,7 +33,14 @@ class Settings:
         "http://localhost:8000",  # FastAPI development server
         "http://127.0.0.1:3000",
         "http://127.0.0.1:8000",
+        "https://fifa-tracker-qcdulk1cy-roshan-johns-projects.vercel.app",  # Vercel deployment
+        "https://fifa-tracker.vercel.app",  # Custom domain (if you have one)
     ]
+    
+    # Allow CORS origins to be overridden by environment variable
+    _cors_origins_env = get_env_var("CORS_ORIGINS")
+    if _cors_origins_env:
+        CORS_ORIGINS = [origin.strip() for origin in _cors_origins_env.split(",")]
     
     # Logging
     LOG_LEVEL: str = get_env_var("LOG_LEVEL", "INFO")
