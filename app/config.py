@@ -3,25 +3,29 @@ from typing import Optional
 from pathlib import Path
 from dotenv import dotenv_values
 
-# Load environment variables
+# Load environment variables from .env file if it exists
 env_path = Path(__file__).parent.parent / '.env'
-config = dotenv_values(env_path)
+config = dotenv_values(env_path) if env_path.exists() else {}
+
+def get_env_var(key: str, default: str = None) -> str:
+    """Get environment variable with fallback to .env file"""
+    return os.getenv(key, config.get(key, default))
 
 class Settings:
     """Application settings"""
     
     # Environment
-    ENVIRONMENT: str = config.get("ENVIRONMENT", "development")
+    ENVIRONMENT: str = get_env_var("ENVIRONMENT", "development")
     DEBUG: bool = ENVIRONMENT == "development"
     
     # Database
-    MONGO_URI: str = config.get("MONGO_URI") or config.get(f"MONGO_URI_{ENVIRONMENT.upper()}")
+    MONGO_URI: str = get_env_var("MONGO_URI") or get_env_var(f"MONGO_URI_{ENVIRONMENT.upper()}")
     DATABASE_NAME: str = "fifa_rivalry"
     
     # JWT Authentication
-    SECRET_KEY: str = config.get("SECRET_KEY", "your-secret-key-here-change-in-production")
+    SECRET_KEY: str = get_env_var("SECRET_KEY", "your-secret-key-here-change-in-production")
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(config.get("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(get_env_var("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
     
     # CORS
     CORS_ORIGINS: list = [
@@ -32,9 +36,9 @@ class Settings:
     ]
     
     # Logging
-    LOG_LEVEL: str = os.getenv("LOG_LEVEL", config.get("LOG_LEVEL", "INFO"))
-    LOG_FORMAT: str = os.getenv("LOG_FORMAT", config.get("LOG_FORMAT", "%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
-    LOG_FILE: Optional[str] = os.getenv("LOG_FILE", config.get("LOG_FILE"))
+    LOG_LEVEL: str = get_env_var("LOG_LEVEL", "INFO")
+    LOG_FORMAT: str = get_env_var("LOG_FORMAT", "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    LOG_FILE: Optional[str] = get_env_var("LOG_FILE")
     LOG_DATE_FORMAT: str = "%Y-%m-%d %H:%M:%S"
     
     # API
