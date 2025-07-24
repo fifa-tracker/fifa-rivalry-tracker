@@ -324,3 +324,45 @@ async def add_match_to_tournament(tournament_id: str, match: Match, current_user
     await db.tournaments.update_one({"_id": ObjectId(tournament_id)}, {"$set": {"matches_count": tournament["matches_count"] + 1}})
     tournament["matches_count"] = tournament["matches_count"] + 1
     return Tournament(**tournament_helper(tournament))
+
+@router.delete("/tournament/{tournament_id}/match/{match_id}", response_model=dict)
+async def delete_match_from_tournament(tournament_id: str, match_id: str, current_user: UserInDB = Depends(get_current_active_user)):
+    """Delete a match from a tournament"""
+    db = await get_database()
+    
+    # Check if tournament exists
+    tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
+    if not tournament:
+        raise HTTPException(status_code=404, detail="Tournament not found")
+    
+    # Validate that the current user is the owner of the tournament
+    tournament_owner_id = tournament.get("owner_id")
+    current_user_id = str(current_user.id)
+    
+    if tournament_owner_id != current_user_id:
+        raise HTTPException(
+            status_code=403, 
+            detail="You can only delete matches from tournaments that you created"
+        )
+    
+    # Check if match exists and belongs to this tournament
+    try:
+        match = await db.matches.find_one({"_id": ObjectId(match_id), "tournament_id": tournament_id})
+        if not match:
+            raise HTTPException(status_code=404, detail="Match not found in this tournament")
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid match ID format")
+    
+    # Delete the match
+    await db.matches.delete_one({"_id": ObjectId(match_id)})
+    logger.info(f"Deleted match {match_id} from tournament {tournament_id} by user {current_user_id}")
+    
+    # Update tournament matches count
+    current_matches_count = tournament.get("matches_count", 0)
+    new_matches_count = max(0, current_matches_count - 1)  # Ensure count doesn't go below 0
+    await db.tournaments.update_one(
+        {"_id": ObjectId(tournament_id)}, 
+        {"$set": {"matches_count": new_matches_count}}
+    )
+    
+    return {"message": "Match deleted successfully from tournament"}
