@@ -27,6 +27,7 @@ async def match_helper(match : Match, db) -> dict:
                 "date": match.get("date", datetime.now()),
                 "team1": match.get("team1", "Unknown"),
                 "team2": match.get("team2", "Unknown"),
+                "half_length": match.get("half_length", 4),  # Default to 4 minutes if not set
             }
         
         # Find players
@@ -53,6 +54,7 @@ async def match_helper(match : Match, db) -> dict:
             "date": match.get("date", datetime.now()),
             "team1": match.get("team1", "Unknown"),
             "team2": match.get("team2", "Unknown"),
+            "half_length": match.get("half_length", 4),  # Default to 4 minutes if not set
         }
         
         # Add tournament info if available
@@ -72,6 +74,7 @@ async def match_helper(match : Match, db) -> dict:
             "player1_goals": 0,
             "player2_goals": 0,
             "date": datetime.now(),
+            "half_length": match.get("half_length", 4),  # Default to 4 minutes if not set
         }
 
 
