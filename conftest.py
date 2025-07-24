@@ -1,7 +1,7 @@
 import pytest
 import pytest_asyncio
 from fastapi.testclient import TestClient
-from app.main import app
+from main import app
 from app.api.dependencies import get_database
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
@@ -49,7 +49,30 @@ def sample_match_data():
         "player1_goals": 2,
         "player2_goals": 1,
         "team1": "Team A",
-        "team2": "Team B"
+        "team2": "Team B",
+        "half_length": 4
+    }
+
+@pytest.fixture
+def sample_match_with_players():
+    """Sample match data with actual player IDs (to be used with created_players fixture)"""
+    return {
+        "player1_id": "",  # Will be filled by test
+        "player2_id": "",  # Will be filled by test
+        "player1_goals": 2,
+        "player2_goals": 1,
+        "team1": "Barcelona",
+        "team2": "Real Madrid",
+        "half_length": 4
+    }
+
+@pytest.fixture
+def sample_match_update_data():
+    """Sample match update data for testing"""
+    return {
+        "player1_goals": 3,
+        "player2_goals": 2,
+        "half_length": 5
     }
 
 @pytest.fixture

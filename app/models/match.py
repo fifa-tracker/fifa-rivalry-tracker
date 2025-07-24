@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class MatchCreate(BaseModel):
@@ -11,6 +11,7 @@ class MatchCreate(BaseModel):
     tournament_id: str
     team1: str
     team2: str
+    half_length: int = Field(ge=3, le=6, description="Match half length in minutes (3-6 minutes)")
 
 
 class Match(BaseModel):
@@ -23,11 +24,13 @@ class Match(BaseModel):
     team1: Optional[str] = None
     team2: Optional[str] = None
     tournament_name: Optional[str] = None
+    half_length: int
 
 
 class MatchUpdate(BaseModel):
     player1_goals: int
     player2_goals: int
+    half_length: int = Field(ge=3, le=6, description="Match half length in minutes (3-6 minutes)")
 
 
 class HeadToHeadStats(BaseModel):
