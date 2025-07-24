@@ -1,7 +1,8 @@
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends
 from bson import ObjectId
 from pydantic import BaseModel
+from datetime import datetime
 
 from app.models import TournamentCreate, Tournament, Match, Player, TournamentPlayerStats
 from app.models.auth import UserInDB
@@ -33,6 +34,13 @@ def tournament_helper(tournament : Tournament):
 class PlayerIdRequest(BaseModel):
     player_id: str
 
+class TournamentUpdate(BaseModel):
+    name: Optional[str] = None
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    description: Optional[str] = None
+    completed: Optional[bool] = None
+
 @router.post("/", response_model=Tournament)
 async def create_tournament(tournament: TournamentCreate, current_user: UserInDB = Depends(get_current_active_user)):
     """Create a new tournament"""
@@ -42,6 +50,7 @@ async def create_tournament(tournament: TournamentCreate, current_user: UserInDB
     tournament_dict["matches"] = []
     tournament_dict["matches_count"] = 0
     tournament_dict["completed"] = False
+    tournament_dict["owner_id"] = str(current_user.id)
     new_tournament = await db.tournaments.insert_one(tournament_dict)
     created_tournament = await db.tournaments.find_one({"_id": new_tournament.inserted_id})
     return Tournament(**tournament_helper(created_tournament))
@@ -68,6 +77,67 @@ async def get_tournament(tournament_id: str, current_user: UserInDB = Depends(ge
     if not tournament:
         raise HTTPException(status_code=404, detail="Tournament not found")
     return Tournament(**tournament_helper(tournament))
+
+@router.put("/{tournament_id}/", response_model=Tournament)
+async def update_tournament(tournament_id: str, tournament_update: TournamentUpdate, current_user: UserInDB = Depends(get_current_active_user)):
+    """Update tournament details"""
+    db = await get_database()
+    
+    # Check if tournament exists
+    tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
+    if not tournament:
+        raise HTTPException(status_code=404, detail="Tournament not found")
+    
+    # Get only the fields that are provided in the update request
+    update_data = tournament_update.model_dump(exclude_unset=True)
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    
+    # Validate date logic if both dates are provided
+    if update_data.get("start_date") and update_data.get("end_date"):
+        if update_data["start_date"] > update_data["end_date"]:
+            raise HTTPException(status_code=400, detail="Start date cannot be after end date")
+    
+    # Update the tournament
+    await db.tournaments.update_one(
+        {"_id": ObjectId(tournament_id)}, 
+        {"$set": update_data}
+    )
+    
+    # Return the updated tournament
+    updated_tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
+    return Tournament(**tournament_helper(updated_tournament))
+
+@router.delete("/{tournament_id}/", response_model=dict)
+async def delete_tournament(tournament_id: str, current_user: UserInDB = Depends(get_current_active_user)):
+    """Delete a tournament and all its associated matches"""
+    db = await get_database()
+    
+    # Check if tournament exists
+    tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
+    if not tournament:
+        raise HTTPException(status_code=404, detail="Tournament not found")
+    
+    # Validate that the current user is the owner of the tournament
+    tournament_owner_id = tournament.get("owner_id")
+    current_user_id = str(current_user.id)
+    
+    if tournament_owner_id != current_user_id:
+        raise HTTPException(
+            status_code=403, 
+            detail="You can only delete tournaments that you created"
+        )
+    
+    # Delete all matches associated with this tournament
+    matches_deleted = await db.matches.delete_many({"tournament_id": tournament_id})
+    logger.info(f"Deleted {matches_deleted.deleted_count} matches for tournament {tournament_id}")
+    
+    # Delete the tournament
+    await db.tournaments.delete_one({"_id": ObjectId(tournament_id)})
+    logger.info(f"Deleted tournament {tournament_id} by user {current_user_id}")
+    
+    return {"message": "Tournament and all associated matches deleted successfully"}
 
 @router.post("/{tournament_id}/players", response_model=Tournament)
 async def add_player_to_tournament(tournament_id: str, player_request: PlayerIdRequest, current_user: UserInDB = Depends(get_current_active_user)):

@@ -26,7 +26,7 @@ logger = get_logger(__name__)
 
 def load_config():
     """Load configuration from .env file"""
-    env_path = pathlib.Path(__file__).parent / '.env'
+    env_path = pathlib.Path(__file__).parent.parent / '.env'
     config = dotenv_values(env_path)
     
     # Determine environment from .env file
@@ -42,6 +42,7 @@ def load_config():
 
 async def drop_all_collections():
     """Drop all collections in the fifa_rivalry database"""
+    client = None
     try:
         # Load configuration
         mongo_uri = load_config()
@@ -104,8 +105,9 @@ async def drop_all_collections():
         raise
     finally:
         # Close the connection
-        client.close()
-        logger.info("🔌 Database connection closed")
+        if client:
+            client.close()
+            logger.info("🔌 Database connection closed")
 
 def main():
     """Main function"""

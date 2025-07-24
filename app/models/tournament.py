@@ -22,6 +22,7 @@ class Tournament(BaseModel):
     matches_count: int = 0
     player_ids: List[str] = Field(default_factory=list)
     completed: bool = False
+    owner_id: Optional[str] = None
 
 
 class TournamentPlayerStats(BaseModel):
