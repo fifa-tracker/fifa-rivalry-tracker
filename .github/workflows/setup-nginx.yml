@@ -1,0 +1,111 @@
+name: Setup Nginx Configuration
+
+on:
+  workflow_dispatch:
+    inputs:
+      server_host:
+        description: 'Server hostname or IP'
+        required: true
+        default: '46.62.134.177'
+      force_reload:
+        description: 'Force nginx reload even if configuration test fails'
+        required: false
+        default: 'false'
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'nginx/**'
+      - 'scripts/setup_nginx.sh'
+
+jobs:
+  setup-nginx:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Setup nginx configuration
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ github.event.inputs.server_host || '46.62.134.177' }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.SSH_PORT }}
+        script: |
+          echo "Setting up nginx configuration for FIFA Rivalry Tracker..."
+          
+          # Navigate to the project directory
+          cd ~/fifa-rivalry-tracker || { echo "❌ Project directory not found"; exit 1; }
+          
+          # Pull latest changes if triggered by push
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "Pulling latest changes..."
+            git fetch origin
+            git reset --hard origin/main
+          fi
+          
+          # Check if nginx setup script exists
+          if [ ! -f "scripts/setup_nginx.sh" ]; then
+            echo "❌ Nginx setup script not found"
+            echo "Available files in scripts directory:"
+            ls -la scripts/ || echo "Scripts directory not found"
+            exit 1
+          fi
+          
+          # Check if nginx configuration exists
+          if [ ! -f "nginx/default" ]; then
+            echo "❌ Nginx configuration file not found"
+            echo "Available files in nginx directory:"
+            ls -la nginx/ || echo "Nginx directory not found"
+            exit 1
+          fi
+          
+          # Make script executable and run it
+          echo "✅ Found nginx setup script, executing..."
+          chmod +x scripts/setup_nginx.sh
+          
+          # Run the setup script
+          if ./scripts/setup_nginx.sh; then
+            echo "✅ Nginx configuration completed successfully"
+          else
+            echo "❌ Nginx configuration failed"
+            if [ "${{ github.event.inputs.force_reload }}" = "true" ]; then
+              echo "Force reload requested, attempting to reload nginx anyway..."
+              sudo systemctl reload nginx || sudo systemctl restart nginx
+            fi
+            exit 1
+          fi
+          
+          # Verify nginx is running
+          echo "Verifying nginx status..."
+          if sudo systemctl is-active --quiet nginx; then
+            echo "✅ Nginx is running"
+            echo "Nginx status:"
+            sudo systemctl status nginx --no-pager -l
+          else
+            echo "❌ Nginx is not running"
+            echo "Attempting to start nginx..."
+            sudo systemctl start nginx
+            sudo systemctl status nginx --no-pager -l
+          fi
+          
+          # Test nginx configuration
+          echo "Testing nginx configuration..."
+          if sudo nginx -t; then
+            echo "✅ Nginx configuration test passed"
+          else
+            echo "❌ Nginx configuration test failed"
+            exit 1
+          fi
+          
+          # Test if application is accessible through nginx (if running)
+          echo "Testing nginx proxy to application..."
+          sleep 3
+          if curl -f http://localhost/ > /dev/null 2>&1; then
+            echo "✅ Nginx proxy is working correctly!"
+          else
+            echo "⚠️  Nginx proxy test failed - application might not be running"
+            echo "This is normal if the application hasn't been deployed yet"
+            echo "Nginx error logs:"
+            sudo tail -n 10 /var/log/nginx/error.log || echo "Could not read nginx error logs"
+          fi
+          
+          echo "🎉 Nginx setup completed!" 

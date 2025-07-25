@@ -100,3 +100,44 @@ jobs:
           # Final cleanup of old images to save space
           echo "Final cleanup of old Docker images..."
           docker image prune -f
+          
+          # Setup nginx configuration
+          echo "Setting up nginx configuration..."
+          if [ -f "scripts/setup_nginx.sh" ]; then
+            echo "✅ Nginx setup script found, executing..."
+            chmod +x scripts/setup_nginx.sh
+            sudo ./scripts/setup_nginx.sh
+            echo "✅ Nginx configuration completed"
+          else
+            echo "❌ Nginx setup script not found"
+            echo "Available files in scripts directory:"
+            ls -la scripts/ || echo "Scripts directory not found"
+            exit 1
+          fi
+          
+          # Verify nginx is running and configured
+          echo "Verifying nginx status..."
+          if sudo systemctl is-active --quiet nginx; then
+            echo "✅ Nginx is running"
+            echo "Nginx status:"
+            sudo systemctl status nginx --no-pager -l
+          else
+            echo "❌ Nginx is not running"
+            echo "Attempting to start nginx..."
+            sudo systemctl start nginx
+            sudo systemctl status nginx --no-pager -l
+          fi
+          
+          # Test nginx proxy to application
+          echo "Testing nginx proxy to application..."
+          sleep 5  # Give nginx a moment to fully start
+          if curl -f http://localhost/ > /dev/null 2>&1; then
+            echo "✅ Nginx proxy is working correctly!"
+          else
+            echo "❌ Nginx proxy test failed"
+            echo "Nginx error logs:"
+            sudo tail -n 20 /var/log/nginx/error.log || echo "Could not read nginx error logs"
+            echo "Nginx access logs:"
+            sudo tail -n 10 /var/log/nginx/access.log || echo "Could not read nginx access logs"
+            exit 1
+          fi
