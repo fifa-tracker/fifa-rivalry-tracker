@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:8000"
+    env_file:
+      - .env
     environment:
       - ENVIRONMENT=${ENVIRONMENT:-development}
       - MONGO_URI=${MONGO_URI}

@@ -41,6 +41,21 @@ jobs:
           LOG_LEVEL=INFO
           EOF
           
+          # Verify .env file was created and has content
+          echo "Verifying .env file..."
+          if [ -f ".env" ]; then
+            echo "✅ .env file created successfully"
+            echo "File contents (without values):"
+            cat .env | sed 's/=.*/=***/' || echo "Could not display file contents"
+          else
+            echo "❌ .env file was not created"
+            exit 1
+          fi
+          
+          # Test environment variable loading
+          echo "Testing environment variable loading..."
+          python3 scripts/test_env.py || echo "Warning: Could not run environment test"
+          
           # Stop and remove ALL existing containers, networks, and volumes
           echo "Stopping and removing ALL existing containers..."
           docker compose down --remove-orphans --volumes --rmi all || true
