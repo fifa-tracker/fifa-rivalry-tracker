@@ -6,11 +6,11 @@ services:
     ports:
       - "3000:8000"
     environment:
-      - ENVIRONMENT=development
-      - MONGO_URI=mongodb+srv://roshan:l5ppwgpgN5MryQAk@fifa-tracker.eqz1vaw.mongodb.net/fifa_rivalry
-      - SECRET_KEY=your-super-secret-key-change-this-in-production
-      - ACCESS_TOKEN_EXPIRE_MINUTES=30
-      - LOG_LEVEL=INFO
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - MONGO_URI=${MONGO_URI}
+      - SECRET_KEY=${SECRET_KEY}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
     networks:
       - app-network
 

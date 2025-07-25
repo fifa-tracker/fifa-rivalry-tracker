@@ -31,6 +31,16 @@ jobs:
             git clone https://github.com/${{ github.repository }}.git .
           fi
           
+          # Create .env file with secrets
+          echo "Creating .env file with secrets..."
+          cat > .env << EOF
+          ENVIRONMENT=production
+          MONGO_URI=${{ secrets.MONGO_URI }}
+          SECRET_KEY=${{ secrets.SECRET_KEY }}
+          ACCESS_TOKEN_EXPIRE_MINUTES=30
+          LOG_LEVEL=INFO
+          EOF
+          
           # Stop and remove ALL existing containers, networks, and volumes
           echo "Stopping and removing ALL existing containers..."
           docker compose down --remove-orphans --volumes --rmi all || true
@@ -74,4 +84,4 @@ jobs:
           
           # Final cleanup of old images to save space
           echo "Final cleanup of old Docker images..."
-          docker image prune -f 
+          docker image prune -f
