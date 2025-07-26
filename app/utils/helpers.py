@@ -14,7 +14,7 @@ async def match_helper(match : Match, db) -> dict:
     """Convert match document to dict format with player names"""
     start_time = time.time()
     match_id = str(match.get("_id", "unknown"))
-    logger.debug(f"Starting match_helper for match_id: {match_id}")
+    logger.info(f"Starting match_helper for match_id: {match_id}")
     
     try:
         # Get player information
@@ -24,7 +24,7 @@ async def match_helper(match : Match, db) -> dict:
         if not player1_id or not player2_id:
             logger.error(f"Match missing player IDs: {match.get('_id')}")
             error_time = time.time()
-            logger.debug(f"match_helper completed with error in {(error_time - start_time) * 1000:.2f}ms - match_id: {match_id}")
+            logger.info(f"match_helper completed with error in {(error_time - start_time) * 1000:.2f}ms - match_id: {match_id}")
             return {
                 "id": str(match["_id"]),
                 "player1_name": "Unknown Player",
@@ -42,7 +42,7 @@ async def match_helper(match : Match, db) -> dict:
         player1 : Player = await db.users.find_one({"_id": ObjectId(player1_id)})
         player2 : Player = await db.users.find_one({"_id": ObjectId(player2_id)})
         players_time = time.time()
-        logger.debug(f"Player queries completed in {(players_time - players_start) * 1000:.2f}ms - match_id: {match_id}, player1_id: {player1_id}, player2_id: {player2_id}")
+        logger.info(f"Player queries completed in {(players_time - players_start) * 1000:.2f}ms - match_id: {match_id}, player1_id: {player1_id}, player2_id: {player2_id}")
         
         # Handle deleted players
         if player1 and player1.get("is_deleted", False):
@@ -75,16 +75,16 @@ async def match_helper(match : Match, db) -> dict:
                 result["tournament_name"] = tournament["name"]
         tournament_time = time.time()
         if match.get("tournament_id"):
-            logger.debug(f"Tournament query completed in {(tournament_time - tournament_start) * 1000:.2f}ms - match_id: {match_id}, tournament_id: {match['tournament_id']}")
+            logger.info(f"Tournament query completed in {(tournament_time - tournament_start) * 1000:.2f}ms - match_id: {match_id}, tournament_id: {match['tournament_id']}")
         
         total_time = time.time()
-        logger.debug(f"match_helper completed successfully in {(total_time - start_time) * 1000:.2f}ms - match_id: {match_id}, player1: {player1_name}, player2: {player2_name}")
+        logger.info(f"match_helper completed successfully in {(total_time - start_time) * 1000:.2f}ms - match_id: {match_id}, player1: {player1_name}, player2: {player2_name}")
         
         return result
     except Exception as e:
         error_time = time.time()
         logger.error(f"Error in match_helper: {str(e)} - match_id: {match_id}")
-        logger.debug(f"match_helper failed with exception in {(error_time - start_time) * 1000:.2f}ms - match_id: {match_id}")
+        logger.info(f"match_helper failed with exception in {(error_time - start_time) * 1000:.2f}ms - match_id: {match_id}")
         # Return a minimal valid response
         return {
             "id": str(match.get("_id", "unknown")),
