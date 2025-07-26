@@ -63,15 +63,21 @@ class TestTournamentEndpoints:
         response = client.get(f"/api/v1/tournaments/{tournament_id}/matches")
         
         assert response.status_code == 200
-        assert response.json() == []
+        data = response.json()
+        assert data["items"] == []
+        assert data["total"] == 0
+        assert data["page"] == 1
+        assert data["page_size"] == 50  # Default page size
+        assert data["total_pages"] == 0
+        assert data["has_next"] is False
+        assert data["has_previous"] is False
 
     def test_get_tournament_matches_invalid_id(self, client: TestClient):
         """Test getting matches for non-existent tournament"""
         fake_id = str(ObjectId())
         response = client.get(f"/api/v1/tournaments/{fake_id}/matches")
         
-        assert response.status_code == 200
-        assert response.json() == []  # Returns empty list for non-existent tournament
+        assert response.status_code == 404  # Now returns 404 for non-existent tournament
 
 
 class TestTournamentValidation:
@@ -197,4 +203,44 @@ class TestTournamentIntegration:
         # Read - tournament matches
         matches_response = client.get(f"/api/v1/tournaments/{tournament_id}/matches")
         assert matches_response.status_code == 200
-        assert matches_response.json() == [] 
+        matches_data = matches_response.json()
+        assert matches_data["items"] == []
+        assert matches_data["total"] == 0
+
+    def test_get_tournament_matches_pagination(self, client: TestClient, created_tournament):
+        """Test pagination for tournament matches"""
+        tournament_id = created_tournament["id"]
+        
+        # Test default pagination (page 1, default page size)
+        response = client.get(f"/api/v1/tournaments/{tournament_id}/matches")
+        assert response.status_code == 200
+        data = response.json()
+        assert "items" in data
+        assert "total" in data
+        assert "page" in data
+        assert "page_size" in data
+        assert "total_pages" in data
+        assert "has_next" in data
+        assert "has_previous" in data
+        assert data["page"] == 1
+        assert data["page_size"] == 50  # Default page size
+        
+        # Test custom page size
+        response = client.get(f"/api/v1/tournaments/{tournament_id}/matches?page_size=10")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["page_size"] == 10
+        
+        # Test custom page number
+        response = client.get(f"/api/v1/tournaments/{tournament_id}/matches?page=2")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["page"] == 2
+        
+        # Test invalid page number
+        response = client.get(f"/api/v1/tournaments/{tournament_id}/matches?page=0")
+        assert response.status_code == 422  # Validation error
+        
+        # Test invalid page size
+        response = client.get(f"/api/v1/tournaments/{tournament_id}/matches?page_size=0")
+        assert response.status_code == 422  # Validation error 

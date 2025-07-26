@@ -1,15 +1,17 @@
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
 from bson import ObjectId
 from pydantic import BaseModel
 from datetime import datetime
+import math
 
-from app.models import TournamentCreate, Tournament, Match, Player, TournamentPlayerStats
+from app.models import TournamentCreate, Tournament, Match, Player, TournamentPlayerStats, PaginatedResponse, MatchUpdate
 from app.models.auth import UserInDB
 from app.api.dependencies import get_database
 from app.utils.helpers import match_helper, calculate_tournament_stats
 from app.utils.auth import get_current_active_user
 from app.utils.logging import get_logger
+from app.config import settings
 
 logger = get_logger(__name__)
 
@@ -62,12 +64,48 @@ async def get_tournaments(current_user: UserInDB = Depends(get_current_active_us
     tournaments : List[Tournament] = await db.tournaments.find().to_list(1000)
     return [Tournament(**tournament_helper(t)) for t in tournaments]
 
-@router.get("/{tournament_id}/matches", response_model=List[Match])
-async def get_tournament_matches(tournament_id: str, current_user: UserInDB = Depends(get_current_active_user)):
-    """Get all matches for a specific tournament"""
+@router.get("/{tournament_id}/matches", response_model=PaginatedResponse[Match])
+async def get_tournament_matches(
+    tournament_id: str, 
+    page: int = Query(1, ge=1, description="Page number (1-based)"),
+    page_size: int = Query(settings.DEFAULT_PAGE_SIZE, ge=1, le=settings.MAX_PAGE_SIZE, description="Number of items per page"),
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Get all matches for a specific tournament with pagination"""
     db = await get_database()
-    matches : List[Match] = await db.matches.find({"tournament_id": tournament_id}).sort("date", -1).to_list(1000)
-    return [Match(**await match_helper(match, db)) for match in matches]
+    
+    # Validate tournament exists
+    tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
+    if not tournament:
+        raise HTTPException(status_code=404, detail="Tournament not found")
+    
+    # Calculate skip value for pagination
+    skip = (page - 1) * page_size
+    
+    # Get total count of matches for this tournament
+    total_matches = await db.matches.count_documents({"tournament_id": tournament_id})
+    
+    # Get paginated matches
+    matches_cursor = db.matches.find({"tournament_id": tournament_id}).sort("date", -1).skip(skip).limit(page_size)
+    matches = await matches_cursor.to_list(page_size)
+    
+    # Process matches with helper function
+    processed_matches = [Match(**await match_helper(match, db)) for match in matches]
+    
+    # Calculate pagination metadata
+    total_pages = math.ceil(total_matches / page_size) if total_matches > 0 else 0
+    has_next = page < total_pages
+    has_previous = page > 1
+    
+    return PaginatedResponse[Match](
+        items=processed_matches,
+        total=total_matches,
+        page=page,
+        page_size=page_size,
+        total_pages=total_pages,
+        has_next=has_next,
+        has_previous=has_previous
+    )
 
 @router.get("/{tournament_id}/", response_model=Tournament)
 async def get_tournament(tournament_id: str, current_user: UserInDB = Depends(get_current_active_user)):
@@ -366,3 +404,52 @@ async def delete_match_from_tournament(tournament_id: str, match_id: str, curren
     )
     
     return {"message": "Match deleted successfully from tournament"}
+
+@router.put("/tournament/{tournament_id}/match/{match_id}", response_model=Match)
+async def edit_match_in_tournament(
+    tournament_id: str, 
+    match_id: str, 
+    match_update: MatchUpdate, 
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Edit a match in a tournament"""
+    db = await get_database()
+    
+    # Check if tournament exists
+    tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
+    if not tournament:
+        raise HTTPException(status_code=404, detail="Tournament not found")
+    
+    # Validate that the current user is the owner of the tournament
+    tournament_owner_id = tournament.get("owner_id")
+    current_user_id = str(current_user.id)
+    
+    if tournament_owner_id != current_user_id:
+        raise HTTPException(
+            status_code=403, 
+            detail="You can only edit matches in tournaments that you created"
+        )
+    
+    # Check if match exists and belongs to this tournament
+    try:
+        match = await db.matches.find_one({"_id": ObjectId(match_id), "tournament_id": tournament_id})
+        if not match:
+            raise HTTPException(status_code=404, detail="Match not found in this tournament")
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid match ID format")
+    
+    # Get only the fields that are provided in the update request
+    update_data = match_update.model_dump(exclude_unset=True)
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    
+    # Update the match
+    await db.matches.update_one(
+        {"_id": ObjectId(match_id)}, 
+        {"$set": update_data}
+    )
+    
+    # Return the updated match
+    updated_match = await db.matches.find_one({"_id": ObjectId(match_id)})
+    return Match(**await match_helper(updated_match, db))
