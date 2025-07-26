@@ -106,9 +106,68 @@ async def get_tournament_matches(
     matches_time = time.time()
     logger.info(f"Matches fetch query completed in {(matches_time - matches_start) * 1000:.2f}ms - fetched_matches: {len(matches)}")
     
-    # Process matches with helper function
+    # Fetch all unique player IDs from the matches
+    player_ids_start = time.time()
+    unique_player_ids = set()
+    for match in matches:
+        if match.get("player1_id"):
+            unique_player_ids.add(match["player1_id"])
+        if match.get("player2_id"):
+            unique_player_ids.add(match["player2_id"])
+    
+    # Fetch all players in one query
+    players = {}
+    if unique_player_ids:
+        player_objects = await db.users.find({"_id": {"$in": [ObjectId(pid) for pid in unique_player_ids]}}).to_list(len(unique_player_ids))
+        players = {str(player["_id"]): player for player in player_objects}
+    
+    player_ids_time = time.time()
+    logger.info(f"Player data fetch completed in {(player_ids_time - player_ids_start) * 1000:.2f}ms - unique_players: {len(players)}")
+    
+    # Process matches with helper function using pre-fetched data
     processing_start = time.time()
-    processed_matches = [Match(**await match_helper(match, db)) for match in matches]
+    processed_matches = []
+    for match in matches:
+        # Create a simplified match_helper that uses pre-fetched data
+        match_id = str(match.get("_id", "unknown"))
+        
+        # Get player information from pre-fetched data
+        player1_id = match.get("player1_id")
+        player2_id = match.get("player2_id")
+        
+        if not player1_id or not player2_id:
+            player1_name = "Unknown Player"
+            player2_name = "Unknown Player"
+        else:
+            player1 = players.get(player1_id)
+            player2 = players.get(player2_id)
+            
+            # Handle deleted players
+            if player1 and player1.get("is_deleted", False):
+                player1_name = "Deleted Player"
+            else:
+                player1_name = player1["username"] if player1 else "Unknown Player"
+                
+            if player2 and player2.get("is_deleted", False):
+                player2_name = "Deleted Player"
+            else:
+                player2_name = player2["username"] if player2 else "Unknown Player"
+        
+        processed_match = {
+            "id": str(match["_id"]),
+            "player1_name": player1_name,
+            "player2_name": player2_name,
+            "player1_goals": match.get("player1_goals", 0),
+            "player2_goals": match.get("player2_goals", 0),
+            "date": match.get("date", datetime.now()),
+            "team1": match.get("team1", "Unknown"),
+            "team2": match.get("team2", "Unknown"),
+            "half_length": match.get("half_length", 4),
+            "tournament_name": tournament["name"] if tournament else None
+        }
+        
+        processed_matches.append(Match(**processed_match))
+    
     processing_time = time.time()
     logger.info(f"Match processing completed in {(processing_time - processing_start) * 1000:.2f}ms - processed_matches: {len(processed_matches)}")
     
