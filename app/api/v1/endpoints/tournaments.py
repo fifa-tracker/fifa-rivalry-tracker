@@ -4,6 +4,7 @@ from bson import ObjectId
 from pydantic import BaseModel
 from datetime import datetime
 import math
+import time
 
 from app.models import TournamentCreate, Tournament, Match, Player, TournamentPlayerStats, PaginatedResponse, MatchUpdate
 from app.models.auth import UserInDB
@@ -72,30 +73,52 @@ async def get_tournament_matches(
     current_user: UserInDB = Depends(get_current_active_user)
 ):
     """Get all matches for a specific tournament with pagination"""
+    start_time = time.time()
+    logger.info(f"Starting tournament matches request - tournament_id: {tournament_id}, page: {page}, page_size: {page_size}")
+    
     db = await get_database()
+    db_time = time.time()
+    logger.info(f"Database connection established in {(db_time - start_time) * 1000:.2f}ms")
     
     # Validate tournament exists
+    tournament_start = time.time()
     tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
+    tournament_time = time.time()
+    logger.info(f"Tournament validation query completed in {(tournament_time - tournament_start) * 1000:.2f}ms")
+    
     if not tournament:
+        logger.warning(f"Tournament not found - tournament_id: {tournament_id}")
         raise HTTPException(status_code=404, detail="Tournament not found")
     
     # Calculate skip value for pagination
     skip = (page - 1) * page_size
     
     # Get total count of matches for this tournament
+    count_start = time.time()
     total_matches = await db.matches.count_documents({"tournament_id": tournament_id})
+    count_time = time.time()
+    logger.info(f"Match count query completed in {(count_time - count_start) * 1000:.2f}ms - total_matches: {total_matches}")
     
     # Get paginated matches
+    matches_start = time.time()
     matches_cursor = db.matches.find({"tournament_id": tournament_id}).sort("date", -1).skip(skip).limit(page_size)
     matches = await matches_cursor.to_list(page_size)
+    matches_time = time.time()
+    logger.info(f"Matches fetch query completed in {(matches_time - matches_start) * 1000:.2f}ms - fetched_matches: {len(matches)}")
     
     # Process matches with helper function
+    processing_start = time.time()
     processed_matches = [Match(**await match_helper(match, db)) for match in matches]
+    processing_time = time.time()
+    logger.info(f"Match processing completed in {(processing_time - processing_start) * 1000:.2f}ms - processed_matches: {len(processed_matches)}")
     
     # Calculate pagination metadata
     total_pages = math.ceil(total_matches / page_size) if total_matches > 0 else 0
     has_next = page < total_pages
     has_previous = page > 1
+    
+    total_time = time.time()
+    logger.info(f"Tournament matches request completed in {(total_time - start_time) * 1000:.2f}ms - tournament_id: {tournament_id}, page: {page}, total_matches: {total_matches}, returned_matches: {len(processed_matches)}")
     
     return PaginatedResponse[Match](
         items=processed_matches,
