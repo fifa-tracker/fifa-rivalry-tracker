@@ -535,3 +535,48 @@ async def edit_match_in_tournament(
     # Return the updated match
     updated_match = await db.matches.find_one({"_id": ObjectId(match_id)})
     return Match(**await match_helper(updated_match, db))
+
+@router.post("/{tournament_id}/end", response_model=Tournament)
+async def end_tournament(tournament_id: str, current_user: UserInDB = Depends(get_current_active_user)):
+    """End a tournament by marking it as completed and setting the end date"""
+    db = await get_database()
+    
+    # Check if tournament exists
+    tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
+    if not tournament:
+        raise HTTPException(status_code=404, detail="Tournament not found")
+    
+    # Validate that the current user is the owner of the tournament
+    tournament_owner_id = tournament.get("owner_id")
+    current_user_id = str(current_user.id)
+    
+    if tournament_owner_id != current_user_id:
+        raise HTTPException(
+            status_code=403, 
+            detail="You can only end tournaments that you created"
+        )
+    
+    # Check if tournament is already completed
+    if tournament.get("completed", False):
+        raise HTTPException(
+            status_code=400, 
+            detail="Tournament is already completed"
+        )
+    
+    # Update tournament to mark it as completed and set end date
+    current_time = datetime.now()
+    update_data = {
+        "completed": True,
+        "end_date": current_time
+    }
+    
+    await db.tournaments.update_one(
+        {"_id": ObjectId(tournament_id)}, 
+        {"$set": update_data}
+    )
+    
+    # Return the updated tournament
+    updated_tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
+    logger.info(f"Tournament {tournament_id} ended by user {current_user_id} at {current_time}")
+    
+    return Tournament(**tournament_helper(updated_tournament))
