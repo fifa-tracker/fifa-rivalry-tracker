@@ -115,8 +115,10 @@ async def update_player(player_id: str, player: UserUpdate, current_user: UserIn
         update_data["username"] = player.username
     if player.email is not None:
         update_data["email"] = player.email
-    if player.name is not None:
-        update_data["name"] = player.name
+    if player.first_name is not None:
+        update_data["first_name"] = player.first_name
+    if player.last_name is not None:
+        update_data["last_name"] = player.last_name
 
     # Check if any fields are being updated
     if not update_data:

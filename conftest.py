@@ -36,7 +36,8 @@ def sample_player_data():
     return {
         "username": "testplayer",
         "email": "test@example.com",
-        "full_name": "Test Player",
+        "first_name": "Test",
+        "last_name": "Player",
         "password": "testpassword123"
     }
 

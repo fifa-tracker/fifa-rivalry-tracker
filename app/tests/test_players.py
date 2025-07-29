@@ -98,7 +98,7 @@ class TestPlayerEndpoints:
         player_id = created_player["id"]
         
         # Update player
-        new_data = {"username": "updatedplayer", "email": "updated@example.com", "full_name": "Updated Player Name"}
+        new_data = {"username": "updatedplayer", "email": "updated@example.com", "first_name": "Updated", "last_name": "Player Name"}
         response = client.put(f"/api/v1/players/{player_id}", json=new_data)
         
         assert response.status_code == 200
@@ -109,7 +109,7 @@ class TestPlayerEndpoints:
     def test_update_player_not_found(self, client: TestClient):
         """Test updating a player that doesn't exist"""
         fake_id = str(ObjectId())
-        new_data = {"username": "updatedname", "email": "updated@example.com", "full_name": "Updated Name"}
+        new_data = {"username": "updatedname", "email": "updated@example.com", "first_name": "Updated", "last_name": "Name"}
         response = client.put(f"/api/v1/players/{fake_id}", json=new_data)
         
         assert response.status_code == 404
@@ -215,9 +215,9 @@ class TestPlayerIntegration:
     def test_multiple_players_creation_and_retrieval(self, client: TestClient):
         """Test creating multiple players and retrieving them"""
         players_data = [
-            {"username": "player1", "email": "player1@example.com", "full_name": "Player 1", "password": "password123"},
-            {"username": "player2", "email": "player2@example.com", "full_name": "Player 2", "password": "password123"},
-            {"username": "player3", "email": "player3@example.com", "full_name": "Player 3", "password": "password123"}
+            {"username": "player1", "email": "player1@example.com", "first_name": "Player", "last_name": "1", "password": "password123"},
+            {"username": "player2", "email": "player2@example.com", "first_name": "Player", "last_name": "2", "password": "password123"},
+            {"username": "player3", "email": "player3@example.com", "first_name": "Player", "last_name": "3", "password": "password123"}
         ]
         
         created_players = []
@@ -239,7 +239,7 @@ class TestPlayerIntegration:
     def test_player_lifecycle(self, client: TestClient):
         """Test complete player lifecycle: create, read, update, delete"""
         # Create
-        create_data = {"username": "lifecycleplayer", "email": "lifecycle@example.com", "full_name": "Lifecycle Player", "password": "password123"}
+        create_data = {"username": "lifecycleplayer", "email": "lifecycle@example.com", "first_name": "Lifecycle", "last_name": "Player", "password": "password123"}
         create_response = client.post("/api/v1/players/", json=create_data)
         assert create_response.status_code == 200
         player = create_response.json()
@@ -251,7 +251,7 @@ class TestPlayerIntegration:
         assert read_response.json()["username"] == create_data["username"]
         
         # Update
-        update_data = {"username": "updatedlifecycle", "email": "updated@example.com", "full_name": "Updated Lifecycle Player"}
+        update_data = {"username": "updatedlifecycle", "email": "updated@example.com", "first_name": "Updated", "last_name": "Lifecycle Player"}
         update_response = client.put(f"/api/v1/players/{player_id}", json=update_data)
         assert update_response.status_code == 200
         assert update_response.json()["username"] == update_data["username"]

@@ -34,7 +34,8 @@ async def create_admin_user():
     admin_data = {
         "username": "admin",
         "email": "admin@fifa-tracker.com",
-        "full_name": "Administrator",
+        "first_name": "Administrator",
+        "last_name": "",
         "hashed_password": get_password_hash("admin123"),  # Change this password!
         "is_active": True,
         "is_superuser": True,
@@ -77,7 +78,8 @@ async def create_test_user():
     test_user_data = {
         "username": "testuser",
         "email": "test@fifa-tracker.com",
-        "full_name": "Test User",
+        "first_name": "Test",
+        "last_name": "User",
         "hashed_password": get_password_hash("test123"),
         "is_active": True,
         "is_superuser": False,

@@ -30,7 +30,8 @@ class TournamentPlayerStats(BaseModel):
     id: str
     username: str
     email: str
-    name: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
     total_matches: int
     total_goals_scored: int
     total_goals_conceded: int

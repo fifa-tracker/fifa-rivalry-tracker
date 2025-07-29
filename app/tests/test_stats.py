@@ -41,8 +41,8 @@ class TestStatsEndpoints:
         
         assert response.status_code == 200
         data = response.json()
-        assert data["player1_name"] == player1["name"]
-        assert data["player2_name"] == player2["name"]
+        assert data["player1_name"] == player1["username"]
+        assert data["player2_name"] == player2["username"]
         assert data["total_matches"] == 0
         assert data["player1_wins"] == 0
         assert data["player2_wins"] == 0
@@ -205,10 +205,10 @@ class TestStatsIntegration:
         """Test stats endpoint with multiple players having different performance"""
         # Create multiple players
         players_data = [
-            {"name": "Player A"},
-            {"name": "Player B"},
-            {"name": "Player C"},
-            {"name": "Player D"}
+            {"username": "player_a", "email": "a@example.com", "first_name": "Player", "last_name": "A", "password": "password123"},
+            {"username": "player_b", "email": "b@example.com", "first_name": "Player", "last_name": "B", "password": "password123"},
+            {"username": "player_c", "email": "c@example.com", "first_name": "Player", "last_name": "C", "password": "password123"},
+            {"username": "player_d", "email": "d@example.com", "first_name": "Player", "last_name": "D", "password": "password123"}
         ]
         
         created_players = []
@@ -229,7 +229,7 @@ class TestStatsIntegration:
             assert player_stats["total_matches"] == 0
             assert player_stats["points"] == 0
             # Verify all required fields are present
-            required_fields = ["id", "name", "total_matches", "wins", "losses", "draws", 
+            required_fields = ["id", "username", "total_matches", "wins", "losses", "draws", 
                              "points", "total_goals_scored", "total_goals_conceded", "goal_difference"]
             for field in required_fields:
                 assert field in player_stats 
