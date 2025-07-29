@@ -55,7 +55,7 @@ Add the following to your `.env` file:
 ```env
 # JWT Configuration
 SECRET_KEY=your-super-secret-key-change-this-in-production
-ACCESS_TOKEN_EXPIRE_MINUTES=30
+ACCESS_TOKEN_EXPIRE_MINUTES=43200
 ```
 
 ## API Endpoints
@@ -164,7 +164,7 @@ curl -X GET "http://localhost:8000/api/v1/players" \
 - Keep the secret key secure and never commit it to version control
 
 ### 2. Token Expiration
-- Tokens expire after 30 minutes by default
+- Tokens expire after 1 month (43,200 minutes) by default
 - Users should refresh tokens before expiration
 - Consider implementing refresh tokens for better security
 
@@ -242,7 +242,7 @@ Set these environment variables in production:
 
 ```env
 SECRET_KEY=your-production-secret-key
-ACCESS_TOKEN_EXPIRE_MINUTES=30
+ACCESS_TOKEN_EXPIRE_MINUTES=43200
 MONGO_URI=your-production-mongodb-uri
 ```
 

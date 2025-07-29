@@ -25,7 +25,7 @@ class Settings:
     # JWT Authentication
     SECRET_KEY: str = get_env_var("SECRET_KEY", "your-secret-key-here-change-in-production")
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(get_env_var("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(get_env_var("ACCESS_TOKEN_EXPIRE_MINUTES", "43200"))
     
     # CORS
     CORS_ORIGINS: list = [

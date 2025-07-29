@@ -53,7 +53,7 @@ MONGO_URI=your-mongodb-connection-string
 
 # JWT Authentication
 SECRET_KEY=your-super-secret-key-change-this-in-production
-ACCESS_TOKEN_EXPIRE_MINUTES=30
+ACCESS_TOKEN_EXPIRE_MINUTES=43200
 
 # Logging (optional)
 LOG_LEVEL=INFO

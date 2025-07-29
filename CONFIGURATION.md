@@ -19,7 +19,7 @@ MONGO_URI=mongodb://localhost:27017/fifa_rivalry
 
 # JWT Authentication
 SECRET_KEY=your-super-secret-key-change-this-in-production
-ACCESS_TOKEN_EXPIRE_MINUTES=30
+ACCESS_TOKEN_EXPIRE_MINUTES=43200
 ```
 
 ### Logging Configuration
