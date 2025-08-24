@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, Dict, List, Union
 from datetime import datetime
 
@@ -22,7 +22,7 @@ class UserUpdate(BaseModel):
 
 
 class UserLogin(BaseModel):
-    username: str
+    username: str = Field(..., description="Username or email address")
     password: str
 
 

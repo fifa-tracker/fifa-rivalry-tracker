@@ -17,7 +17,7 @@ def test_cors_from_frontend():
         "/",
         "/cors-debug",
         "/cors-test",
-        "/api/v1/auth/login-json"
+        "/api/v1/auth/login"
     ]
     
     print("🧪 Testing CORS Configuration...")

@@ -1,6 +1,5 @@
 from datetime import timedelta
 from fastapi import APIRouter, HTTPException, Depends, status
-from fastapi.security import OAuth2PasswordRequestForm
 from bson import ObjectId
 from pydantic import BaseModel
 
@@ -94,68 +93,21 @@ async def register_user(user: UserCreate):
 
 
 @router.post("/login", response_model=Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login(user_data: UserLogin):
     """Login to get access token"""
     db = await get_database()
     
-    # Find user by username
-    user = await db.users.find_one({"username": form_data.username})
+    # Find user by username or email
+    user = await db.users.find_one({
+        "$or": [
+            {"username": user_data.username},
+            {"email": user_data.username}
+        ]
+    })
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    # Verify password
-    if not verify_password(form_data.password, user["hashed_password"]):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    # Check if user is active
-    if not user.get("is_active", True):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Inactive user"
-        )
-    
-    # Check if user is deleted
-    if user.get("is_deleted", False):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User account has been deleted"
-        )
-    
-    # Create access token
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user["username"], "user_id": str(user["_id"])},
-        expires_delta=access_token_expires
-    )
-    
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
-        "email": user["email"],
-        "username": user["username"]
-    }
-
-
-@router.post("/login-json", response_model=Token)
-async def login_with_json(user_data: UserLogin):
-    """Login with JSON data instead of form data"""
-    db = await get_database()
-    
-    # Find user by username
-    user = await db.users.find_one({"username": user_data.username})
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Incorrect username/email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
@@ -163,7 +115,7 @@ async def login_with_json(user_data: UserLogin):
     if not verify_password(user_data.password, user["hashed_password"]):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Incorrect username/email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
     

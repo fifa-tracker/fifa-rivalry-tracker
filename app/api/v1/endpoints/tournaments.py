@@ -565,6 +565,10 @@ async def end_tournament(tournament_id: str, current_user: UserInDB = Depends(ge
             detail="Tournament is already completed"
         )
     
+    # Get all players in the tournament
+    player_ids = tournament.get("player_ids", [])
+    logger.info(f"Ending tournament {tournament_id} with {len(player_ids)} players")
+    
     # Update tournament to mark it as completed and set end date
     current_time = datetime.now()
     update_data = {
@@ -576,6 +580,25 @@ async def end_tournament(tournament_id: str, current_user: UserInDB = Depends(ge
         {"_id": ObjectId(tournament_id)}, 
         {"$set": update_data}
     )
+    
+    # Increment tournaments_played count for all players in the tournament
+    if player_ids:
+        try:
+            # Convert string IDs to ObjectIds for database query
+            player_object_ids = [ObjectId(pid) if isinstance(pid, str) else pid for pid in player_ids]
+            
+            # Update all players' tournaments_played count
+            result = await db.users.update_many(
+                {"_id": {"$in": player_object_ids}},
+                {"$inc": {"tournaments_played": 1}}
+            )
+            
+            logger.info(f"Updated tournaments_played count for {result.modified_count} players in tournament {tournament_id}")
+            
+        except Exception as e:
+            logger.error(f"Error updating player tournament counts: {e}")
+            # Don't fail the entire operation if player count update fails
+            # The tournament is still marked as completed
     
     # Return the updated tournament
     updated_tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})

@@ -65,8 +65,7 @@ async def root():
         "cors_origins": settings.CORS_ORIGINS,
         "authentication": {
             "register": f"{settings.API_V1_STR}/auth/register",
-            "login": f"{settings.API_V1_STR}/auth/login",
-            "login_json": f"{settings.API_V1_STR}/auth/login-json"
+            "login": f"{settings.API_V1_STR}/auth/login"
         }
     }
 
