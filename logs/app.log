@@ -1,0 +1,832 @@
+2025-09-04 13:45:44 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-04 13:45:44 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-04 13:45:44 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-04 13:45:44 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-04 13:45:44 - uvicorn.error - INFO - _serve:83 - Started server process [6228]
+2025-09-04 13:45:44 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-04 13:45:44 - main - ERROR - startup_event:51 - ❌ MongoDB Atlas connection failed: bad auth : authentication failed, full error: {'ok': 0, 'errmsg': 'bad auth : authentication failed', 'code': 8000, 'codeName': 'AtlasError'}
+2025-09-04 13:45:44 - main - ERROR - startup_event:52 - Please check:
+2025-09-04 13:45:44 - main - ERROR - startup_event:53 - 1. Your internet connection
+2025-09-04 13:45:44 - main - ERROR - startup_event:54 - 2. MongoDB Atlas IP whitelist settings
+2025-09-04 13:45:44 - main - ERROR - startup_event:55 - 3. Username and password in connection string
+2025-09-04 13:45:44 - main - ERROR - startup_event:56 - 4. Database name in connection string
+2025-09-04 13:45:44 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-04 13:46:07 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-04 13:46:07 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-04 13:46:07 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-04 13:46:07 - uvicorn.error - INFO - _serve:93 - Finished server process [6228]
+2025-09-04 13:46:25 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-04 13:46:25 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-04 13:46:25 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-04 13:46:25 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-04 13:46:25 - uvicorn.error - INFO - _serve:83 - Started server process [6400]
+2025-09-04 13:46:25 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-04 13:46:26 - main - ERROR - startup_event:51 - ❌ MongoDB Atlas connection failed: bad auth : authentication failed, full error: {'ok': 0, 'errmsg': 'bad auth : authentication failed', 'code': 8000, 'codeName': 'AtlasError'}
+2025-09-04 13:46:26 - main - ERROR - startup_event:52 - Please check:
+2025-09-04 13:46:26 - main - ERROR - startup_event:53 - 1. Your internet connection
+2025-09-04 13:46:26 - main - ERROR - startup_event:54 - 2. MongoDB Atlas IP whitelist settings
+2025-09-04 13:46:26 - main - ERROR - startup_event:55 - 3. Username and password in connection string
+2025-09-04 13:46:26 - main - ERROR - startup_event:56 - 4. Database name in connection string
+2025-09-04 13:46:26 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-04 13:46:36 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-04 13:46:36 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-04 13:46:36 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-04 13:46:36 - uvicorn.error - INFO - _serve:93 - Finished server process [6400]
+2025-09-04 13:48:54 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-04 13:48:54 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-04 13:48:54 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-04 13:48:54 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-04 13:48:54 - uvicorn.error - INFO - _serve:83 - Started server process [6589]
+2025-09-04 13:48:54 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-04 13:48:55 - main - ERROR - startup_event:51 - ❌ MongoDB Atlas connection failed: bad auth : authentication failed, full error: {'ok': 0, 'errmsg': 'bad auth : authentication failed', 'code': 8000, 'codeName': 'AtlasError'}
+2025-09-04 13:48:55 - main - ERROR - startup_event:52 - Please check:
+2025-09-04 13:48:55 - main - ERROR - startup_event:53 - 1. Your internet connection
+2025-09-04 13:48:55 - main - ERROR - startup_event:54 - 2. MongoDB Atlas IP whitelist settings
+2025-09-04 13:48:55 - main - ERROR - startup_event:55 - 3. Username and password in connection string
+2025-09-04 13:48:55 - main - ERROR - startup_event:56 - 4. Database name in connection string
+2025-09-04 13:48:55 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-04 13:49:41 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-04 13:49:41 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-04 13:49:41 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-04 13:49:41 - uvicorn.error - INFO - _serve:93 - Finished server process [6589]
+2025-09-04 13:49:53 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-04 13:49:53 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-04 13:49:53 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-04 13:49:53 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-04 13:49:53 - uvicorn.error - INFO - _serve:83 - Started server process [6755]
+2025-09-04 13:49:53 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-04 13:49:54 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-04 13:49:54 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-04 13:53:23 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-04 13:53:23 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-04 13:53:23 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-04 13:53:23 - uvicorn.error - INFO - _serve:93 - Finished server process [6755]
+2025-09-04 13:54:10 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-04 13:54:10 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-04 13:54:10 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-04 13:54:10 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-04 13:54:10 - uvicorn.error - INFO - _serve:83 - Started server process [7782]
+2025-09-04 13:54:10 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-04 13:54:11 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-04 13:54:11 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-04 13:58:42 - uvicorn.access - INFO - send:473 - 127.0.0.1:37264 - "GET /api/v1/tournaments/ HTTP/1.1" 403
+2025-09-04 13:58:57 - uvicorn.access - INFO - send:473 - 127.0.0.1:35026 - "OPTIONS /api/v1/auth/login HTTP/1.1" 200
+2025-09-04 13:58:57 - uvicorn.access - INFO - send:473 - 127.0.0.1:35026 - "POST /api/v1/auth/login HTTP/1.1" 401
+2025-09-04 13:59:03 - passlib.handlers.bcrypt - WARNING - _load_backend_mixin:622 - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/home/roshan/.ssh/fifa-rivalry-tracker/.venv/lib/python3.13/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-09-04 13:59:04 - uvicorn.access - INFO - send:473 - 127.0.0.1:57158 - "POST /api/v1/auth/login HTTP/1.1" 200
+2025-09-04 13:59:04 - uvicorn.access - INFO - send:473 - 127.0.0.1:57158 - "OPTIONS /api/v1/auth/me HTTP/1.1" 200
+2025-09-04 13:59:04 - uvicorn.access - INFO - send:473 - 127.0.0.1:57158 - "GET /api/v1/auth/me HTTP/1.1" 200
+2025-09-04 13:59:08 - uvicorn.access - INFO - send:473 - 127.0.0.1:57158 - "OPTIONS /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-04 13:59:08 - uvicorn.access - INFO - send:473 - 127.0.0.1:57166 - "OPTIONS /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-04 13:59:08 - uvicorn.access - INFO - send:473 - 127.0.0.1:57158 - "GET /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-04 13:59:08 - uvicorn.access - INFO - send:473 - 127.0.0.1:57158 - "OPTIONS /api/v1/tournaments/6883c24aa1f48eda9581dd82/players HTTP/1.1" 200
+2025-09-04 13:59:08 - uvicorn.access - INFO - send:473 - 127.0.0.1:57158 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/players HTTP/1.1" 200
+2025-09-04 13:59:08 - uvicorn.access - INFO - send:473 - 127.0.0.1:57166 - "GET /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-04 13:59:08 - uvicorn.access - INFO - send:473 - 127.0.0.1:57158 - "OPTIONS /api/v1/tournaments/6883c24aa1f48eda9581dd82/stats HTTP/1.1" 200
+2025-09-04 13:59:08 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:355 - Tournament: {'_id': ObjectId('6883c24aa1f48eda9581dd82'), 'name': 'July Tournament', 'start_date': datetime.datetime(2025, 7, 25, 0, 0), 'end_date': datetime.datetime(2025, 7, 29, 22, 51, 53, 962000), 'description': 'Flicky Licky was in town', 'player_ids': ['6883c171a1f48eda9581dd7f', '6883c1f9a1f48eda9581dd80', '6883c21ca1f48eda9581dd81', '6884bc4ec3c047b867142c0d', '6884bf66c3c047b867142c0e', '6884cab9c3c047b867142c14'], 'completed': True, 'matches': [ObjectId('6883c288a1f48eda9581dd83'), ObjectId('6883c5cea1f48eda9581dd84'), ObjectId('6883c898a1f48eda9581dd85'), ObjectId('6883cd3ca1f48eda9581dd86'), ObjectId('6883cd3ea1f48eda9581dd87'), ObjectId('6884c2aec3c047b867142c0f'), ObjectId('6884c5c8c3c047b867142c10'), ObjectId('6884c7fcc3c047b867142c11'), ObjectId('6884c7fec3c047b867142c12'), ObjectId('6884ca8fc3c047b867142c13'), ObjectId('6884cb5cc3c047b867142c15'), ObjectId('6884cd6ac3c047b867142c16'), ObjectId('6884d1e0c3c047b867142c17'), ObjectId('6884d1e1c3c047b867142c18'), ObjectId('6884d3dbc3c047b867142c19'), ObjectId('6884d63ac3c047b867142c1a'), ObjectId('6884d9e44d90dc81e5e022ad'), ObjectId('688526f4c3c047b867142c1b'), ObjectId('68852949c3c047b867142c1c'), ObjectId('68852c5fc3c047b867142c1d'), ObjectId('6885324649577df3ccc5faf3'), ObjectId('6885358949577df3ccc5faf4'), ObjectId('688537c549577df3ccc5faf5'), ObjectId('68853cfc49577df3ccc5faf7'), ObjectId('68853e4c49577df3ccc5faf8'), ObjectId('6887b3ca3d8d460ab7577f06'), ObjectId('6887b65c3d8d460ab7577f07'), ObjectId('6887b9693d8d460ab7577f08'), ObjectId('6887bc403d8d460ab7577f09'), ObjectId('6887bf263d8d460ab7577f0a'), ObjectId('6887c27b3d8d460ab7577f0b'), ObjectId('6887c4593d8d460ab7577f0c'), ObjectId('6887c7593d8d460ab7577f0d'), ObjectId('6887ca433d8d460ab7577f0e'), ObjectId('6887cf873d8d460ab7577f0f'), ObjectId('6887d1c83d8d460ab7577f10')], 'matches_count': 32, 'owner_id': '6883c171a1f48eda9581dd7f'} 
+
+2025-09-04 13:59:08 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:361 - Player IDs from tournament: ['6883c171a1f48eda9581dd7f', '6883c1f9a1f48eda9581dd80', '6883c21ca1f48eda9581dd81', '6884bc4ec3c047b867142c0d', '6884bf66c3c047b867142c0e', '6884cab9c3c047b867142c14']
+2025-09-04 13:59:08 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:371 - Found 6 players in database
+2025-09-04 13:59:08 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:377 - Found 32 matches for tournament
+2025-09-04 13:59:08 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player roshatron (ID: 6883c171a1f48eda9581dd7f)
+2025-09-04 13:59:08 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player roshatron tournament stats: {'total_matches': 13, 'total_goals_scored': 35, 'total_goals_conceded': 17, 'wins': 10, 'losses': 3, 'draws': 0, 'points': 30, 'goal_difference': 18}
+2025-09-04 13:59:08 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player kAMi (ID: 6883c1f9a1f48eda9581dd80)
+2025-09-04 13:59:08 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player kAMi tournament stats: {'total_matches': 9, 'total_goals_scored': 15, 'total_goals_conceded': 19, 'wins': 3, 'losses': 5, 'draws': 1, 'points': 10, 'goal_difference': -4}
+2025-09-04 13:59:08 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player shinigami (ID: 6883c21ca1f48eda9581dd81)
+2025-09-04 13:59:08 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player shinigami tournament stats: {'total_matches': 14, 'total_goals_scored': 32, 'total_goals_conceded': 19, 'wins': 8, 'losses': 3, 'draws': 3, 'points': 27, 'goal_difference': 13}
+2025-09-04 13:59:08 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player sreemanth (ID: 6884bc4ec3c047b867142c0d)
+2025-09-04 13:59:08 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player sreemanth tournament stats: {'total_matches': 7, 'total_goals_scored': 8, 'total_goals_conceded': 19, 'wins': 2, 'losses': 5, 'draws': 0, 'points': 6, 'goal_difference': -11}
+2025-09-04 13:59:08 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player Funhaver (ID: 6884bf66c3c047b867142c0e)
+2025-09-04 13:59:08 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player Funhaver tournament stats: {'total_matches': 14, 'total_goals_scored': 17, 'total_goals_conceded': 28, 'wins': 3, 'losses': 8, 'draws': 3, 'points': 12, 'goal_difference': -11}
+2025-09-04 13:59:08 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player vapranav (ID: 6884cab9c3c047b867142c14)
+2025-09-04 13:59:08 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player vapranav tournament stats: {'total_matches': 7, 'total_goals_scored': 9, 'total_goals_conceded': 14, 'wins': 2, 'losses': 4, 'draws': 1, 'points': 7, 'goal_difference': -5}
+2025-09-04 13:59:08 - uvicorn.access - INFO - send:473 - 127.0.0.1:57166 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/stats HTTP/1.1" 200
+2025-09-04 13:59:11 - uvicorn.access - INFO - send:473 - 127.0.0.1:57166 - "OPTIONS /api/v1/tournaments/68aad6c41859a9e9af6f5da7/players HTTP/1.1" 200
+2025-09-04 13:59:11 - uvicorn.access - INFO - send:473 - 127.0.0.1:57158 - "GET /api/v1/tournaments/68aad6c41859a9e9af6f5da7/players HTTP/1.1" 200
+2025-09-04 13:59:12 - uvicorn.access - INFO - send:473 - 127.0.0.1:57166 - "OPTIONS /api/v1/tournaments/68aad6c41859a9e9af6f5da7/stats HTTP/1.1" 200
+2025-09-04 13:59:12 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:355 - Tournament: {'_id': ObjectId('68aad6c41859a9e9af6f5da7'), 'name': 'August 24th', 'start_date': datetime.datetime(2025, 8, 24, 0, 0), 'end_date': None, 'description': '', 'player_ids': ['6883c171a1f48eda9581dd7f', '6883c21ca1f48eda9581dd81', '6883c1f9a1f48eda9581dd80'], 'completed': False, 'matches': [ObjectId('68aae9ce1859a9e9af6f5da8'), ObjectId('68aaed651859a9e9af6f5da9'), ObjectId('68aaef741859a9e9af6f5daa'), ObjectId('68ab15c21859a9e9af6f5dab'), ObjectId('68ab173a1859a9e9af6f5dac'), ObjectId('68ab19861859a9e9af6f5dad')], 'matches_count': 6, 'owner_id': '6883c171a1f48eda9581dd7f'} 
+
+2025-09-04 13:59:12 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:361 - Player IDs from tournament: ['6883c171a1f48eda9581dd7f', '6883c21ca1f48eda9581dd81', '6883c1f9a1f48eda9581dd80']
+2025-09-04 13:59:12 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:371 - Found 3 players in database
+2025-09-04 13:59:12 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:377 - Found 6 matches for tournament
+2025-09-04 13:59:12 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player roshatron (ID: 6883c171a1f48eda9581dd7f)
+2025-09-04 13:59:12 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player roshatron tournament stats: {'total_matches': 4, 'total_goals_scored': 8, 'total_goals_conceded': 9, 'wins': 1, 'losses': 2, 'draws': 1, 'points': 4, 'goal_difference': -1}
+2025-09-04 13:59:12 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player kAMi (ID: 6883c1f9a1f48eda9581dd80)
+2025-09-04 13:59:12 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player kAMi tournament stats: {'total_matches': 4, 'total_goals_scored': 4, 'total_goals_conceded': 7, 'wins': 1, 'losses': 2, 'draws': 1, 'points': 4, 'goal_difference': -3}
+2025-09-04 13:59:12 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player shinigami (ID: 6883c21ca1f48eda9581dd81)
+2025-09-04 13:59:12 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player shinigami tournament stats: {'total_matches': 4, 'total_goals_scored': 9, 'total_goals_conceded': 5, 'wins': 3, 'losses': 1, 'draws': 0, 'points': 9, 'goal_difference': 4}
+2025-09-04 13:59:12 - uvicorn.access - INFO - send:473 - 127.0.0.1:57166 - "GET /api/v1/tournaments/68aad6c41859a9e9af6f5da7/stats HTTP/1.1" 200
+2025-09-04 13:59:29 - uvicorn.access - INFO - send:473 - 127.0.0.1:49388 - "OPTIONS /api/v1/tournaments/68aad6c41859a9e9af6f5da7/matches?page=1&page_size=20 HTTP/1.1" 200
+2025-09-04 13:59:29 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:77 - Starting tournament matches request - tournament_id: 68aad6c41859a9e9af6f5da7, page: 1, page_size: 20
+2025-09-04 13:59:29 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:81 - Database connection established in 0.17ms
+2025-09-04 13:59:29 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:87 - Tournament validation query completed in 34.67ms
+2025-09-04 13:59:29 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:100 - Match count query completed in 33.61ms - total_matches: 6
+2025-09-04 13:59:29 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:107 - Matches fetch query completed in 33.58ms - fetched_matches: 6
+2025-09-04 13:59:29 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:125 - Player data fetch completed in 36.70ms - unique_players: 3
+2025-09-04 13:59:29 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:172 - Match processing completed in 0.12ms - processed_matches: 6
+2025-09-04 13:59:29 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:180 - Tournament matches request completed in 139.89ms - tournament_id: 68aad6c41859a9e9af6f5da7, page: 1, total_matches: 6, returned_matches: 6
+2025-09-04 13:59:29 - uvicorn.access - INFO - send:473 - 127.0.0.1:49388 - "GET /api/v1/tournaments/68aad6c41859a9e9af6f5da7/matches?page=1&page_size=20 HTTP/1.1" 200
+2025-09-04 13:59:59 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:355 - Tournament: {'_id': ObjectId('68aad6c41859a9e9af6f5da7'), 'name': 'August 24th', 'start_date': datetime.datetime(2025, 8, 24, 0, 0), 'end_date': None, 'description': '', 'player_ids': ['6883c171a1f48eda9581dd7f', '6883c21ca1f48eda9581dd81', '6883c1f9a1f48eda9581dd80'], 'completed': False, 'matches': [ObjectId('68aae9ce1859a9e9af6f5da8'), ObjectId('68aaed651859a9e9af6f5da9'), ObjectId('68aaef741859a9e9af6f5daa'), ObjectId('68ab15c21859a9e9af6f5dab'), ObjectId('68ab173a1859a9e9af6f5dac'), ObjectId('68ab19861859a9e9af6f5dad')], 'matches_count': 6, 'owner_id': '6883c171a1f48eda9581dd7f'} 
+
+2025-09-04 13:59:59 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:361 - Player IDs from tournament: ['6883c171a1f48eda9581dd7f', '6883c21ca1f48eda9581dd81', '6883c1f9a1f48eda9581dd80']
+2025-09-04 13:59:59 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:371 - Found 3 players in database
+2025-09-04 14:00:00 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:377 - Found 6 matches for tournament
+2025-09-04 14:00:00 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player roshatron (ID: 6883c171a1f48eda9581dd7f)
+2025-09-04 14:00:00 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player roshatron tournament stats: {'total_matches': 4, 'total_goals_scored': 8, 'total_goals_conceded': 9, 'wins': 1, 'losses': 2, 'draws': 1, 'points': 4, 'goal_difference': -1}
+2025-09-04 14:00:00 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player kAMi (ID: 6883c1f9a1f48eda9581dd80)
+2025-09-04 14:00:00 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player kAMi tournament stats: {'total_matches': 4, 'total_goals_scored': 4, 'total_goals_conceded': 7, 'wins': 1, 'losses': 2, 'draws': 1, 'points': 4, 'goal_difference': -3}
+2025-09-04 14:00:00 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player shinigami (ID: 6883c21ca1f48eda9581dd81)
+2025-09-04 14:00:00 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player shinigami tournament stats: {'total_matches': 4, 'total_goals_scored': 9, 'total_goals_conceded': 5, 'wins': 3, 'losses': 1, 'draws': 0, 'points': 9, 'goal_difference': 4}
+2025-09-04 14:00:00 - uvicorn.access - INFO - send:473 - 127.0.0.1:49678 - "GET /api/v1/tournaments/68aad6c41859a9e9af6f5da7/stats HTTP/1.1" 200
+2025-09-04 14:00:05 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:77 - Starting tournament matches request - tournament_id: 68aad6c41859a9e9af6f5da7, page: 1, page_size: 20
+2025-09-04 14:00:05 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:81 - Database connection established in 0.24ms
+2025-09-04 14:00:05 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:87 - Tournament validation query completed in 33.67ms
+2025-09-04 14:00:05 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:100 - Match count query completed in 33.28ms - total_matches: 6
+2025-09-04 14:00:05 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:107 - Matches fetch query completed in 34.13ms - fetched_matches: 6
+2025-09-04 14:00:05 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:125 - Player data fetch completed in 34.91ms - unique_players: 3
+2025-09-04 14:00:05 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:172 - Match processing completed in 0.07ms - processed_matches: 6
+2025-09-04 14:00:05 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:180 - Tournament matches request completed in 137.34ms - tournament_id: 68aad6c41859a9e9af6f5da7, page: 1, total_matches: 6, returned_matches: 6
+2025-09-04 14:00:05 - uvicorn.access - INFO - send:473 - 127.0.0.1:56732 - "GET /api/v1/tournaments/68aad6c41859a9e9af6f5da7/matches?page=1&page_size=20 HTTP/1.1" 200
+2025-09-04 14:00:12 - uvicorn.access - INFO - send:473 - 127.0.0.1:39304 - "OPTIONS /api/v1/players/ HTTP/1.1" 200
+2025-09-04 14:00:12 - uvicorn.access - INFO - send:473 - 127.0.0.1:39320 - "OPTIONS /api/v1/players/ HTTP/1.1" 200
+2025-09-04 14:00:12 - uvicorn.access - INFO - send:473 - 127.0.0.1:39304 - "GET /api/v1/players/ HTTP/1.1" 200
+2025-09-04 14:00:12 - uvicorn.access - INFO - send:473 - 127.0.0.1:39320 - "GET /api/v1/players/ HTTP/1.1" 200
+2025-09-04 14:00:17 - uvicorn.access - INFO - send:473 - 127.0.0.1:39320 - "GET /api/v1/players/ HTTP/1.1" 200
+2025-09-04 14:00:17 - uvicorn.access - INFO - send:473 - 127.0.0.1:39304 - "GET /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-04 14:00:17 - uvicorn.access - INFO - send:473 - 127.0.0.1:39304 - "GET /api/v1/tournaments/68aad6c41859a9e9af6f5da7/players HTTP/1.1" 200
+2025-09-04 14:00:17 - uvicorn.access - INFO - send:473 - 127.0.0.1:39320 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/players HTTP/1.1" 200
+2025-09-04 14:00:17 - uvicorn.access - INFO - send:473 - 127.0.0.1:39338 - "GET /api/v1/players/ HTTP/1.1" 200
+2025-09-04 14:00:17 - uvicorn.access - INFO - send:473 - 127.0.0.1:39328 - "GET /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-04 14:00:17 - uvicorn.access - INFO - send:473 - 127.0.0.1:39320 - "GET /api/v1/tournaments/68aad6c41859a9e9af6f5da7/players HTTP/1.1" 200
+2025-09-04 14:00:17 - uvicorn.access - INFO - send:473 - 127.0.0.1:39304 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/players HTTP/1.1" 200
+2025-09-04 14:00:26 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:355 - Tournament: {'_id': ObjectId('68aad6c41859a9e9af6f5da7'), 'name': 'August 24th', 'start_date': datetime.datetime(2025, 8, 24, 0, 0), 'end_date': None, 'description': '', 'player_ids': ['6883c171a1f48eda9581dd7f', '6883c21ca1f48eda9581dd81', '6883c1f9a1f48eda9581dd80'], 'completed': False, 'matches': [ObjectId('68aae9ce1859a9e9af6f5da8'), ObjectId('68aaed651859a9e9af6f5da9'), ObjectId('68aaef741859a9e9af6f5daa'), ObjectId('68ab15c21859a9e9af6f5dab'), ObjectId('68ab173a1859a9e9af6f5dac'), ObjectId('68ab19861859a9e9af6f5dad')], 'matches_count': 6, 'owner_id': '6883c171a1f48eda9581dd7f'} 
+
+2025-09-04 14:00:26 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:361 - Player IDs from tournament: ['6883c171a1f48eda9581dd7f', '6883c21ca1f48eda9581dd81', '6883c1f9a1f48eda9581dd80']
+2025-09-04 14:00:26 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:371 - Found 3 players in database
+2025-09-04 14:00:26 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:377 - Found 6 matches for tournament
+2025-09-04 14:00:26 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player roshatron (ID: 6883c171a1f48eda9581dd7f)
+2025-09-04 14:00:26 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player roshatron tournament stats: {'total_matches': 4, 'total_goals_scored': 8, 'total_goals_conceded': 9, 'wins': 1, 'losses': 2, 'draws': 1, 'points': 4, 'goal_difference': -1}
+2025-09-04 14:00:26 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player kAMi (ID: 6883c1f9a1f48eda9581dd80)
+2025-09-04 14:00:26 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player kAMi tournament stats: {'total_matches': 4, 'total_goals_scored': 4, 'total_goals_conceded': 7, 'wins': 1, 'losses': 2, 'draws': 1, 'points': 4, 'goal_difference': -3}
+2025-09-04 14:00:26 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player shinigami (ID: 6883c21ca1f48eda9581dd81)
+2025-09-04 14:00:26 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player shinigami tournament stats: {'total_matches': 4, 'total_goals_scored': 9, 'total_goals_conceded': 5, 'wins': 3, 'losses': 1, 'draws': 0, 'points': 9, 'goal_difference': 4}
+2025-09-04 14:00:26 - uvicorn.access - INFO - send:473 - 127.0.0.1:38924 - "GET /api/v1/tournaments/68aad6c41859a9e9af6f5da7/stats HTTP/1.1" 200
+2025-09-04 14:02:35 - uvicorn.access - INFO - send:473 - 127.0.0.1:50076 - "OPTIONS /api/v1/players/6883c171a1f48eda9581dd7f/stats?_t=1756974755096 HTTP/1.1" 200
+2025-09-04 14:02:35 - uvicorn.access - INFO - send:473 - 127.0.0.1:50070 - "OPTIONS /api/v1/players/6883c171a1f48eda9581dd7f/stats?_t=1756974755096 HTTP/1.1" 200
+2025-09-04 14:02:36 - uvicorn.access - INFO - send:473 - 127.0.0.1:50076 - "GET /api/v1/players/6883c171a1f48eda9581dd7f/stats?_t=1756974755096 HTTP/1.1" 200
+2025-09-04 14:02:36 - uvicorn.access - INFO - send:473 - 127.0.0.1:50070 - "GET /api/v1/players/6883c171a1f48eda9581dd7f/stats?_t=1756974755096 HTTP/1.1" 200
+2025-09-04 14:02:48 - uvicorn.access - INFO - send:473 - 127.0.0.1:57726 - "GET /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-04 14:02:48 - uvicorn.access - INFO - send:473 - 127.0.0.1:57726 - "GET /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-04 14:02:48 - uvicorn.access - INFO - send:473 - 127.0.0.1:57738 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/players HTTP/1.1" 200
+2025-09-04 14:02:48 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:355 - Tournament: {'_id': ObjectId('6883c24aa1f48eda9581dd82'), 'name': 'July Tournament', 'start_date': datetime.datetime(2025, 7, 25, 0, 0), 'end_date': datetime.datetime(2025, 7, 29, 22, 51, 53, 962000), 'description': 'Flicky Licky was in town', 'player_ids': ['6883c171a1f48eda9581dd7f', '6883c1f9a1f48eda9581dd80', '6883c21ca1f48eda9581dd81', '6884bc4ec3c047b867142c0d', '6884bf66c3c047b867142c0e', '6884cab9c3c047b867142c14'], 'completed': True, 'matches': [ObjectId('6883c288a1f48eda9581dd83'), ObjectId('6883c5cea1f48eda9581dd84'), ObjectId('6883c898a1f48eda9581dd85'), ObjectId('6883cd3ca1f48eda9581dd86'), ObjectId('6883cd3ea1f48eda9581dd87'), ObjectId('6884c2aec3c047b867142c0f'), ObjectId('6884c5c8c3c047b867142c10'), ObjectId('6884c7fcc3c047b867142c11'), ObjectId('6884c7fec3c047b867142c12'), ObjectId('6884ca8fc3c047b867142c13'), ObjectId('6884cb5cc3c047b867142c15'), ObjectId('6884cd6ac3c047b867142c16'), ObjectId('6884d1e0c3c047b867142c17'), ObjectId('6884d1e1c3c047b867142c18'), ObjectId('6884d3dbc3c047b867142c19'), ObjectId('6884d63ac3c047b867142c1a'), ObjectId('6884d9e44d90dc81e5e022ad'), ObjectId('688526f4c3c047b867142c1b'), ObjectId('68852949c3c047b867142c1c'), ObjectId('68852c5fc3c047b867142c1d'), ObjectId('6885324649577df3ccc5faf3'), ObjectId('6885358949577df3ccc5faf4'), ObjectId('688537c549577df3ccc5faf5'), ObjectId('68853cfc49577df3ccc5faf7'), ObjectId('68853e4c49577df3ccc5faf8'), ObjectId('6887b3ca3d8d460ab7577f06'), ObjectId('6887b65c3d8d460ab7577f07'), ObjectId('6887b9693d8d460ab7577f08'), ObjectId('6887bc403d8d460ab7577f09'), ObjectId('6887bf263d8d460ab7577f0a'), ObjectId('6887c27b3d8d460ab7577f0b'), ObjectId('6887c4593d8d460ab7577f0c'), ObjectId('6887c7593d8d460ab7577f0d'), ObjectId('6887ca433d8d460ab7577f0e'), ObjectId('6887cf873d8d460ab7577f0f'), ObjectId('6887d1c83d8d460ab7577f10')], 'matches_count': 32, 'owner_id': '6883c171a1f48eda9581dd7f'} 
+
+2025-09-04 14:02:48 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:361 - Player IDs from tournament: ['6883c171a1f48eda9581dd7f', '6883c1f9a1f48eda9581dd80', '6883c21ca1f48eda9581dd81', '6884bc4ec3c047b867142c0d', '6884bf66c3c047b867142c0e', '6884cab9c3c047b867142c14']
+2025-09-04 14:02:48 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:371 - Found 6 players in database
+2025-09-04 14:02:48 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:377 - Found 32 matches for tournament
+2025-09-04 14:02:48 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player roshatron (ID: 6883c171a1f48eda9581dd7f)
+2025-09-04 14:02:48 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player roshatron tournament stats: {'total_matches': 13, 'total_goals_scored': 35, 'total_goals_conceded': 17, 'wins': 10, 'losses': 3, 'draws': 0, 'points': 30, 'goal_difference': 18}
+2025-09-04 14:02:48 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player kAMi (ID: 6883c1f9a1f48eda9581dd80)
+2025-09-04 14:02:48 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player kAMi tournament stats: {'total_matches': 9, 'total_goals_scored': 15, 'total_goals_conceded': 19, 'wins': 3, 'losses': 5, 'draws': 1, 'points': 10, 'goal_difference': -4}
+2025-09-04 14:02:48 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player shinigami (ID: 6883c21ca1f48eda9581dd81)
+2025-09-04 14:02:48 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player shinigami tournament stats: {'total_matches': 14, 'total_goals_scored': 32, 'total_goals_conceded': 19, 'wins': 8, 'losses': 3, 'draws': 3, 'points': 27, 'goal_difference': 13}
+2025-09-04 14:02:48 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player sreemanth (ID: 6884bc4ec3c047b867142c0d)
+2025-09-04 14:02:48 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player sreemanth tournament stats: {'total_matches': 7, 'total_goals_scored': 8, 'total_goals_conceded': 19, 'wins': 2, 'losses': 5, 'draws': 0, 'points': 6, 'goal_difference': -11}
+2025-09-04 14:02:48 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player Funhaver (ID: 6884bf66c3c047b867142c0e)
+2025-09-04 14:02:48 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player Funhaver tournament stats: {'total_matches': 14, 'total_goals_scored': 17, 'total_goals_conceded': 28, 'wins': 3, 'losses': 8, 'draws': 3, 'points': 12, 'goal_difference': -11}
+2025-09-04 14:02:48 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player vapranav (ID: 6884cab9c3c047b867142c14)
+2025-09-04 14:02:48 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player vapranav tournament stats: {'total_matches': 7, 'total_goals_scored': 9, 'total_goals_conceded': 14, 'wins': 2, 'losses': 4, 'draws': 1, 'points': 7, 'goal_difference': -5}
+2025-09-04 14:02:48 - uvicorn.access - INFO - send:473 - 127.0.0.1:57738 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/stats HTTP/1.1" 200
+2025-09-04 14:03:11 - uvicorn.access - INFO - send:473 - 127.0.0.1:39468 - "OPTIONS /api/v1/tournaments/6883c24aa1f48eda9581dd82/matches?page=1&page_size=20 HTTP/1.1" 200
+2025-09-04 14:03:11 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:77 - Starting tournament matches request - tournament_id: 6883c24aa1f48eda9581dd82, page: 1, page_size: 20
+2025-09-04 14:03:11 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:81 - Database connection established in 0.20ms
+2025-09-04 14:03:11 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:87 - Tournament validation query completed in 35.47ms
+2025-09-04 14:03:11 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:100 - Match count query completed in 34.49ms - total_matches: 32
+2025-09-04 14:03:11 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:107 - Matches fetch query completed in 32.92ms - fetched_matches: 20
+2025-09-04 14:03:11 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:125 - Player data fetch completed in 32.93ms - unique_players: 6
+2025-09-04 14:03:11 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:172 - Match processing completed in 0.15ms - processed_matches: 20
+2025-09-04 14:03:11 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:180 - Tournament matches request completed in 137.06ms - tournament_id: 6883c24aa1f48eda9581dd82, page: 1, total_matches: 32, returned_matches: 20
+2025-09-04 14:03:11 - uvicorn.access - INFO - send:473 - 127.0.0.1:39468 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/matches?page=1&page_size=20 HTTP/1.1" 200
+2025-09-04 14:03:14 - uvicorn.access - INFO - send:473 - 127.0.0.1:39468 - "OPTIONS /api/v1/tournaments/6883c24aa1f48eda9581dd82/matches?page=2&page_size=20 HTTP/1.1" 200
+2025-09-04 14:03:14 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:77 - Starting tournament matches request - tournament_id: 6883c24aa1f48eda9581dd82, page: 2, page_size: 20
+2025-09-04 14:03:14 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:81 - Database connection established in 0.15ms
+2025-09-04 14:03:14 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:87 - Tournament validation query completed in 33.15ms
+2025-09-04 14:03:14 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:100 - Match count query completed in 32.96ms - total_matches: 32
+2025-09-04 14:03:14 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:107 - Matches fetch query completed in 32.80ms - fetched_matches: 12
+2025-09-04 14:03:14 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:125 - Player data fetch completed in 34.40ms - unique_players: 6
+2025-09-04 14:03:14 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:172 - Match processing completed in 0.11ms - processed_matches: 12
+2025-09-04 14:03:14 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:180 - Tournament matches request completed in 134.27ms - tournament_id: 6883c24aa1f48eda9581dd82, page: 2, total_matches: 32, returned_matches: 12
+2025-09-04 14:03:14 - uvicorn.access - INFO - send:473 - 127.0.0.1:39468 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/matches?page=2&page_size=20 HTTP/1.1" 200
+2025-09-04 14:03:15 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:77 - Starting tournament matches request - tournament_id: 6883c24aa1f48eda9581dd82, page: 1, page_size: 20
+2025-09-04 14:03:15 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:81 - Database connection established in 0.14ms
+2025-09-04 14:03:15 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:87 - Tournament validation query completed in 34.81ms
+2025-09-04 14:03:15 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:100 - Match count query completed in 33.53ms - total_matches: 32
+2025-09-04 14:03:15 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:107 - Matches fetch query completed in 34.14ms - fetched_matches: 20
+2025-09-04 14:03:15 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:125 - Player data fetch completed in 34.70ms - unique_players: 6
+2025-09-04 14:03:15 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:172 - Match processing completed in 0.12ms - processed_matches: 20
+2025-09-04 14:03:15 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:180 - Tournament matches request completed in 138.23ms - tournament_id: 6883c24aa1f48eda9581dd82, page: 1, total_matches: 32, returned_matches: 20
+2025-09-04 14:03:15 - uvicorn.access - INFO - send:473 - 127.0.0.1:39468 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/matches?page=1&page_size=20 HTTP/1.1" 200
+2025-09-04 14:03:17 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:77 - Starting tournament matches request - tournament_id: 6883c24aa1f48eda9581dd82, page: 2, page_size: 20
+2025-09-04 14:03:17 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:81 - Database connection established in 0.16ms
+2025-09-04 14:03:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:87 - Tournament validation query completed in 34.06ms
+2025-09-04 14:03:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:100 - Match count query completed in 33.24ms - total_matches: 32
+2025-09-04 14:03:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:107 - Matches fetch query completed in 36.56ms - fetched_matches: 12
+2025-09-04 14:03:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:125 - Player data fetch completed in 32.91ms - unique_players: 6
+2025-09-04 14:03:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:172 - Match processing completed in 0.08ms - processed_matches: 12
+2025-09-04 14:03:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:180 - Tournament matches request completed in 138.18ms - tournament_id: 6883c24aa1f48eda9581dd82, page: 2, total_matches: 32, returned_matches: 12
+2025-09-04 14:03:18 - uvicorn.access - INFO - send:473 - 127.0.0.1:39468 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/matches?page=2&page_size=20 HTTP/1.1" 200
+2025-09-04 14:03:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:355 - Tournament: {'_id': ObjectId('6883c24aa1f48eda9581dd82'), 'name': 'July Tournament', 'start_date': datetime.datetime(2025, 7, 25, 0, 0), 'end_date': datetime.datetime(2025, 7, 29, 22, 51, 53, 962000), 'description': 'Flicky Licky was in town', 'player_ids': ['6883c171a1f48eda9581dd7f', '6883c1f9a1f48eda9581dd80', '6883c21ca1f48eda9581dd81', '6884bc4ec3c047b867142c0d', '6884bf66c3c047b867142c0e', '6884cab9c3c047b867142c14'], 'completed': True, 'matches': [ObjectId('6883c288a1f48eda9581dd83'), ObjectId('6883c5cea1f48eda9581dd84'), ObjectId('6883c898a1f48eda9581dd85'), ObjectId('6883cd3ca1f48eda9581dd86'), ObjectId('6883cd3ea1f48eda9581dd87'), ObjectId('6884c2aec3c047b867142c0f'), ObjectId('6884c5c8c3c047b867142c10'), ObjectId('6884c7fcc3c047b867142c11'), ObjectId('6884c7fec3c047b867142c12'), ObjectId('6884ca8fc3c047b867142c13'), ObjectId('6884cb5cc3c047b867142c15'), ObjectId('6884cd6ac3c047b867142c16'), ObjectId('6884d1e0c3c047b867142c17'), ObjectId('6884d1e1c3c047b867142c18'), ObjectId('6884d3dbc3c047b867142c19'), ObjectId('6884d63ac3c047b867142c1a'), ObjectId('6884d9e44d90dc81e5e022ad'), ObjectId('688526f4c3c047b867142c1b'), ObjectId('68852949c3c047b867142c1c'), ObjectId('68852c5fc3c047b867142c1d'), ObjectId('6885324649577df3ccc5faf3'), ObjectId('6885358949577df3ccc5faf4'), ObjectId('688537c549577df3ccc5faf5'), ObjectId('68853cfc49577df3ccc5faf7'), ObjectId('68853e4c49577df3ccc5faf8'), ObjectId('6887b3ca3d8d460ab7577f06'), ObjectId('6887b65c3d8d460ab7577f07'), ObjectId('6887b9693d8d460ab7577f08'), ObjectId('6887bc403d8d460ab7577f09'), ObjectId('6887bf263d8d460ab7577f0a'), ObjectId('6887c27b3d8d460ab7577f0b'), ObjectId('6887c4593d8d460ab7577f0c'), ObjectId('6887c7593d8d460ab7577f0d'), ObjectId('6887ca433d8d460ab7577f0e'), ObjectId('6887cf873d8d460ab7577f0f'), ObjectId('6887d1c83d8d460ab7577f10')], 'matches_count': 32, 'owner_id': '6883c171a1f48eda9581dd7f'} 
+
+2025-09-04 14:03:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:361 - Player IDs from tournament: ['6883c171a1f48eda9581dd7f', '6883c1f9a1f48eda9581dd80', '6883c21ca1f48eda9581dd81', '6884bc4ec3c047b867142c0d', '6884bf66c3c047b867142c0e', '6884cab9c3c047b867142c14']
+2025-09-04 14:03:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:371 - Found 6 players in database
+2025-09-04 14:03:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:377 - Found 32 matches for tournament
+2025-09-04 14:03:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player roshatron (ID: 6883c171a1f48eda9581dd7f)
+2025-09-04 14:03:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player roshatron tournament stats: {'total_matches': 13, 'total_goals_scored': 35, 'total_goals_conceded': 17, 'wins': 10, 'losses': 3, 'draws': 0, 'points': 30, 'goal_difference': 18}
+2025-09-04 14:03:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player kAMi (ID: 6883c1f9a1f48eda9581dd80)
+2025-09-04 14:03:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player kAMi tournament stats: {'total_matches': 9, 'total_goals_scored': 15, 'total_goals_conceded': 19, 'wins': 3, 'losses': 5, 'draws': 1, 'points': 10, 'goal_difference': -4}
+2025-09-04 14:03:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player shinigami (ID: 6883c21ca1f48eda9581dd81)
+2025-09-04 14:03:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player shinigami tournament stats: {'total_matches': 14, 'total_goals_scored': 32, 'total_goals_conceded': 19, 'wins': 8, 'losses': 3, 'draws': 3, 'points': 27, 'goal_difference': 13}
+2025-09-04 14:03:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player sreemanth (ID: 6884bc4ec3c047b867142c0d)
+2025-09-04 14:03:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player sreemanth tournament stats: {'total_matches': 7, 'total_goals_scored': 8, 'total_goals_conceded': 19, 'wins': 2, 'losses': 5, 'draws': 0, 'points': 6, 'goal_difference': -11}
+2025-09-04 14:03:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player Funhaver (ID: 6884bf66c3c047b867142c0e)
+2025-09-04 14:03:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player Funhaver tournament stats: {'total_matches': 14, 'total_goals_scored': 17, 'total_goals_conceded': 28, 'wins': 3, 'losses': 8, 'draws': 3, 'points': 12, 'goal_difference': -11}
+2025-09-04 14:03:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player vapranav (ID: 6884cab9c3c047b867142c14)
+2025-09-04 14:03:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player vapranav tournament stats: {'total_matches': 7, 'total_goals_scored': 9, 'total_goals_conceded': 14, 'wins': 2, 'losses': 4, 'draws': 1, 'points': 7, 'goal_difference': -5}
+2025-09-04 14:03:19 - uvicorn.access - INFO - send:473 - 127.0.0.1:39468 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/stats HTTP/1.1" 200
+2025-09-04 14:03:33 - uvicorn.access - INFO - send:473 - 127.0.0.1:60052 - "GET /api/v1/players/ HTTP/1.1" 200
+2025-09-04 14:03:33 - uvicorn.access - INFO - send:473 - 127.0.0.1:60052 - "GET /api/v1/players/ HTTP/1.1" 200
+2025-09-04 14:03:34 - uvicorn.access - INFO - send:473 - 127.0.0.1:60052 - "GET /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-04 14:03:34 - uvicorn.access - INFO - send:473 - 127.0.0.1:60068 - "GET /api/v1/players/ HTTP/1.1" 200
+2025-09-04 14:03:34 - uvicorn.access - INFO - send:473 - 127.0.0.1:60078 - "GET /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-04 14:03:34 - uvicorn.access - INFO - send:473 - 127.0.0.1:60086 - "GET /api/v1/players/ HTTP/1.1" 200
+2025-09-04 14:03:34 - uvicorn.access - INFO - send:473 - 127.0.0.1:60068 - "GET /api/v1/tournaments/68aad6c41859a9e9af6f5da7/players HTTP/1.1" 200
+2025-09-04 14:03:34 - uvicorn.access - INFO - send:473 - 127.0.0.1:60052 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/players HTTP/1.1" 200
+2025-09-04 14:03:34 - uvicorn.access - INFO - send:473 - 127.0.0.1:60086 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/players HTTP/1.1" 200
+2025-09-04 14:03:34 - uvicorn.access - INFO - send:473 - 127.0.0.1:60078 - "GET /api/v1/tournaments/68aad6c41859a9e9af6f5da7/players HTTP/1.1" 200
+2025-09-04 14:03:50 - uvicorn.access - INFO - send:473 - 127.0.0.1:48830 - "OPTIONS /api/v1/tournaments/68aad6c41859a9e9af6f5da7/ HTTP/1.1" 200
+2025-09-04 14:03:50 - uvicorn.access - INFO - send:473 - 127.0.0.1:48830 - "PUT /api/v1/tournaments/68aad6c41859a9e9af6f5da7/ HTTP/1.1" 200
+2025-09-04 14:03:56 - uvicorn.access - INFO - send:473 - 127.0.0.1:40418 - "GET /api/v1/tournaments/68aad6c41859a9e9af6f5da7/players HTTP/1.1" 200
+2025-09-04 14:03:56 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:355 - Tournament: {'_id': ObjectId('68aad6c41859a9e9af6f5da7'), 'name': 'August 24th', 'start_date': datetime.datetime(2025, 8, 24, 0, 0), 'end_date': None, 'description': '', 'player_ids': ['6883c171a1f48eda9581dd7f', '6883c21ca1f48eda9581dd81', '6883c1f9a1f48eda9581dd80'], 'completed': True, 'matches': [ObjectId('68aae9ce1859a9e9af6f5da8'), ObjectId('68aaed651859a9e9af6f5da9'), ObjectId('68aaef741859a9e9af6f5daa'), ObjectId('68ab15c21859a9e9af6f5dab'), ObjectId('68ab173a1859a9e9af6f5dac'), ObjectId('68ab19861859a9e9af6f5dad')], 'matches_count': 6, 'owner_id': '6883c171a1f48eda9581dd7f'} 
+
+2025-09-04 14:03:56 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:361 - Player IDs from tournament: ['6883c171a1f48eda9581dd7f', '6883c21ca1f48eda9581dd81', '6883c1f9a1f48eda9581dd80']
+2025-09-04 14:03:56 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:371 - Found 3 players in database
+2025-09-04 14:03:56 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:377 - Found 6 matches for tournament
+2025-09-04 14:03:56 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player roshatron (ID: 6883c171a1f48eda9581dd7f)
+2025-09-04 14:03:56 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player roshatron tournament stats: {'total_matches': 4, 'total_goals_scored': 8, 'total_goals_conceded': 9, 'wins': 1, 'losses': 2, 'draws': 1, 'points': 4, 'goal_difference': -1}
+2025-09-04 14:03:56 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player kAMi (ID: 6883c1f9a1f48eda9581dd80)
+2025-09-04 14:03:56 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player kAMi tournament stats: {'total_matches': 4, 'total_goals_scored': 4, 'total_goals_conceded': 7, 'wins': 1, 'losses': 2, 'draws': 1, 'points': 4, 'goal_difference': -3}
+2025-09-04 14:03:56 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player shinigami (ID: 6883c21ca1f48eda9581dd81)
+2025-09-04 14:03:56 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player shinigami tournament stats: {'total_matches': 4, 'total_goals_scored': 9, 'total_goals_conceded': 5, 'wins': 3, 'losses': 1, 'draws': 0, 'points': 9, 'goal_difference': 4}
+2025-09-04 14:03:56 - uvicorn.access - INFO - send:473 - 127.0.0.1:40418 - "GET /api/v1/tournaments/68aad6c41859a9e9af6f5da7/stats HTTP/1.1" 200
+2025-09-04 14:03:58 - uvicorn.access - INFO - send:473 - 127.0.0.1:40418 - "OPTIONS /api/v1/tournaments/68aad6c41859a9e9af6f5da7/matches?page=2&page_size=20 HTTP/1.1" 200
+2025-09-04 14:03:58 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:77 - Starting tournament matches request - tournament_id: 68aad6c41859a9e9af6f5da7, page: 2, page_size: 20
+2025-09-04 14:03:58 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:81 - Database connection established in 0.27ms
+2025-09-04 14:03:58 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:87 - Tournament validation query completed in 32.51ms
+2025-09-04 14:03:58 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:100 - Match count query completed in 32.69ms - total_matches: 6
+2025-09-04 14:03:58 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:107 - Matches fetch query completed in 33.74ms - fetched_matches: 0
+2025-09-04 14:03:58 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:125 - Player data fetch completed in 0.00ms - unique_players: 0
+2025-09-04 14:03:58 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:172 - Match processing completed in 0.00ms - processed_matches: 0
+2025-09-04 14:03:58 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:180 - Tournament matches request completed in 99.80ms - tournament_id: 68aad6c41859a9e9af6f5da7, page: 2, total_matches: 6, returned_matches: 0
+2025-09-04 14:03:58 - uvicorn.access - INFO - send:473 - 127.0.0.1:40418 - "GET /api/v1/tournaments/68aad6c41859a9e9af6f5da7/matches?page=2&page_size=20 HTTP/1.1" 200
+2025-09-04 14:03:58 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:355 - Tournament: {'_id': ObjectId('68aad6c41859a9e9af6f5da7'), 'name': 'August 24th', 'start_date': datetime.datetime(2025, 8, 24, 0, 0), 'end_date': None, 'description': '', 'player_ids': ['6883c171a1f48eda9581dd7f', '6883c21ca1f48eda9581dd81', '6883c1f9a1f48eda9581dd80'], 'completed': True, 'matches': [ObjectId('68aae9ce1859a9e9af6f5da8'), ObjectId('68aaed651859a9e9af6f5da9'), ObjectId('68aaef741859a9e9af6f5daa'), ObjectId('68ab15c21859a9e9af6f5dab'), ObjectId('68ab173a1859a9e9af6f5dac'), ObjectId('68ab19861859a9e9af6f5dad')], 'matches_count': 6, 'owner_id': '6883c171a1f48eda9581dd7f'} 
+
+2025-09-04 14:03:58 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:361 - Player IDs from tournament: ['6883c171a1f48eda9581dd7f', '6883c21ca1f48eda9581dd81', '6883c1f9a1f48eda9581dd80']
+2025-09-04 14:03:59 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:371 - Found 3 players in database
+2025-09-04 14:03:59 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:377 - Found 6 matches for tournament
+2025-09-04 14:03:59 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player roshatron (ID: 6883c171a1f48eda9581dd7f)
+2025-09-04 14:03:59 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player roshatron tournament stats: {'total_matches': 4, 'total_goals_scored': 8, 'total_goals_conceded': 9, 'wins': 1, 'losses': 2, 'draws': 1, 'points': 4, 'goal_difference': -1}
+2025-09-04 14:03:59 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player kAMi (ID: 6883c1f9a1f48eda9581dd80)
+2025-09-04 14:03:59 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player kAMi tournament stats: {'total_matches': 4, 'total_goals_scored': 4, 'total_goals_conceded': 7, 'wins': 1, 'losses': 2, 'draws': 1, 'points': 4, 'goal_difference': -3}
+2025-09-04 14:03:59 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player shinigami (ID: 6883c21ca1f48eda9581dd81)
+2025-09-04 14:03:59 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player shinigami tournament stats: {'total_matches': 4, 'total_goals_scored': 9, 'total_goals_conceded': 5, 'wins': 3, 'losses': 1, 'draws': 0, 'points': 9, 'goal_difference': 4}
+2025-09-04 14:03:59 - uvicorn.access - INFO - send:473 - 127.0.0.1:40418 - "GET /api/v1/tournaments/68aad6c41859a9e9af6f5da7/stats HTTP/1.1" 200
+2025-09-04 14:03:59 - uvicorn.access - INFO - send:473 - 127.0.0.1:40418 - "GET /api/v1/players/ HTTP/1.1" 200
+2025-09-04 14:03:59 - uvicorn.access - INFO - send:473 - 127.0.0.1:40420 - "GET /api/v1/players/ HTTP/1.1" 200
+2025-09-04 14:04:03 - uvicorn.access - INFO - send:473 - 127.0.0.1:40420 - "GET /api/v1/auth/me HTTP/1.1" 200
+2025-09-04 14:04:03 - uvicorn.access - INFO - send:473 - 127.0.0.1:40418 - "GET /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-04 14:04:03 - uvicorn.access - INFO - send:473 - 127.0.0.1:40420 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/players HTTP/1.1" 200
+2025-09-04 14:04:03 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:355 - Tournament: {'_id': ObjectId('6883c24aa1f48eda9581dd82'), 'name': 'July Tournament', 'start_date': datetime.datetime(2025, 7, 25, 0, 0), 'end_date': datetime.datetime(2025, 7, 29, 22, 51, 53, 962000), 'description': 'Flicky Licky was in town', 'player_ids': ['6883c171a1f48eda9581dd7f', '6883c1f9a1f48eda9581dd80', '6883c21ca1f48eda9581dd81', '6884bc4ec3c047b867142c0d', '6884bf66c3c047b867142c0e', '6884cab9c3c047b867142c14'], 'completed': True, 'matches': [ObjectId('6883c288a1f48eda9581dd83'), ObjectId('6883c5cea1f48eda9581dd84'), ObjectId('6883c898a1f48eda9581dd85'), ObjectId('6883cd3ca1f48eda9581dd86'), ObjectId('6883cd3ea1f48eda9581dd87'), ObjectId('6884c2aec3c047b867142c0f'), ObjectId('6884c5c8c3c047b867142c10'), ObjectId('6884c7fcc3c047b867142c11'), ObjectId('6884c7fec3c047b867142c12'), ObjectId('6884ca8fc3c047b867142c13'), ObjectId('6884cb5cc3c047b867142c15'), ObjectId('6884cd6ac3c047b867142c16'), ObjectId('6884d1e0c3c047b867142c17'), ObjectId('6884d1e1c3c047b867142c18'), ObjectId('6884d3dbc3c047b867142c19'), ObjectId('6884d63ac3c047b867142c1a'), ObjectId('6884d9e44d90dc81e5e022ad'), ObjectId('688526f4c3c047b867142c1b'), ObjectId('68852949c3c047b867142c1c'), ObjectId('68852c5fc3c047b867142c1d'), ObjectId('6885324649577df3ccc5faf3'), ObjectId('6885358949577df3ccc5faf4'), ObjectId('688537c549577df3ccc5faf5'), ObjectId('68853cfc49577df3ccc5faf7'), ObjectId('68853e4c49577df3ccc5faf8'), ObjectId('6887b3ca3d8d460ab7577f06'), ObjectId('6887b65c3d8d460ab7577f07'), ObjectId('6887b9693d8d460ab7577f08'), ObjectId('6887bc403d8d460ab7577f09'), ObjectId('6887bf263d8d460ab7577f0a'), ObjectId('6887c27b3d8d460ab7577f0b'), ObjectId('6887c4593d8d460ab7577f0c'), ObjectId('6887c7593d8d460ab7577f0d'), ObjectId('6887ca433d8d460ab7577f0e'), ObjectId('6887cf873d8d460ab7577f0f'), ObjectId('6887d1c83d8d460ab7577f10')], 'matches_count': 32, 'owner_id': '6883c171a1f48eda9581dd7f'} 
+
+2025-09-04 14:04:03 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:361 - Player IDs from tournament: ['6883c171a1f48eda9581dd7f', '6883c1f9a1f48eda9581dd80', '6883c21ca1f48eda9581dd81', '6884bc4ec3c047b867142c0d', '6884bf66c3c047b867142c0e', '6884cab9c3c047b867142c14']
+2025-09-04 14:04:03 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:371 - Found 6 players in database
+2025-09-04 14:04:03 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:377 - Found 32 matches for tournament
+2025-09-04 14:04:03 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player roshatron (ID: 6883c171a1f48eda9581dd7f)
+2025-09-04 14:04:03 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player roshatron tournament stats: {'total_matches': 13, 'total_goals_scored': 35, 'total_goals_conceded': 17, 'wins': 10, 'losses': 3, 'draws': 0, 'points': 30, 'goal_difference': 18}
+2025-09-04 14:04:03 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player kAMi (ID: 6883c1f9a1f48eda9581dd80)
+2025-09-04 14:04:03 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player kAMi tournament stats: {'total_matches': 9, 'total_goals_scored': 15, 'total_goals_conceded': 19, 'wins': 3, 'losses': 5, 'draws': 1, 'points': 10, 'goal_difference': -4}
+2025-09-04 14:04:03 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player shinigami (ID: 6883c21ca1f48eda9581dd81)
+2025-09-04 14:04:03 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player shinigami tournament stats: {'total_matches': 14, 'total_goals_scored': 32, 'total_goals_conceded': 19, 'wins': 8, 'losses': 3, 'draws': 3, 'points': 27, 'goal_difference': 13}
+2025-09-04 14:04:03 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player sreemanth (ID: 6884bc4ec3c047b867142c0d)
+2025-09-04 14:04:03 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player sreemanth tournament stats: {'total_matches': 7, 'total_goals_scored': 8, 'total_goals_conceded': 19, 'wins': 2, 'losses': 5, 'draws': 0, 'points': 6, 'goal_difference': -11}
+2025-09-04 14:04:03 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player Funhaver (ID: 6884bf66c3c047b867142c0e)
+2025-09-04 14:04:03 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player Funhaver tournament stats: {'total_matches': 14, 'total_goals_scored': 17, 'total_goals_conceded': 28, 'wins': 3, 'losses': 8, 'draws': 3, 'points': 12, 'goal_difference': -11}
+2025-09-04 14:04:03 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player vapranav (ID: 6884cab9c3c047b867142c14)
+2025-09-04 14:04:03 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player vapranav tournament stats: {'total_matches': 7, 'total_goals_scored': 9, 'total_goals_conceded': 14, 'wins': 2, 'losses': 4, 'draws': 1, 'points': 7, 'goal_difference': -5}
+2025-09-04 14:04:03 - uvicorn.access - INFO - send:473 - 127.0.0.1:40418 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/stats HTTP/1.1" 200
+2025-09-04 14:04:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:355 - Tournament: {'_id': ObjectId('6883c24aa1f48eda9581dd82'), 'name': 'July Tournament', 'start_date': datetime.datetime(2025, 7, 25, 0, 0), 'end_date': datetime.datetime(2025, 7, 29, 22, 51, 53, 962000), 'description': 'Flicky Licky was in town', 'player_ids': ['6883c171a1f48eda9581dd7f', '6883c1f9a1f48eda9581dd80', '6883c21ca1f48eda9581dd81', '6884bc4ec3c047b867142c0d', '6884bf66c3c047b867142c0e', '6884cab9c3c047b867142c14'], 'completed': True, 'matches': [ObjectId('6883c288a1f48eda9581dd83'), ObjectId('6883c5cea1f48eda9581dd84'), ObjectId('6883c898a1f48eda9581dd85'), ObjectId('6883cd3ca1f48eda9581dd86'), ObjectId('6883cd3ea1f48eda9581dd87'), ObjectId('6884c2aec3c047b867142c0f'), ObjectId('6884c5c8c3c047b867142c10'), ObjectId('6884c7fcc3c047b867142c11'), ObjectId('6884c7fec3c047b867142c12'), ObjectId('6884ca8fc3c047b867142c13'), ObjectId('6884cb5cc3c047b867142c15'), ObjectId('6884cd6ac3c047b867142c16'), ObjectId('6884d1e0c3c047b867142c17'), ObjectId('6884d1e1c3c047b867142c18'), ObjectId('6884d3dbc3c047b867142c19'), ObjectId('6884d63ac3c047b867142c1a'), ObjectId('6884d9e44d90dc81e5e022ad'), ObjectId('688526f4c3c047b867142c1b'), ObjectId('68852949c3c047b867142c1c'), ObjectId('68852c5fc3c047b867142c1d'), ObjectId('6885324649577df3ccc5faf3'), ObjectId('6885358949577df3ccc5faf4'), ObjectId('688537c549577df3ccc5faf5'), ObjectId('68853cfc49577df3ccc5faf7'), ObjectId('68853e4c49577df3ccc5faf8'), ObjectId('6887b3ca3d8d460ab7577f06'), ObjectId('6887b65c3d8d460ab7577f07'), ObjectId('6887b9693d8d460ab7577f08'), ObjectId('6887bc403d8d460ab7577f09'), ObjectId('6887bf263d8d460ab7577f0a'), ObjectId('6887c27b3d8d460ab7577f0b'), ObjectId('6887c4593d8d460ab7577f0c'), ObjectId('6887c7593d8d460ab7577f0d'), ObjectId('6887ca433d8d460ab7577f0e'), ObjectId('6887cf873d8d460ab7577f0f'), ObjectId('6887d1c83d8d460ab7577f10')], 'matches_count': 32, 'owner_id': '6883c171a1f48eda9581dd7f'} 
+
+2025-09-04 14:04:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:361 - Player IDs from tournament: ['6883c171a1f48eda9581dd7f', '6883c1f9a1f48eda9581dd80', '6883c21ca1f48eda9581dd81', '6884bc4ec3c047b867142c0d', '6884bf66c3c047b867142c0e', '6884cab9c3c047b867142c14']
+2025-09-04 14:04:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:371 - Found 6 players in database
+2025-09-04 14:04:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:377 - Found 32 matches for tournament
+2025-09-04 14:04:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player roshatron (ID: 6883c171a1f48eda9581dd7f)
+2025-09-04 14:04:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player roshatron tournament stats: {'total_matches': 13, 'total_goals_scored': 35, 'total_goals_conceded': 17, 'wins': 10, 'losses': 3, 'draws': 0, 'points': 30, 'goal_difference': 18}
+2025-09-04 14:04:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player kAMi (ID: 6883c1f9a1f48eda9581dd80)
+2025-09-04 14:04:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player kAMi tournament stats: {'total_matches': 9, 'total_goals_scored': 15, 'total_goals_conceded': 19, 'wins': 3, 'losses': 5, 'draws': 1, 'points': 10, 'goal_difference': -4}
+2025-09-04 14:04:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player shinigami (ID: 6883c21ca1f48eda9581dd81)
+2025-09-04 14:04:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player shinigami tournament stats: {'total_matches': 14, 'total_goals_scored': 32, 'total_goals_conceded': 19, 'wins': 8, 'losses': 3, 'draws': 3, 'points': 27, 'goal_difference': 13}
+2025-09-04 14:04:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player sreemanth (ID: 6884bc4ec3c047b867142c0d)
+2025-09-04 14:04:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player sreemanth tournament stats: {'total_matches': 7, 'total_goals_scored': 8, 'total_goals_conceded': 19, 'wins': 2, 'losses': 5, 'draws': 0, 'points': 6, 'goal_difference': -11}
+2025-09-04 14:04:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player Funhaver (ID: 6884bf66c3c047b867142c0e)
+2025-09-04 14:04:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player Funhaver tournament stats: {'total_matches': 14, 'total_goals_scored': 17, 'total_goals_conceded': 28, 'wins': 3, 'losses': 8, 'draws': 3, 'points': 12, 'goal_difference': -11}
+2025-09-04 14:04:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player vapranav (ID: 6884cab9c3c047b867142c14)
+2025-09-04 14:04:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player vapranav tournament stats: {'total_matches': 7, 'total_goals_scored': 9, 'total_goals_conceded': 14, 'wins': 2, 'losses': 4, 'draws': 1, 'points': 7, 'goal_difference': -5}
+2025-09-04 14:04:06 - uvicorn.access - INFO - send:473 - 127.0.0.1:40420 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/stats HTTP/1.1" 200
+2025-09-04 14:04:07 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:77 - Starting tournament matches request - tournament_id: 6883c24aa1f48eda9581dd82, page: 1, page_size: 20
+2025-09-04 14:04:07 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:81 - Database connection established in 0.25ms
+2025-09-04 14:04:07 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:87 - Tournament validation query completed in 36.10ms
+2025-09-04 14:04:07 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:100 - Match count query completed in 34.55ms - total_matches: 32
+2025-09-04 14:04:07 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:107 - Matches fetch query completed in 36.08ms - fetched_matches: 20
+2025-09-04 14:04:07 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:125 - Player data fetch completed in 35.51ms - unique_players: 6
+2025-09-04 14:04:07 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:172 - Match processing completed in 0.11ms - processed_matches: 20
+2025-09-04 14:04:07 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:180 - Tournament matches request completed in 143.61ms - tournament_id: 6883c24aa1f48eda9581dd82, page: 1, total_matches: 32, returned_matches: 20
+2025-09-04 14:04:07 - uvicorn.access - INFO - send:473 - 127.0.0.1:40418 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/matches?page=1&page_size=20 HTTP/1.1" 200
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:77 - Starting tournament matches request - tournament_id: 6883c24aa1f48eda9581dd82, page: 1, page_size: 20
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:81 - Database connection established in 0.21ms
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:87 - Tournament validation query completed in 33.16ms
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:100 - Match count query completed in 33.20ms - total_matches: 32
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:107 - Matches fetch query completed in 34.46ms - fetched_matches: 20
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:125 - Player data fetch completed in 32.90ms - unique_players: 6
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:172 - Match processing completed in 0.13ms - processed_matches: 20
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:180 - Tournament matches request completed in 134.85ms - tournament_id: 6883c24aa1f48eda9581dd82, page: 1, total_matches: 32, returned_matches: 20
+2025-09-04 14:04:18 - uvicorn.access - INFO - send:473 - 127.0.0.1:54890 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/matches?page=1&page_size=20 HTTP/1.1" 200
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:355 - Tournament: {'_id': ObjectId('6883c24aa1f48eda9581dd82'), 'name': 'July Tournament', 'start_date': datetime.datetime(2025, 7, 25, 0, 0), 'end_date': datetime.datetime(2025, 7, 29, 22, 51, 53, 962000), 'description': 'Flicky Licky was in town', 'player_ids': ['6883c171a1f48eda9581dd7f', '6883c1f9a1f48eda9581dd80', '6883c21ca1f48eda9581dd81', '6884bc4ec3c047b867142c0d', '6884bf66c3c047b867142c0e', '6884cab9c3c047b867142c14'], 'completed': True, 'matches': [ObjectId('6883c288a1f48eda9581dd83'), ObjectId('6883c5cea1f48eda9581dd84'), ObjectId('6883c898a1f48eda9581dd85'), ObjectId('6883cd3ca1f48eda9581dd86'), ObjectId('6883cd3ea1f48eda9581dd87'), ObjectId('6884c2aec3c047b867142c0f'), ObjectId('6884c5c8c3c047b867142c10'), ObjectId('6884c7fcc3c047b867142c11'), ObjectId('6884c7fec3c047b867142c12'), ObjectId('6884ca8fc3c047b867142c13'), ObjectId('6884cb5cc3c047b867142c15'), ObjectId('6884cd6ac3c047b867142c16'), ObjectId('6884d1e0c3c047b867142c17'), ObjectId('6884d1e1c3c047b867142c18'), ObjectId('6884d3dbc3c047b867142c19'), ObjectId('6884d63ac3c047b867142c1a'), ObjectId('6884d9e44d90dc81e5e022ad'), ObjectId('688526f4c3c047b867142c1b'), ObjectId('68852949c3c047b867142c1c'), ObjectId('68852c5fc3c047b867142c1d'), ObjectId('6885324649577df3ccc5faf3'), ObjectId('6885358949577df3ccc5faf4'), ObjectId('688537c549577df3ccc5faf5'), ObjectId('68853cfc49577df3ccc5faf7'), ObjectId('68853e4c49577df3ccc5faf8'), ObjectId('6887b3ca3d8d460ab7577f06'), ObjectId('6887b65c3d8d460ab7577f07'), ObjectId('6887b9693d8d460ab7577f08'), ObjectId('6887bc403d8d460ab7577f09'), ObjectId('6887bf263d8d460ab7577f0a'), ObjectId('6887c27b3d8d460ab7577f0b'), ObjectId('6887c4593d8d460ab7577f0c'), ObjectId('6887c7593d8d460ab7577f0d'), ObjectId('6887ca433d8d460ab7577f0e'), ObjectId('6887cf873d8d460ab7577f0f'), ObjectId('6887d1c83d8d460ab7577f10')], 'matches_count': 32, 'owner_id': '6883c171a1f48eda9581dd7f'} 
+
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:361 - Player IDs from tournament: ['6883c171a1f48eda9581dd7f', '6883c1f9a1f48eda9581dd80', '6883c21ca1f48eda9581dd81', '6884bc4ec3c047b867142c0d', '6884bf66c3c047b867142c0e', '6884cab9c3c047b867142c14']
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:371 - Found 6 players in database
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:377 - Found 32 matches for tournament
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player roshatron (ID: 6883c171a1f48eda9581dd7f)
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player roshatron tournament stats: {'total_matches': 13, 'total_goals_scored': 35, 'total_goals_conceded': 17, 'wins': 10, 'losses': 3, 'draws': 0, 'points': 30, 'goal_difference': 18}
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player kAMi (ID: 6883c1f9a1f48eda9581dd80)
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player kAMi tournament stats: {'total_matches': 9, 'total_goals_scored': 15, 'total_goals_conceded': 19, 'wins': 3, 'losses': 5, 'draws': 1, 'points': 10, 'goal_difference': -4}
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player shinigami (ID: 6883c21ca1f48eda9581dd81)
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player shinigami tournament stats: {'total_matches': 14, 'total_goals_scored': 32, 'total_goals_conceded': 19, 'wins': 8, 'losses': 3, 'draws': 3, 'points': 27, 'goal_difference': 13}
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player sreemanth (ID: 6884bc4ec3c047b867142c0d)
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player sreemanth tournament stats: {'total_matches': 7, 'total_goals_scored': 8, 'total_goals_conceded': 19, 'wins': 2, 'losses': 5, 'draws': 0, 'points': 6, 'goal_difference': -11}
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player Funhaver (ID: 6884bf66c3c047b867142c0e)
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player Funhaver tournament stats: {'total_matches': 14, 'total_goals_scored': 17, 'total_goals_conceded': 28, 'wins': 3, 'losses': 8, 'draws': 3, 'points': 12, 'goal_difference': -11}
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player vapranav (ID: 6884cab9c3c047b867142c14)
+2025-09-04 14:04:18 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player vapranav tournament stats: {'total_matches': 7, 'total_goals_scored': 9, 'total_goals_conceded': 14, 'wins': 2, 'losses': 4, 'draws': 1, 'points': 7, 'goal_difference': -5}
+2025-09-04 14:04:18 - uvicorn.access - INFO - send:473 - 127.0.0.1:54890 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/stats HTTP/1.1" 200
+2025-09-04 14:04:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:77 - Starting tournament matches request - tournament_id: 6883c24aa1f48eda9581dd82, page: 1, page_size: 20
+2025-09-04 14:04:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:81 - Database connection established in 0.23ms
+2025-09-04 14:04:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:87 - Tournament validation query completed in 32.92ms
+2025-09-04 14:04:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:100 - Match count query completed in 32.67ms - total_matches: 32
+2025-09-04 14:04:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:107 - Matches fetch query completed in 34.01ms - fetched_matches: 20
+2025-09-04 14:04:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:125 - Player data fetch completed in 36.79ms - unique_players: 6
+2025-09-04 14:04:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:172 - Match processing completed in 0.10ms - processed_matches: 20
+2025-09-04 14:04:19 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:180 - Tournament matches request completed in 137.72ms - tournament_id: 6883c24aa1f48eda9581dd82, page: 1, total_matches: 32, returned_matches: 20
+2025-09-04 14:04:19 - uvicorn.access - INFO - send:473 - 127.0.0.1:54890 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/matches?page=1&page_size=20 HTTP/1.1" 200
+2025-09-04 14:04:24 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:77 - Starting tournament matches request - tournament_id: 6883c24aa1f48eda9581dd82, page: 1, page_size: 20
+2025-09-04 14:04:24 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:81 - Database connection established in 0.15ms
+2025-09-04 14:04:24 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:87 - Tournament validation query completed in 32.11ms
+2025-09-04 14:04:24 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:100 - Match count query completed in 32.84ms - total_matches: 32
+2025-09-04 14:04:24 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:107 - Matches fetch query completed in 34.64ms - fetched_matches: 20
+2025-09-04 14:04:24 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:125 - Player data fetch completed in 35.73ms - unique_players: 6
+2025-09-04 14:04:24 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:172 - Match processing completed in 0.10ms - processed_matches: 20
+2025-09-04 14:04:24 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:180 - Tournament matches request completed in 136.50ms - tournament_id: 6883c24aa1f48eda9581dd82, page: 1, total_matches: 32, returned_matches: 20
+2025-09-04 14:04:24 - uvicorn.access - INFO - send:473 - 127.0.0.1:35602 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/matches?page=1&page_size=20 HTTP/1.1" 200
+2025-09-04 14:06:21 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:355 - Tournament: {'_id': ObjectId('6883c24aa1f48eda9581dd82'), 'name': 'July Tournament', 'start_date': datetime.datetime(2025, 7, 25, 0, 0), 'end_date': datetime.datetime(2025, 7, 29, 22, 51, 53, 962000), 'description': 'Flicky Licky was in town', 'player_ids': ['6883c171a1f48eda9581dd7f', '6883c1f9a1f48eda9581dd80', '6883c21ca1f48eda9581dd81', '6884bc4ec3c047b867142c0d', '6884bf66c3c047b867142c0e', '6884cab9c3c047b867142c14'], 'completed': True, 'matches': [ObjectId('6883c288a1f48eda9581dd83'), ObjectId('6883c5cea1f48eda9581dd84'), ObjectId('6883c898a1f48eda9581dd85'), ObjectId('6883cd3ca1f48eda9581dd86'), ObjectId('6883cd3ea1f48eda9581dd87'), ObjectId('6884c2aec3c047b867142c0f'), ObjectId('6884c5c8c3c047b867142c10'), ObjectId('6884c7fcc3c047b867142c11'), ObjectId('6884c7fec3c047b867142c12'), ObjectId('6884ca8fc3c047b867142c13'), ObjectId('6884cb5cc3c047b867142c15'), ObjectId('6884cd6ac3c047b867142c16'), ObjectId('6884d1e0c3c047b867142c17'), ObjectId('6884d1e1c3c047b867142c18'), ObjectId('6884d3dbc3c047b867142c19'), ObjectId('6884d63ac3c047b867142c1a'), ObjectId('6884d9e44d90dc81e5e022ad'), ObjectId('688526f4c3c047b867142c1b'), ObjectId('68852949c3c047b867142c1c'), ObjectId('68852c5fc3c047b867142c1d'), ObjectId('6885324649577df3ccc5faf3'), ObjectId('6885358949577df3ccc5faf4'), ObjectId('688537c549577df3ccc5faf5'), ObjectId('68853cfc49577df3ccc5faf7'), ObjectId('68853e4c49577df3ccc5faf8'), ObjectId('6887b3ca3d8d460ab7577f06'), ObjectId('6887b65c3d8d460ab7577f07'), ObjectId('6887b9693d8d460ab7577f08'), ObjectId('6887bc403d8d460ab7577f09'), ObjectId('6887bf263d8d460ab7577f0a'), ObjectId('6887c27b3d8d460ab7577f0b'), ObjectId('6887c4593d8d460ab7577f0c'), ObjectId('6887c7593d8d460ab7577f0d'), ObjectId('6887ca433d8d460ab7577f0e'), ObjectId('6887cf873d8d460ab7577f0f'), ObjectId('6887d1c83d8d460ab7577f10')], 'matches_count': 32, 'owner_id': '6883c171a1f48eda9581dd7f'} 
+
+2025-09-04 14:06:21 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:361 - Player IDs from tournament: ['6883c171a1f48eda9581dd7f', '6883c1f9a1f48eda9581dd80', '6883c21ca1f48eda9581dd81', '6884bc4ec3c047b867142c0d', '6884bf66c3c047b867142c0e', '6884cab9c3c047b867142c14']
+2025-09-04 14:06:21 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:371 - Found 6 players in database
+2025-09-04 14:06:21 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:377 - Found 32 matches for tournament
+2025-09-04 14:06:21 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player roshatron (ID: 6883c171a1f48eda9581dd7f)
+2025-09-04 14:06:21 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player roshatron tournament stats: {'total_matches': 13, 'total_goals_scored': 35, 'total_goals_conceded': 17, 'wins': 10, 'losses': 3, 'draws': 0, 'points': 30, 'goal_difference': 18}
+2025-09-04 14:06:21 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player kAMi (ID: 6883c1f9a1f48eda9581dd80)
+2025-09-04 14:06:21 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player kAMi tournament stats: {'total_matches': 9, 'total_goals_scored': 15, 'total_goals_conceded': 19, 'wins': 3, 'losses': 5, 'draws': 1, 'points': 10, 'goal_difference': -4}
+2025-09-04 14:06:21 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player shinigami (ID: 6883c21ca1f48eda9581dd81)
+2025-09-04 14:06:21 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player shinigami tournament stats: {'total_matches': 14, 'total_goals_scored': 32, 'total_goals_conceded': 19, 'wins': 8, 'losses': 3, 'draws': 3, 'points': 27, 'goal_difference': 13}
+2025-09-04 14:06:21 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player sreemanth (ID: 6884bc4ec3c047b867142c0d)
+2025-09-04 14:06:21 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player sreemanth tournament stats: {'total_matches': 7, 'total_goals_scored': 8, 'total_goals_conceded': 19, 'wins': 2, 'losses': 5, 'draws': 0, 'points': 6, 'goal_difference': -11}
+2025-09-04 14:06:21 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player Funhaver (ID: 6884bf66c3c047b867142c0e)
+2025-09-04 14:06:21 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player Funhaver tournament stats: {'total_matches': 14, 'total_goals_scored': 17, 'total_goals_conceded': 28, 'wins': 3, 'losses': 8, 'draws': 3, 'points': 12, 'goal_difference': -11}
+2025-09-04 14:06:21 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player vapranav (ID: 6884cab9c3c047b867142c14)
+2025-09-04 14:06:21 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player vapranav tournament stats: {'total_matches': 7, 'total_goals_scored': 9, 'total_goals_conceded': 14, 'wins': 2, 'losses': 4, 'draws': 1, 'points': 7, 'goal_difference': -5}
+2025-09-04 14:06:21 - uvicorn.access - INFO - send:473 - 127.0.0.1:49554 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/stats HTTP/1.1" 200
+2025-09-04 14:10:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:77 - Starting tournament matches request - tournament_id: 6883c24aa1f48eda9581dd82, page: 1, page_size: 20
+2025-09-04 14:10:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:81 - Database connection established in 0.53ms
+2025-09-04 14:10:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:87 - Tournament validation query completed in 33.63ms
+2025-09-04 14:10:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:100 - Match count query completed in 34.25ms - total_matches: 32
+2025-09-04 14:10:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:107 - Matches fetch query completed in 36.96ms - fetched_matches: 20
+2025-09-04 14:10:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:125 - Player data fetch completed in 37.99ms - unique_players: 6
+2025-09-04 14:10:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:172 - Match processing completed in 0.12ms - processed_matches: 20
+2025-09-04 14:10:06 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:180 - Tournament matches request completed in 144.69ms - tournament_id: 6883c24aa1f48eda9581dd82, page: 1, total_matches: 32, returned_matches: 20
+2025-09-04 14:10:06 - uvicorn.access - INFO - send:473 - 127.0.0.1:39460 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/matches?page=1&page_size=20 HTTP/1.1" 200
+2025-09-04 14:10:30 - uvicorn.access - INFO - send:473 - 127.0.0.1:45930 - "OPTIONS /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-04 14:10:30 - uvicorn.access - INFO - send:473 - 127.0.0.1:45944 - "OPTIONS /api/v1/auth/me HTTP/1.1" 200
+2025-09-04 14:10:30 - uvicorn.access - INFO - send:473 - 127.0.0.1:45944 - "GET /api/v1/auth/me HTTP/1.1" 200
+2025-09-04 14:10:30 - uvicorn.access - INFO - send:473 - 127.0.0.1:45930 - "GET /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-04 14:10:30 - uvicorn.access - INFO - send:473 - 127.0.0.1:45930 - "OPTIONS /api/v1/tournaments/6883c24aa1f48eda9581dd82/players HTTP/1.1" 200
+2025-09-04 14:10:30 - uvicorn.access - INFO - send:473 - 127.0.0.1:45930 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/players HTTP/1.1" 200
+2025-09-04 14:10:30 - uvicorn.access - INFO - send:473 - 127.0.0.1:45930 - "OPTIONS /api/v1/tournaments/6883c24aa1f48eda9581dd82/stats HTTP/1.1" 200
+2025-09-04 14:10:30 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:355 - Tournament: {'_id': ObjectId('6883c24aa1f48eda9581dd82'), 'name': 'July Tournament', 'start_date': datetime.datetime(2025, 7, 25, 0, 0), 'end_date': datetime.datetime(2025, 7, 29, 22, 51, 53, 962000), 'description': 'Flicky Licky was in town', 'player_ids': ['6883c171a1f48eda9581dd7f', '6883c1f9a1f48eda9581dd80', '6883c21ca1f48eda9581dd81', '6884bc4ec3c047b867142c0d', '6884bf66c3c047b867142c0e', '6884cab9c3c047b867142c14'], 'completed': True, 'matches': [ObjectId('6883c288a1f48eda9581dd83'), ObjectId('6883c5cea1f48eda9581dd84'), ObjectId('6883c898a1f48eda9581dd85'), ObjectId('6883cd3ca1f48eda9581dd86'), ObjectId('6883cd3ea1f48eda9581dd87'), ObjectId('6884c2aec3c047b867142c0f'), ObjectId('6884c5c8c3c047b867142c10'), ObjectId('6884c7fcc3c047b867142c11'), ObjectId('6884c7fec3c047b867142c12'), ObjectId('6884ca8fc3c047b867142c13'), ObjectId('6884cb5cc3c047b867142c15'), ObjectId('6884cd6ac3c047b867142c16'), ObjectId('6884d1e0c3c047b867142c17'), ObjectId('6884d1e1c3c047b867142c18'), ObjectId('6884d3dbc3c047b867142c19'), ObjectId('6884d63ac3c047b867142c1a'), ObjectId('6884d9e44d90dc81e5e022ad'), ObjectId('688526f4c3c047b867142c1b'), ObjectId('68852949c3c047b867142c1c'), ObjectId('68852c5fc3c047b867142c1d'), ObjectId('6885324649577df3ccc5faf3'), ObjectId('6885358949577df3ccc5faf4'), ObjectId('688537c549577df3ccc5faf5'), ObjectId('68853cfc49577df3ccc5faf7'), ObjectId('68853e4c49577df3ccc5faf8'), ObjectId('6887b3ca3d8d460ab7577f06'), ObjectId('6887b65c3d8d460ab7577f07'), ObjectId('6887b9693d8d460ab7577f08'), ObjectId('6887bc403d8d460ab7577f09'), ObjectId('6887bf263d8d460ab7577f0a'), ObjectId('6887c27b3d8d460ab7577f0b'), ObjectId('6887c4593d8d460ab7577f0c'), ObjectId('6887c7593d8d460ab7577f0d'), ObjectId('6887ca433d8d460ab7577f0e'), ObjectId('6887cf873d8d460ab7577f0f'), ObjectId('6887d1c83d8d460ab7577f10')], 'matches_count': 32, 'owner_id': '6883c171a1f48eda9581dd7f'} 
+
+2025-09-04 14:10:30 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:361 - Player IDs from tournament: ['6883c171a1f48eda9581dd7f', '6883c1f9a1f48eda9581dd80', '6883c21ca1f48eda9581dd81', '6884bc4ec3c047b867142c0d', '6884bf66c3c047b867142c0e', '6884cab9c3c047b867142c14']
+2025-09-04 14:10:30 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:371 - Found 6 players in database
+2025-09-04 14:10:30 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:377 - Found 32 matches for tournament
+2025-09-04 14:10:30 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player roshatron (ID: 6883c171a1f48eda9581dd7f)
+2025-09-04 14:10:30 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player roshatron tournament stats: {'total_matches': 13, 'total_goals_scored': 35, 'total_goals_conceded': 17, 'wins': 10, 'losses': 3, 'draws': 0, 'points': 30, 'goal_difference': 18}
+2025-09-04 14:10:30 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player kAMi (ID: 6883c1f9a1f48eda9581dd80)
+2025-09-04 14:10:30 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player kAMi tournament stats: {'total_matches': 9, 'total_goals_scored': 15, 'total_goals_conceded': 19, 'wins': 3, 'losses': 5, 'draws': 1, 'points': 10, 'goal_difference': -4}
+2025-09-04 14:10:30 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player shinigami (ID: 6883c21ca1f48eda9581dd81)
+2025-09-04 14:10:30 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player shinigami tournament stats: {'total_matches': 14, 'total_goals_scored': 32, 'total_goals_conceded': 19, 'wins': 8, 'losses': 3, 'draws': 3, 'points': 27, 'goal_difference': 13}
+2025-09-04 14:10:30 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player sreemanth (ID: 6884bc4ec3c047b867142c0d)
+2025-09-04 14:10:30 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player sreemanth tournament stats: {'total_matches': 7, 'total_goals_scored': 8, 'total_goals_conceded': 19, 'wins': 2, 'losses': 5, 'draws': 0, 'points': 6, 'goal_difference': -11}
+2025-09-04 14:10:30 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player Funhaver (ID: 6884bf66c3c047b867142c0e)
+2025-09-04 14:10:30 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player Funhaver tournament stats: {'total_matches': 14, 'total_goals_scored': 17, 'total_goals_conceded': 28, 'wins': 3, 'losses': 8, 'draws': 3, 'points': 12, 'goal_difference': -11}
+2025-09-04 14:10:30 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:410 - Calculating stats for player vapranav (ID: 6884cab9c3c047b867142c14)
+2025-09-04 14:10:30 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:431 - Player vapranav tournament stats: {'total_matches': 7, 'total_goals_scored': 9, 'total_goals_conceded': 14, 'wins': 2, 'losses': 4, 'draws': 1, 'points': 7, 'goal_difference': -5}
+2025-09-04 14:10:30 - uvicorn.access - INFO - send:473 - 127.0.0.1:45930 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/stats HTTP/1.1" 200
+2025-09-04 14:10:38 - uvicorn.access - INFO - send:473 - 127.0.0.1:45870 - "GET /api/v1/auth/me HTTP/1.1" 200
+2025-09-04 14:10:50 - uvicorn.access - INFO - send:473 - 127.0.0.1:50880 - "GET /docs HTTP/1.1" 200
+2025-09-04 14:10:50 - uvicorn.access - INFO - send:473 - 127.0.0.1:50880 - "GET /openapi.json HTTP/1.1" 200
+2025-09-04 14:11:25 - uvicorn.access - INFO - send:473 - 127.0.0.1:53682 - "POST /api/v1/auth/login HTTP/1.1" 200
+2025-09-04 14:12:10 - uvicorn.access - INFO - send:473 - 127.0.0.1:34314 - "GET /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-04 14:12:46 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:77 - Starting tournament matches request - tournament_id: 6883c24aa1f48eda9581dd82, page: 1, page_size: 50
+2025-09-04 14:12:46 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:81 - Database connection established in 0.15ms
+2025-09-04 14:12:46 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:87 - Tournament validation query completed in 32.47ms
+2025-09-04 14:12:46 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:100 - Match count query completed in 32.87ms - total_matches: 32
+2025-09-04 14:12:46 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:107 - Matches fetch query completed in 33.18ms - fetched_matches: 32
+2025-09-04 14:12:46 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:125 - Player data fetch completed in 35.97ms - unique_players: 6
+2025-09-04 14:12:46 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:172 - Match processing completed in 0.20ms - processed_matches: 32
+2025-09-04 14:12:46 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:180 - Tournament matches request completed in 136.02ms - tournament_id: 6883c24aa1f48eda9581dd82, page: 1, total_matches: 32, returned_matches: 32
+2025-09-04 14:12:46 - uvicorn.access - INFO - send:473 - 127.0.0.1:47630 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/matches?page=1&page_size=50 HTTP/1.1" 200
+2025-09-04 14:14:39 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-04 14:14:39 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-04 14:14:39 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-04 14:14:39 - uvicorn.error - INFO - _serve:93 - Finished server process [7782]
+2025-09-04 14:16:30 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-04 14:16:30 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-04 14:16:30 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-04 14:16:30 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-04 14:16:30 - uvicorn.error - INFO - _serve:83 - Started server process [16075]
+2025-09-04 14:16:30 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-04 14:16:31 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-04 14:16:31 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-04 14:17:12 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-04 14:17:12 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-04 14:17:12 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-04 14:17:12 - uvicorn.error - INFO - _serve:93 - Finished server process [16075]
+2025-09-04 14:17:23 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-04 14:17:23 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-04 14:17:23 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-04 14:17:23 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-04 14:17:23 - uvicorn.error - INFO - _serve:83 - Started server process [16549]
+2025-09-04 14:17:23 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-04 14:17:24 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-04 14:17:24 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-04 14:22:13 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-04 14:22:13 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-04 14:22:13 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-04 14:22:13 - uvicorn.error - INFO - _serve:93 - Finished server process [16549]
+2025-09-04 14:22:16 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-04 14:22:16 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-04 14:22:16 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-04 14:22:16 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-04 14:22:16 - uvicorn.error - INFO - _serve:83 - Started server process [17895]
+2025-09-04 14:22:16 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-04 14:22:16 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-04 14:22:16 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-04 14:22:18 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-04 14:22:18 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-04 14:22:18 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-04 14:22:18 - uvicorn.error - INFO - _serve:93 - Finished server process [17895]
+2025-09-04 14:22:26 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-04 14:22:26 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-04 14:22:26 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-04 14:22:26 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-04 14:22:26 - uvicorn.error - INFO - _serve:83 - Started server process [17957]
+2025-09-04 14:22:26 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-04 14:22:27 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-04 14:22:27 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-04 14:22:28 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-04 14:22:28 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-04 14:22:28 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-04 14:22:28 - uvicorn.error - INFO - _serve:93 - Finished server process [17957]
+2025-09-04 14:22:29 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-04 14:22:29 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-04 14:22:29 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-04 14:22:29 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-04 14:22:29 - uvicorn.error - INFO - _serve:83 - Started server process [17992]
+2025-09-04 14:22:29 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-04 14:22:30 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-04 14:22:30 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-05 10:09:52 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 10:09:52 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 10:09:52 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 10:09:52 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 10:09:52 - uvicorn.error - INFO - _serve:83 - Started server process [420392]
+2025-09-05 10:09:52 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-05 10:09:53 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-05 10:09:53 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-05 10:33:46 - uvicorn.access - INFO - send:473 - 127.0.0.1:33014 - "OPTIONS /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-05 10:33:46 - uvicorn.access - INFO - send:473 - 127.0.0.1:33028 - "OPTIONS /api/v1/auth/me HTTP/1.1" 200
+2025-09-05 10:33:46 - uvicorn.access - INFO - send:473 - 127.0.0.1:33014 - "GET /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-05 10:33:46 - uvicorn.access - INFO - send:473 - 127.0.0.1:33014 - "OPTIONS /api/v1/tournaments/6883c24aa1f48eda9581dd82/players HTTP/1.1" 200
+2025-09-05 10:33:46 - uvicorn.access - INFO - send:473 - 127.0.0.1:33028 - "GET /api/v1/auth/me HTTP/1.1" 200
+2025-09-05 10:33:46 - uvicorn.access - INFO - send:473 - 127.0.0.1:33014 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/players HTTP/1.1" 200
+2025-09-05 10:33:47 - uvicorn.access - INFO - send:473 - 127.0.0.1:33014 - "OPTIONS /api/v1/tournaments/6883c24aa1f48eda9581dd82/stats HTTP/1.1" 200
+2025-09-05 10:33:47 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:528 - Tournament: {'_id': ObjectId('6883c24aa1f48eda9581dd82'), 'name': 'July Tournament', 'start_date': datetime.datetime(2025, 7, 25, 0, 0), 'end_date': datetime.datetime(2025, 7, 29, 22, 51, 53, 962000), 'description': 'Flicky Licky was in town', 'player_ids': ['6883c171a1f48eda9581dd7f', '6883c1f9a1f48eda9581dd80', '6883c21ca1f48eda9581dd81', '6884bc4ec3c047b867142c0d', '6884bf66c3c047b867142c0e', '6884cab9c3c047b867142c14'], 'completed': True, 'matches': [ObjectId('6883c288a1f48eda9581dd83'), ObjectId('6883c5cea1f48eda9581dd84'), ObjectId('6883c898a1f48eda9581dd85'), ObjectId('6883cd3ca1f48eda9581dd86'), ObjectId('6883cd3ea1f48eda9581dd87'), ObjectId('6884c2aec3c047b867142c0f'), ObjectId('6884c5c8c3c047b867142c10'), ObjectId('6884c7fcc3c047b867142c11'), ObjectId('6884c7fec3c047b867142c12'), ObjectId('6884ca8fc3c047b867142c13'), ObjectId('6884cb5cc3c047b867142c15'), ObjectId('6884cd6ac3c047b867142c16'), ObjectId('6884d1e0c3c047b867142c17'), ObjectId('6884d1e1c3c047b867142c18'), ObjectId('6884d3dbc3c047b867142c19'), ObjectId('6884d63ac3c047b867142c1a'), ObjectId('6884d9e44d90dc81e5e022ad'), ObjectId('688526f4c3c047b867142c1b'), ObjectId('68852949c3c047b867142c1c'), ObjectId('68852c5fc3c047b867142c1d'), ObjectId('6885324649577df3ccc5faf3'), ObjectId('6885358949577df3ccc5faf4'), ObjectId('688537c549577df3ccc5faf5'), ObjectId('68853cfc49577df3ccc5faf7'), ObjectId('68853e4c49577df3ccc5faf8'), ObjectId('6887b3ca3d8d460ab7577f06'), ObjectId('6887b65c3d8d460ab7577f07'), ObjectId('6887b9693d8d460ab7577f08'), ObjectId('6887bc403d8d460ab7577f09'), ObjectId('6887bf263d8d460ab7577f0a'), ObjectId('6887c27b3d8d460ab7577f0b'), ObjectId('6887c4593d8d460ab7577f0c'), ObjectId('6887c7593d8d460ab7577f0d'), ObjectId('6887ca433d8d460ab7577f0e'), ObjectId('6887cf873d8d460ab7577f0f'), ObjectId('6887d1c83d8d460ab7577f10')], 'matches_count': 32, 'owner_id': '6883c171a1f48eda9581dd7f'} 
+
+2025-09-05 10:33:47 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:534 - Player IDs from tournament: ['6883c171a1f48eda9581dd7f', '6883c1f9a1f48eda9581dd80', '6883c21ca1f48eda9581dd81', '6884bc4ec3c047b867142c0d', '6884bf66c3c047b867142c0e', '6884cab9c3c047b867142c14']
+2025-09-05 10:33:47 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:544 - Found 6 players in database
+2025-09-05 10:33:47 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:550 - Found 32 matches for tournament
+2025-09-05 10:33:47 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:583 - Calculating stats for player roshatron (ID: 6883c171a1f48eda9581dd7f)
+2025-09-05 10:33:47 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:604 - Player roshatron tournament stats: {'total_matches': 13, 'total_goals_scored': 35, 'total_goals_conceded': 17, 'wins': 10, 'losses': 3, 'draws': 0, 'points': 30, 'goal_difference': 18}
+2025-09-05 10:33:47 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:583 - Calculating stats for player kAMi (ID: 6883c1f9a1f48eda9581dd80)
+2025-09-05 10:33:47 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:604 - Player kAMi tournament stats: {'total_matches': 9, 'total_goals_scored': 15, 'total_goals_conceded': 19, 'wins': 3, 'losses': 5, 'draws': 1, 'points': 10, 'goal_difference': -4}
+2025-09-05 10:33:47 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:583 - Calculating stats for player shinigami (ID: 6883c21ca1f48eda9581dd81)
+2025-09-05 10:33:47 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:604 - Player shinigami tournament stats: {'total_matches': 14, 'total_goals_scored': 32, 'total_goals_conceded': 19, 'wins': 8, 'losses': 3, 'draws': 3, 'points': 27, 'goal_difference': 13}
+2025-09-05 10:33:47 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:583 - Calculating stats for player sreemanth (ID: 6884bc4ec3c047b867142c0d)
+2025-09-05 10:33:47 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:604 - Player sreemanth tournament stats: {'total_matches': 7, 'total_goals_scored': 8, 'total_goals_conceded': 19, 'wins': 2, 'losses': 5, 'draws': 0, 'points': 6, 'goal_difference': -11}
+2025-09-05 10:33:47 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:583 - Calculating stats for player Funhaver (ID: 6884bf66c3c047b867142c0e)
+2025-09-05 10:33:47 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:604 - Player Funhaver tournament stats: {'total_matches': 14, 'total_goals_scored': 17, 'total_goals_conceded': 28, 'wins': 3, 'losses': 8, 'draws': 3, 'points': 12, 'goal_difference': -11}
+2025-09-05 10:33:47 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:583 - Calculating stats for player vapranav (ID: 6884cab9c3c047b867142c14)
+2025-09-05 10:33:47 - app.api.v1.endpoints.tournaments - INFO - get_tournament_stats:604 - Player vapranav tournament stats: {'total_matches': 7, 'total_goals_scored': 9, 'total_goals_conceded': 14, 'wins': 2, 'losses': 4, 'draws': 1, 'points': 7, 'goal_difference': -5}
+2025-09-05 10:33:47 - uvicorn.access - INFO - send:473 - 127.0.0.1:33014 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/stats HTTP/1.1" 200
+2025-09-05 10:34:29 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-05 10:34:29 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-05 10:34:29 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-05 10:34:29 - uvicorn.error - INFO - _serve:93 - Finished server process [420392]
+2025-09-05 10:34:29 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 10:34:29 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 10:34:29 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 10:34:29 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 10:34:29 - uvicorn.error - INFO - _serve:83 - Started server process [439608]
+2025-09-05 10:34:29 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-05 10:34:30 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-05 10:34:30 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-05 11:05:23 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-05 11:05:23 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-05 11:05:23 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-05 11:05:23 - uvicorn.error - INFO - _serve:93 - Finished server process [439608]
+2025-09-05 11:05:24 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 11:05:24 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 11:05:24 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 11:05:24 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 11:05:24 - uvicorn.error - INFO - _serve:83 - Started server process [449940]
+2025-09-05 11:05:24 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-05 11:05:25 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-05 11:05:25 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-05 11:05:52 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-05 11:05:52 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-05 11:05:52 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-05 11:05:52 - uvicorn.error - INFO - _serve:93 - Finished server process [449940]
+2025-09-05 11:05:53 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 11:05:53 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 11:05:53 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 11:05:53 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 11:05:53 - uvicorn.error - INFO - _serve:83 - Started server process [450159]
+2025-09-05 11:05:53 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-05 11:05:54 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-05 11:05:54 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-05 11:06:22 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-05 11:06:22 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-05 11:06:22 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-05 11:06:22 - uvicorn.error - INFO - _serve:93 - Finished server process [450159]
+2025-09-05 11:06:23 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 11:06:23 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 11:06:23 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 11:06:23 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 11:06:23 - uvicorn.error - INFO - _serve:83 - Started server process [450389]
+2025-09-05 11:06:23 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-05 11:06:24 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-05 11:06:24 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-05 11:06:31 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-05 11:06:31 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-05 11:06:31 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-05 11:06:31 - uvicorn.error - INFO - _serve:93 - Finished server process [450389]
+2025-09-05 11:06:32 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 11:06:32 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 11:06:32 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 11:06:32 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 11:06:32 - uvicorn.error - INFO - _serve:83 - Started server process [450498]
+2025-09-05 11:06:32 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-05 11:06:33 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-05 11:06:33 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-05 11:07:00 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 11:07:00 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 11:07:00 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 11:07:00 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 11:07:02 - httpx - INFO - _send_single_request:1025 - HTTP Request: POST http://testserver/api/v1/tournaments/ "HTTP/1.1 403 Forbidden"
+2025-09-05 11:07:03 - httpx - INFO - _send_single_request:1025 - HTTP Request: POST http://testserver/api/v1/tournaments/ "HTTP/1.1 403 Forbidden"
+2025-09-05 11:07:05 - httpx - INFO - _send_single_request:1025 - HTTP Request: POST http://testserver/api/v1/tournaments/ "HTTP/1.1 403 Forbidden"
+2025-09-05 11:07:07 - httpx - INFO - _send_single_request:1025 - HTTP Request: GET http://testserver/api/v1/tournaments/ "HTTP/1.1 403 Forbidden"
+2025-09-05 11:07:09 - httpx - INFO - _send_single_request:1025 - HTTP Request: POST http://testserver/api/v1/tournaments/ "HTTP/1.1 403 Forbidden"
+2025-09-05 11:07:09 - httpx - INFO - _send_single_request:1025 - HTTP Request: GET http://testserver/api/v1/tournaments/ "HTTP/1.1 403 Forbidden"
+2025-09-05 11:07:10 - httpx - INFO - _send_single_request:1025 - HTTP Request: POST http://testserver/api/v1/tournaments/ "HTTP/1.1 403 Forbidden"
+2025-09-05 11:07:12 - httpx - INFO - _send_single_request:1025 - HTTP Request: GET http://testserver/api/v1/tournaments/68ba7708727ae9ec7a73e7e2/matches "HTTP/1.1 403 Forbidden"
+2025-09-05 11:07:13 - httpx - INFO - _send_single_request:1025 - HTTP Request: POST http://testserver/api/v1/tournaments/ "HTTP/1.1 403 Forbidden"
+2025-09-05 11:07:14 - httpx - INFO - _send_single_request:1025 - HTTP Request: POST http://testserver/api/v1/tournaments/ "HTTP/1.1 403 Forbidden"
+2025-09-05 11:07:16 - httpx - INFO - _send_single_request:1025 - HTTP Request: POST http://testserver/api/v1/tournaments/ "HTTP/1.1 403 Forbidden"
+2025-09-05 11:07:18 - httpx - INFO - _send_single_request:1025 - HTTP Request: POST http://testserver/api/v1/tournaments/ "HTTP/1.1 403 Forbidden"
+2025-09-05 11:07:21 - httpx - INFO - _send_single_request:1025 - HTTP Request: POST http://testserver/api/v1/tournaments/ "HTTP/1.1 403 Forbidden"
+2025-09-05 11:07:23 - httpx - INFO - _send_single_request:1025 - HTTP Request: POST http://testserver/api/v1/tournaments/ "HTTP/1.1 403 Forbidden"
+2025-09-05 11:07:24 - httpx - INFO - _send_single_request:1025 - HTTP Request: POST http://testserver/api/v1/tournaments/ "HTTP/1.1 403 Forbidden"
+2025-09-05 11:07:51 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-05 11:07:51 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-05 11:07:51 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-05 11:07:51 - uvicorn.error - INFO - _serve:93 - Finished server process [450498]
+2025-09-05 11:07:52 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 11:07:52 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 11:07:52 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 11:07:52 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 11:07:52 - uvicorn.error - INFO - _serve:83 - Started server process [451779]
+2025-09-05 11:07:52 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-05 11:07:55 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-05 11:07:55 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-05 11:08:05 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 11:08:05 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 11:08:05 - app.utils.helpers - INFO - generate_round_robin_matches:46 - Generated 6 round-robin matches for 3 players with 2 rounds per matchup
+2025-09-05 11:08:05 - app.utils.helpers - INFO - generate_missing_matches:104 - Generated 5 missing matches for 3 players. Preserved 1 existing matches.
+2025-09-05 11:08:05 - app.utils.helpers - INFO - generate_missing_matches:104 - Generated 4 missing matches for 3 players. Preserved 2 existing matches.
+2025-09-05 11:08:51 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 11:08:51 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 11:08:51 - app.utils.helpers - INFO - generate_round_robin_matches:46 - Generated 2 round-robin matches for 2 players with 2 rounds per matchup
+2025-09-05 11:08:51 - app.utils.helpers - INFO - generate_missing_matches:104 - Generated 4 missing matches for 3 players. Preserved 2 existing matches.
+2025-09-05 11:08:51 - app.utils.helpers - INFO - generate_missing_matches:104 - Generated 0 missing matches for 2 players. Preserved 2 existing matches.
+2025-09-05 11:36:03 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-05 11:36:03 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-05 11:36:03 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-05 11:36:03 - uvicorn.error - INFO - _serve:93 - Finished server process [451779]
+2025-09-05 11:36:04 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 11:36:04 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 11:36:04 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 11:36:04 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 11:36:04 - uvicorn.error - INFO - _serve:83 - Started server process [461705]
+2025-09-05 11:36:04 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-05 11:36:05 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-05 11:36:05 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-05 11:36:07 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-05 11:36:07 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-05 11:36:07 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-05 11:36:07 - uvicorn.error - INFO - _serve:93 - Finished server process [461705]
+2025-09-05 11:36:08 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 11:36:08 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 11:36:08 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 11:36:08 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 11:36:08 - uvicorn.error - INFO - _serve:83 - Started server process [461765]
+2025-09-05 11:36:08 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-05 11:36:09 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-05 11:36:09 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-05 11:36:30 - uvicorn.access - INFO - send:473 - 127.0.0.1:50790 - "GET /docs HTTP/1.1" 200
+2025-09-05 11:36:31 - uvicorn.access - INFO - send:473 - 127.0.0.1:50790 - "GET /openapi.json HTTP/1.1" 200
+2025-09-05 11:37:15 - passlib.handlers.bcrypt - WARNING - _load_backend_mixin:622 - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/home/roshan/.ssh/fifa-rivalry-tracker/.venv/lib/python3.13/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-09-05 11:37:16 - uvicorn.access - INFO - send:473 - 127.0.0.1:54172 - "POST /api/v1/auth/login HTTP/1.1" 200
+2025-09-05 11:37:55 - uvicorn.access - INFO - send:473 - 127.0.0.1:32770 - "GET /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-05 11:39:44 - uvicorn.access - INFO - send:473 - 127.0.0.1:52808 - "OPTIONS /api/v1/players/ HTTP/1.1" 200
+2025-09-05 11:39:45 - uvicorn.access - INFO - send:473 - 127.0.0.1:52808 - "GET /api/v1/players/ HTTP/1.1" 200
+2025-09-05 11:39:45 - uvicorn.access - INFO - send:473 - 127.0.0.1:52808 - "GET /api/v1/players/ HTTP/1.1" 200
+2025-09-05 11:40:18 - uvicorn.access - INFO - send:473 - 127.0.0.1:50222 - "OPTIONS /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-05 11:40:18 - app.utils.helpers - INFO - generate_round_robin_matches:46 - Generated 6 round-robin matches for 3 players with 2 rounds per matchup
+2025-09-05 11:40:18 - app.api.v1.endpoints.tournaments - INFO - create_tournament:105 - Created tournament 68ba7eca46494214e4f93f8b with 6 auto-generated matches
+2025-09-05 11:40:18 - uvicorn.access - INFO - send:473 - 127.0.0.1:50222 - "POST /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-05 11:40:19 - uvicorn.access - INFO - send:473 - 127.0.0.1:50222 - "GET /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-05 11:40:19 - uvicorn.access - INFO - send:473 - 127.0.0.1:50250 - "GET /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-05 11:40:19 - uvicorn.access - INFO - send:473 - 127.0.0.1:50222 - "OPTIONS /api/v1/tournaments/6883c24aa1f48eda9581dd82/players HTTP/1.1" 200
+2025-09-05 11:40:19 - uvicorn.access - INFO - send:473 - 127.0.0.1:50250 - "OPTIONS /api/v1/tournaments/68ba7eca46494214e4f93f8b/players HTTP/1.1" 200
+2025-09-05 11:40:19 - uvicorn.access - INFO - send:473 - 127.0.0.1:49774 - "OPTIONS /api/v1/tournaments/68aad6c41859a9e9af6f5da7/players HTTP/1.1" 200
+2025-09-05 11:40:19 - uvicorn.access - INFO - send:473 - 127.0.0.1:49774 - "OPTIONS /api/v1/tournaments/6883c24aa1f48eda9581dd82/players HTTP/1.1" 200
+2025-09-05 11:40:19 - uvicorn.access - INFO - send:473 - 127.0.0.1:49778 - "OPTIONS /api/v1/tournaments/68aad6c41859a9e9af6f5da7/players HTTP/1.1" 200
+2025-09-05 11:40:19 - uvicorn.access - INFO - send:473 - 127.0.0.1:49778 - "OPTIONS /api/v1/tournaments/68ba7eca46494214e4f93f8b/players HTTP/1.1" 200
+2025-09-05 11:40:19 - uvicorn.access - INFO - send:473 - 127.0.0.1:50250 - "GET /api/v1/tournaments/68aad6c41859a9e9af6f5da7/players HTTP/1.1" 200
+2025-09-05 11:40:19 - uvicorn.access - INFO - send:473 - 127.0.0.1:50244 - "GET /api/v1/players/ HTTP/1.1" 200
+2025-09-05 11:40:19 - uvicorn.access - INFO - send:473 - 127.0.0.1:50230 - "GET /api/v1/players/ HTTP/1.1" 200
+2025-09-05 11:40:19 - uvicorn.access - INFO - send:473 - 127.0.0.1:50222 - "GET /api/v1/tournaments/68aad6c41859a9e9af6f5da7/players HTTP/1.1" 200
+2025-09-05 11:40:19 - uvicorn.access - INFO - send:473 - 127.0.0.1:50250 - "GET /api/v1/tournaments/68ba7eca46494214e4f93f8b/players HTTP/1.1" 200
+2025-09-05 11:40:19 - uvicorn.access - INFO - send:473 - 127.0.0.1:50244 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/players HTTP/1.1" 200
+2025-09-05 11:40:19 - uvicorn.access - INFO - send:473 - 127.0.0.1:49778 - "GET /api/v1/tournaments/68ba7eca46494214e4f93f8b/players HTTP/1.1" 200
+2025-09-05 11:40:19 - uvicorn.access - INFO - send:473 - 127.0.0.1:49774 - "GET /api/v1/tournaments/6883c24aa1f48eda9581dd82/players HTTP/1.1" 200
+2025-09-05 11:53:10 - uvicorn.access - INFO - send:473 - 127.0.0.1:50382 - "POST //api/v1/auth/login HTTP/1.1" 404
+2025-09-05 11:53:40 - uvicorn.access - INFO - send:473 - 127.0.0.1:45596 - "POST /api/v1/auth/login HTTP/1.1" 200
+2025-09-05 11:53:47 - uvicorn.access - INFO - send:473 - 127.0.0.1:45604 - "GET /api/v1/tournaments HTTP/1.1" 307
+2025-09-05 11:53:47 - uvicorn.access - INFO - send:473 - 127.0.0.1:45604 - "GET /api/v1/tournaments/ HTTP/1.1" 200
+2025-09-05 12:03:37 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:127 - Starting tournament matches request - tournament_id: 68ba7eca46494214e4f93f8b, page: 1, page_size: 50
+2025-09-05 12:03:37 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:131 - Database connection established in 0.22ms
+2025-09-05 12:03:37 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:137 - Tournament validation query completed in 78.46ms
+2025-09-05 12:03:37 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:150 - Match count query completed in 49.28ms - total_matches: 6
+2025-09-05 12:03:37 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:157 - Matches fetch query completed in 48.13ms - fetched_matches: 6
+2025-09-05 12:03:37 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:175 - Player data fetch completed in 49.31ms - unique_players: 3
+2025-09-05 12:03:37 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:222 - Match processing completed in 0.14ms - processed_matches: 6
+2025-09-05 12:03:37 - app.api.v1.endpoints.tournaments - INFO - get_tournament_matches:230 - Tournament matches request completed in 226.60ms - tournament_id: 68ba7eca46494214e4f93f8b, page: 1, total_matches: 6, returned_matches: 6
+2025-09-05 12:03:37 - uvicorn.access - INFO - send:473 - 127.0.0.1:60676 - "GET /api/v1/tournaments/68ba7eca46494214e4f93f8b/matches HTTP/1.1" 200
+2025-09-05 12:07:48 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-05 12:07:48 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-05 12:07:48 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-05 12:07:48 - uvicorn.error - INFO - _serve:93 - Finished server process [461765]
+2025-09-05 12:07:49 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 12:07:49 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 12:07:49 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 12:07:49 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 12:07:49 - uvicorn.error - INFO - _serve:83 - Started server process [472662]
+2025-09-05 12:07:49 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-05 12:07:50 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-05 12:07:50 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-05 12:08:15 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-05 12:08:15 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-05 12:08:15 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-05 12:08:15 - uvicorn.error - INFO - _serve:93 - Finished server process [472662]
+2025-09-05 12:08:16 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 12:08:16 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 12:08:17 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 12:08:17 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 12:08:17 - uvicorn.error - INFO - _serve:83 - Started server process [472882]
+2025-09-05 12:08:17 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-05 12:08:18 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-05 12:08:18 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-05 12:11:14 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 12:11:14 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 12:11:14 - app.utils.helpers - INFO - generate_round_robin_matches:55 - Generated 6 round-robin matches for 3 players with 2 rounds per matchup
+2025-09-05 12:11:14 - app.utils.helpers - INFO - generate_missing_matches:127 - Generated 5 missing matches for 3 players. Preserved 1 existing matches.
+2025-09-05 12:11:14 - app.utils.helpers - INFO - generate_round_robin_matches:55 - Generated 3 round-robin matches for 2 players with 3 rounds per matchup
+2025-09-05 12:13:00 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-05 12:13:00 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-05 12:13:00 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-05 12:13:00 - uvicorn.error - INFO - _serve:93 - Finished server process [472882]
+2025-09-05 12:13:01 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 12:13:01 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 12:13:01 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 12:13:01 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 12:13:01 - uvicorn.error - INFO - _serve:83 - Started server process [474822]
+2025-09-05 12:13:01 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-05 12:13:02 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-05 12:13:02 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-05 12:14:20 - uvicorn.access - INFO - send:473 - 127.0.0.1:40456 - "DELETE /api/v1/tournaments/68ba7eca46494214e4f93f8b HTTP/1.1" 307
+2025-09-05 12:14:20 - app.api.v1.endpoints.tournaments - INFO - delete_tournament:346 - Deleted 6 matches for tournament 68ba7eca46494214e4f93f8b
+2025-09-05 12:14:20 - app.api.v1.endpoints.tournaments - INFO - delete_tournament:350 - Deleted tournament 68ba7eca46494214e4f93f8b by user 6883c171a1f48eda9581dd7f
+2025-09-05 12:14:20 - uvicorn.access - INFO - send:473 - 127.0.0.1:40456 - "DELETE /api/v1/tournaments/68ba7eca46494214e4f93f8b/ HTTP/1.1" 200
+2025-09-05 12:22:36 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-05 12:22:36 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-05 12:22:36 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-05 12:22:36 - uvicorn.error - INFO - _serve:93 - Finished server process [474822]
+2025-09-05 12:22:40 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 12:22:40 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 12:22:40 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 12:22:40 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 12:22:40 - uvicorn.error - INFO - _serve:83 - Started server process [478304]
+2025-09-05 12:22:40 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-05 12:22:42 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-05 12:22:42 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-05 12:25:30 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-05 12:25:30 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-05 12:25:30 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-05 12:25:30 - uvicorn.error - INFO - _serve:93 - Finished server process [478304]
+2025-09-05 12:25:31 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 12:25:31 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 12:25:31 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 12:25:31 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 12:25:31 - uvicorn.error - INFO - _serve:83 - Started server process [479352]
+2025-09-05 12:25:31 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-05 12:25:32 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-05 12:25:32 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-05 12:26:05 - uvicorn.error - INFO - shutdown:263 - Shutting down
+2025-09-05 12:26:05 - uvicorn.error - INFO - shutdown:67 - Waiting for application shutdown.
+2025-09-05 12:26:05 - uvicorn.error - INFO - shutdown:76 - Application shutdown complete.
+2025-09-05 12:26:05 - uvicorn.error - INFO - _serve:93 - Finished server process [479352]
+2025-09-05 12:26:05 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 12:26:05 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 12:26:05 - main - INFO - <module>:24 - CORS Origins configured: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 12:26:05 - main - INFO - <module>:33 - Clean CORS Origins: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000', 'https://fifa-tracker-web-five.vercel.app']
+2025-09-05 12:26:05 - uvicorn.error - INFO - _serve:83 - Started server process [480163]
+2025-09-05 12:26:05 - uvicorn.error - INFO - startup:48 - Waiting for application startup.
+2025-09-05 12:26:06 - main - INFO - startup_event:49 - ✅ MongoDB Atlas connection successful!
+2025-09-05 12:26:06 - uvicorn.error - INFO - startup:62 - Application startup complete.
+2025-09-05 12:26:22 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 12:26:22 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 12:26:22 - __main__ - INFO - main:75 - 🚀 Creating FIFA Rivalry Tracker users...
+2025-09-05 12:26:54 - __main__ - ERROR - main:116 - ❌ Error creating users: localhost:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 68ba899667f94b4a9e99290f, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('localhost:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+2025-09-05 12:26:54 - __main__ - ERROR - main:117 - Make sure your MongoDB connection is working and .env file is configured.
+2025-09-05 12:34:29 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 12:34:29 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 12:34:29 - __main__ - INFO - main:75 - 🚀 Creating FIFA Rivalry Tracker users...
+2025-09-05 12:35:01 - __main__ - ERROR - main:116 - ❌ Error creating users: localhost:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 68ba8b7d9f26874f41255b7a, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('localhost:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+2025-09-05 12:35:01 - __main__ - ERROR - main:117 - Make sure your MongoDB connection is working and .env file is configured.
+2025-09-05 12:36:07 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 12:36:07 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 12:36:07 - __main__ - INFO - main:75 - 🚀 Creating FIFA Rivalry Tracker users...
+2025-09-05 12:36:38 - __main__ - ERROR - main:116 - ❌ Error creating users: 10.255.255.254:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 68ba8bdf476c9a7414c50b69, topology_type: Unknown, servers: [<ServerDescription ('10.255.255.254', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('10.255.255.254:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+2025-09-05 12:36:38 - __main__ - ERROR - main:117 - Make sure your MongoDB connection is working and .env file is configured.
+2025-09-05 12:38:06 - app.utils.logging - INFO - setup_logging:129 - Logging configured - Level: INFO, Format: %(asctime)s - %(name)s - %(levelname)s - %(message)s
+2025-09-05 12:38:06 - app.utils.logging - INFO - setup_logging:131 - Log file: logs/app.log
+2025-09-05 12:38:06 - __main__ - INFO - main:75 - 🚀 Creating FIFA Rivalry Tracker users...
+2025-09-05 12:38:36 - __main__ - ERROR - main:116 - ❌ Error creating users: ivnt-fd480j3:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 68ba8c567213c01b6ee16819, topology_type: Unknown, servers: [<ServerDescription ('ivnt-fd480j3', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('ivnt-fd480j3:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+2025-09-05 12:38:36 - __main__ - ERROR - main:117 - Make sure your MongoDB connection is working and .env file is configured.

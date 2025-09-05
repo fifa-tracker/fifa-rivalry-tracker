@@ -4,8 +4,128 @@ from app.models import Player, Match, Tournament
 from typing import List
 from app.utils.logging import get_logger
 import time
+import itertools
 
 logger = get_logger(__name__)
+
+
+def generate_round_robin_matches(player_ids: List[str], tournament_id: str, rounds_per_matchup: int = 2) -> List[dict]:
+    """
+    Generate round-robin matches for all players in a tournament.
+    Each player plays against every other player the specified number of times.
+    For even numbered rounds, player positions are alternated (player1 becomes player2 and vice versa).
+    
+    Args:
+        player_ids: List of player IDs in the tournament
+        tournament_id: The tournament ID these matches belong to
+        rounds_per_matchup: Number of times each pair of players should play against each other
+        
+    Returns:
+        List of match dictionaries ready to be inserted into the database
+    """
+    matches = []
+    
+    # Generate all unique pairs of players
+    player_pairs = list(itertools.combinations(player_ids, 2))
+    
+    for round_num in range(rounds_per_matchup):
+        for player1_id, player2_id in player_pairs:
+            # For even-numbered rounds (1, 3, 5...), reverse the player positions
+            if round_num % 2 == 1:
+                actual_player1_id = str(player2_id)
+                actual_player2_id = str(player1_id)
+            else:
+                actual_player1_id = str(player1_id)
+                actual_player2_id = str(player2_id)
+            
+            match_dict = {
+                "player1_id": actual_player1_id,
+                "player2_id": actual_player2_id,
+                "player1_goals": 0,
+                "player2_goals": 0,
+                "tournament_id": str(tournament_id),
+                "team1": "",  # Blank as requested
+                "team2": "",  # Blank as requested
+                "half_length": 4,  # Default value
+                "completed": False,  # Not completed initially
+                "date": datetime.now()
+            }
+            matches.append(match_dict)
+    
+    logger.info(f"Generated {len(matches)} round-robin matches for {len(player_ids)} players with {rounds_per_matchup} rounds per matchup")
+    return matches
+
+
+def generate_missing_matches(existing_matches: List[dict], player_ids: List[str], tournament_id: str, rounds_per_matchup: int = 2) -> List[dict]:
+    """
+    Generate only the missing matches to complete the round-robin format while preserving existing matches.
+    For even numbered rounds, player positions are alternated (player1 becomes player2 and vice versa).
+    
+    Args:
+        existing_matches: List of existing matches in the tournament
+        player_ids: Current list of all player IDs in the tournament
+        tournament_id: The tournament ID these matches belong to
+        rounds_per_matchup: Number of times each pair of players should play against each other
+        
+    Returns:
+        List of new match dictionaries that need to be created
+    """
+    if len(player_ids) < 2:
+        return []
+    
+    # Track existing matchups and their counts, considering player order
+    existing_matchups = {}
+    
+    for match in existing_matches:
+        p1_id = str(match.get("player1_id", ""))
+        p2_id = str(match.get("player2_id", ""))
+        
+        # Only consider matches involving current players
+        if p1_id in player_ids and p2_id in player_ids:
+            # Create a key that preserves player order (p1_id, p2_id) vs (p2_id, p1_id)
+            matchup_key = (p1_id, p2_id)
+            existing_matchups[matchup_key] = existing_matchups.get(matchup_key, 0) + 1
+    
+    # Generate all required matchups
+    player_pairs = list(itertools.combinations(player_ids, 2))
+    new_matches = []
+    
+    for player1_id, player2_id in player_pairs:
+        # We need to generate matches for both directions if rounds_per_matchup > 1
+        for round_num in range(rounds_per_matchup):
+            # For even-numbered rounds (1, 3, 5...), reverse the player positions
+            if round_num % 2 == 1:
+                actual_player1_id = str(player2_id)
+                actual_player2_id = str(player1_id)
+            else:
+                actual_player1_id = str(player1_id)
+                actual_player2_id = str(player2_id)
+            
+            # Check if this specific matchup (with this player order) already exists
+            matchup_key = (actual_player1_id, actual_player2_id)
+            existing_count = existing_matchups.get(matchup_key, 0)
+            
+            if existing_count == 0:
+                # This specific matchup doesn't exist, create it
+                match_dict = {
+                    "player1_id": actual_player1_id,
+                    "player2_id": actual_player2_id,
+                    "player1_goals": 0,
+                    "player2_goals": 0,
+                    "tournament_id": str(tournament_id),
+                    "team1": "",  # Blank as requested
+                    "team2": "",  # Blank as requested
+                    "half_length": 4,  # Default value
+                    "completed": False,  # Not completed initially
+                    "date": datetime.now()
+                }
+                new_matches.append(match_dict)
+                
+                # Mark this matchup as created to avoid duplicates
+                existing_matchups[matchup_key] = 1
+    
+    logger.info(f"Generated {len(new_matches)} missing matches for {len(player_ids)} players. Preserved {len(existing_matches)} existing matches.")
+    return new_matches
 
 
 

@@ -10,6 +10,7 @@ class TournamentCreate(BaseModel):
     description: Optional[str] = None
     player_ids: List[str] = Field(default_factory=list)
     completed: bool = False
+    rounds_per_matchup: int = Field(default=2, ge=1, description="Number of times each player plays against each other")
 
 
 class Tournament(BaseModel):
@@ -23,6 +24,8 @@ class Tournament(BaseModel):
     player_ids: List[str] = Field(default_factory=list)
     completed: bool = False
     owner_id: Optional[str] = None
+    old_format: bool = False
+    rounds_per_matchup: int = Field(default=2, ge=1, description="Number of times each player plays against each other")
 
 
 class TournamentPlayerStats(BaseModel):

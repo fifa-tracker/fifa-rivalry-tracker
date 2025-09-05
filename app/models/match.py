@@ -12,6 +12,7 @@ class MatchCreate(BaseModel):
     team1: str
     team2: str
     half_length: int = Field(ge=3, le=6, description="Match half length in minutes (3-6 minutes)")
+    completed: bool = False
 
 
 class Match(BaseModel):
@@ -25,6 +26,7 @@ class Match(BaseModel):
     team2: Optional[str] = None
     tournament_name: Optional[str] = None
     half_length: int
+    completed: bool = False
 
 
 class MatchUpdate(BaseModel):

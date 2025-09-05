@@ -1,7 +1,7 @@
 from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends, Query
 from bson import ObjectId
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
 import math
 import time
@@ -9,7 +9,7 @@ import time
 from app.models import TournamentCreate, Tournament, Match, Player, TournamentPlayerStats, PaginatedResponse, MatchUpdate
 from app.models.auth import UserInDB
 from app.api.dependencies import get_database
-from app.utils.helpers import match_helper, calculate_tournament_stats
+from app.utils.helpers import match_helper, calculate_tournament_stats, generate_round_robin_matches, generate_missing_matches
 from app.utils.auth import get_current_active_user
 from app.utils.logging import get_logger
 from app.config import settings
@@ -32,6 +32,10 @@ def tournament_helper(tournament : Tournament):
     if "player_ids" in result and result["player_ids"]:
         result["player_ids"] = [str(player_id) for player_id in result["player_ids"]]
     
+    # Ensure rounds_per_matchup has a default value for older tournaments
+    if "rounds_per_matchup" not in result:
+        result["rounds_per_matchup"] = 2
+    
     return result
 
 class PlayerIdRequest(BaseModel):
@@ -43,18 +47,64 @@ class TournamentUpdate(BaseModel):
     end_date: Optional[datetime] = None
     description: Optional[str] = None
     completed: Optional[bool] = None
+    rounds_per_matchup: Optional[int] = Field(None, ge=1, description="Number of times each player plays against each other")
 
 @router.post("/", response_model=Tournament)
 async def create_tournament(tournament: TournamentCreate, current_user: UserInDB = Depends(get_current_active_user)):
-    """Create a new tournament"""
+    """Create a new tournament with automatic round-robin match generation"""
     db = await get_database()
+    
+    # Validate that all player IDs exist
+    if tournament.player_ids:
+        try:
+            player_object_ids = [ObjectId(pid) for pid in tournament.player_ids]
+            existing_players = await db.users.find({"_id": {"$in": player_object_ids}}).to_list(len(tournament.player_ids))
+            
+            if len(existing_players) != len(tournament.player_ids):
+                raise HTTPException(status_code=400, detail="One or more player IDs are invalid")
+                
+        except Exception as e:
+            logger.error(f"Error validating player IDs: {e}")
+            raise HTTPException(status_code=400, detail="Invalid player ID format")
+    
     # Convert to dict with default values
     tournament_dict = tournament.model_dump()
     tournament_dict["matches"] = []
     tournament_dict["matches_count"] = 0
     tournament_dict["completed"] = False
     tournament_dict["owner_id"] = str(current_user.id)
+    
+    # Create the tournament first
     new_tournament = await db.tournaments.insert_one(tournament_dict)
+    tournament_id = str(new_tournament.inserted_id)
+    
+    # Generate and insert round-robin matches if there are players
+    if tournament.player_ids and len(tournament.player_ids) >= 2:
+        matches = generate_round_robin_matches(
+            tournament.player_ids, 
+            tournament_id, 
+            tournament.rounds_per_matchup
+        )
+        
+        if matches:
+            # Insert all matches
+            inserted_matches = await db.matches.insert_many(matches)
+            match_ids = [str(match_id) for match_id in inserted_matches.inserted_ids]
+            
+            # Update tournament with match IDs and count
+            await db.tournaments.update_one(
+                {"_id": new_tournament.inserted_id},
+                {
+                    "$set": {
+                        "matches": match_ids,
+                        "matches_count": len(match_ids)
+                    }
+                }
+            )
+            
+            logger.info(f"Created tournament {tournament_id} with {len(matches)} auto-generated matches")
+    
+    # Get the final tournament with all data
     created_tournament = await db.tournaments.find_one({"_id": new_tournament.inserted_id})
     return Tournament(**tournament_helper(created_tournament))
 
@@ -219,11 +269,53 @@ async def update_tournament(tournament_id: str, tournament_update: TournamentUpd
         if update_data["start_date"] > update_data["end_date"]:
             raise HTTPException(status_code=400, detail="Start date cannot be after end date")
     
+    # Check if rounds_per_matchup is being updated and tournament has players
+    regenerate_matches = False
+    if "rounds_per_matchup" in update_data and tournament.get("player_ids") and len(tournament["player_ids"]) >= 2:
+        if not tournament.get("completed", False):
+            regenerate_matches = True
+        else:
+            raise HTTPException(status_code=400, detail="Cannot change rounds per matchup for a completed tournament")
+    
     # Update the tournament
     await db.tournaments.update_one(
         {"_id": ObjectId(tournament_id)}, 
         {"$set": update_data}
     )
+    
+    # Regenerate matches if rounds_per_matchup was changed
+    # !!!!!!! Rework this, already existing matches should be kept
+    if regenerate_matches:
+        # Delete all existing matches for this tournament
+        if tournament.get("matches"):
+            await db.matches.delete_many({"tournament_id": tournament_id})
+            logger.info(f"Deleted existing matches for tournament {tournament_id}")
+        
+        # Generate new round-robin matches
+        new_rounds_per_matchup = update_data.get("rounds_per_matchup", tournament.get("rounds_per_matchup", 2))
+        new_matches = generate_round_robin_matches(
+            tournament["player_ids"], 
+            tournament_id, 
+            new_rounds_per_matchup
+        )
+        
+        match_ids = []
+        if new_matches:
+            # Insert all new matches
+            inserted_matches = await db.matches.insert_many(new_matches)
+            match_ids = [str(match_id) for match_id in inserted_matches.inserted_ids]
+            logger.info(f"Generated {len(new_matches)} new matches for tournament {tournament_id}")
+        
+        # Update tournament with new matches
+        await db.tournaments.update_one(
+            {"_id": ObjectId(tournament_id)}, 
+            {
+                "$set": {
+                    "matches": match_ids,
+                    "matches_count": len(match_ids)
+                }
+            }
+        )
     
     # Return the updated tournament
     updated_tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
@@ -261,7 +353,7 @@ async def delete_tournament(tournament_id: str, current_user: UserInDB = Depends
 
 @router.post("/{tournament_id}/players", response_model=Tournament)
 async def add_player_to_tournament(tournament_id: str, player_request: PlayerIdRequest, current_user: UserInDB = Depends(get_current_active_user)):
-    """Add a player to a tournament"""
+    """Add a player to a tournament and generate missing matches while preserving completed ones"""
     db = await get_database()
     logger.info(f"Adding player {player_request.player_id} to tournament {tournament_id}")
     
@@ -269,6 +361,10 @@ async def add_player_to_tournament(tournament_id: str, player_request: PlayerIdR
     tournament : Tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
     if not tournament:
         raise HTTPException(status_code=404, detail="Tournament not found")
+    
+    # Check if tournament is completed
+    if tournament.get("completed", False):
+        raise HTTPException(status_code=400, detail="Cannot add players to a completed tournament")
     
     # Validate player exists
     try:
@@ -287,10 +383,56 @@ async def add_player_to_tournament(tournament_id: str, player_request: PlayerIdR
     if player_id_str in [str(pid) for pid in tournament["player_ids"]]:
         raise HTTPException(status_code=400, detail="Player already in tournament")
     
-    # Add player ID as string to maintain consistency
+    # Add player ID to tournament
     tournament["player_ids"].append(player_id_str)
-    await db.tournaments.update_one({"_id": ObjectId(tournament_id)}, {"$set": {"player_ids": tournament["player_ids"]}})
-    return Tournament(**tournament_helper(tournament))
+    
+    # Get existing matches for this tournament
+    existing_matches = await db.matches.find({"tournament_id": tournament_id}).to_list(1000)
+    
+    # Generate only the missing matches to complete the round-robin format
+    new_matches = []
+    match_ids = []
+    
+    if len(tournament["player_ids"]) >= 2:
+        from app.utils.helpers import generate_missing_matches
+        rounds_per_matchup = tournament.get("rounds_per_matchup", 2)
+        new_matches = generate_missing_matches(
+            existing_matches,
+            tournament["player_ids"], 
+            tournament_id, 
+            rounds_per_matchup
+        )
+        
+        if new_matches:
+            # Insert only the new matches
+            inserted_matches = await db.matches.insert_many(new_matches)
+            new_match_ids = [str(match_id) for match_id in inserted_matches.inserted_ids]
+            
+            # Combine existing match IDs with new ones
+            existing_match_ids = [str(match["_id"]) for match in existing_matches]
+            match_ids = existing_match_ids + new_match_ids
+            
+            logger.info(f"Generated {len(new_matches)} new matches for tournament {tournament_id}. Total matches: {len(match_ids)}")
+        else:
+            # No new matches needed, just keep existing ones
+            match_ids = [str(match["_id"]) for match in existing_matches]
+            logger.info(f"No new matches needed for tournament {tournament_id}. Keeping {len(match_ids)} existing matches.")
+    
+    # Update tournament with new player and updated match list
+    await db.tournaments.update_one(
+        {"_id": ObjectId(tournament_id)}, 
+        {
+            "$set": {
+                "player_ids": tournament["player_ids"],
+                "matches": match_ids,
+                "matches_count": len(match_ids)
+            }
+        }
+    )
+    
+    # Get updated tournament
+    updated_tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
+    return Tournament(**tournament_helper(updated_tournament))
 
 @router.get("/{tournament_id}/players", response_model=List[Player])
 async def get_tournament_players(tournament_id: str, current_user: UserInDB = Depends(get_current_active_user)):
@@ -327,11 +469,15 @@ async def get_tournament_players(tournament_id: str, current_user: UserInDB = De
 
 @router.delete("/{tournament_id}/players/{player_id}", response_model=Tournament)
 async def remove_player_from_tournament(tournament_id: str, player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
-    """Remove a player from a tournament"""
+    """Remove a player from a tournament and regenerate matches while preserving completed ones"""
     db = await get_database()
     tournament : Tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
     if not tournament:
         raise HTTPException(status_code=404, detail="Tournament not found")
+    
+    # Check if tournament is completed
+    if tournament.get("completed", False):
+        raise HTTPException(status_code=400, detail="Cannot remove players from a completed tournament")
     
     # Initialize player_ids if it doesn't exist
     if "player_ids" not in tournament:
@@ -344,8 +490,80 @@ async def remove_player_from_tournament(tournament_id: str, player_id: str, curr
     
     # Remove player ID
     tournament["player_ids"] = [str(pid) for pid in tournament["player_ids"] if str(pid) != player_id_str]
-    await db.tournaments.update_one({"_id": ObjectId(tournament_id)}, {"$set": {"player_ids": tournament["player_ids"]}})
-    return Tournament(**tournament_helper(tournament))
+    
+    # Get all existing matches for this tournament
+    all_existing_matches = await db.matches.find({"tournament_id": tournament_id}).to_list(1000)
+    
+    # Separate matches into those that involve the removed player and those that don't
+    matches_to_keep = []
+    matches_to_remove = []
+    
+    for match in all_existing_matches:
+        match_player1_id = str(match.get("player1_id", ""))
+        match_player2_id = str(match.get("player2_id", ""))
+        
+        # If the match involves the removed player, mark it for removal
+        if player_id_str in [match_player1_id, match_player2_id]:
+            matches_to_remove.append(match)
+        else:
+            # Keep matches that don't involve the removed player and where both players are still in tournament
+            if match_player1_id in tournament["player_ids"] and match_player2_id in tournament["player_ids"]:
+                matches_to_keep.append(match)
+    
+    # Delete only the matches that involve the removed player
+    if matches_to_remove:
+        match_ids_to_remove = [match["_id"] for match in matches_to_remove]
+        await db.matches.delete_many({"_id": {"$in": match_ids_to_remove}})
+        logger.info(f"Deleted {len(matches_to_remove)} matches involving removed player {player_id_str} from tournament {tournament_id}")
+    
+    # Generate missing matches for the remaining players (if needed)
+    new_matches = []
+    match_ids = []
+    
+    if len(tournament["player_ids"]) >= 2:
+        from app.utils.helpers import generate_missing_matches
+        rounds_per_matchup = tournament.get("rounds_per_matchup", 2)
+        new_matches = generate_missing_matches(
+            matches_to_keep,
+            tournament["player_ids"], 
+            tournament_id, 
+            rounds_per_matchup
+        )
+        
+        if new_matches:
+            # Insert the new matches
+            inserted_matches = await db.matches.insert_many(new_matches)
+            new_match_ids = [str(match_id) for match_id in inserted_matches.inserted_ids]
+            
+            # Combine kept matches with new ones
+            kept_match_ids = [str(match["_id"]) for match in matches_to_keep]
+            match_ids = kept_match_ids + new_match_ids
+            
+            logger.info(f"Generated {len(new_matches)} new matches after removing player {player_id_str}. Total matches: {len(match_ids)}")
+        else:
+            # No new matches needed, just keep existing valid ones
+            match_ids = [str(match["_id"]) for match in matches_to_keep]
+            logger.info(f"No new matches needed after removing player {player_id_str}. Keeping {len(match_ids)} existing matches.")
+    else:
+        # Less than 2 players remaining, no matches possible
+        match_ids = []
+        logger.info(f"Less than 2 players remaining in tournament {tournament_id} after removing player {player_id_str}")
+    
+    # Update tournament with remaining players and updated matches
+    await db.tournaments.update_one(
+        {"_id": ObjectId(tournament_id)}, 
+        {
+            "$set": {
+                "player_ids": tournament["player_ids"],
+                "matches": match_ids,
+                "matches_count": len(match_ids)
+            }
+        }
+    )
+    
+    # Get updated tournament
+    updated_tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
+    return Tournament(**tournament_helper(updated_tournament))
 
 @router.get("/{tournament_id}/stats", response_model=List[TournamentPlayerStats])
 async def get_tournament_stats(tournament_id: str, current_user: UserInDB = Depends(get_current_active_user)):
