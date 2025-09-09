@@ -591,15 +591,24 @@ async def get_tournament_stats(tournament_id: str, current_user: UserInDB = Depe
         logger.error(f"Error converting player IDs: {e}")
         return []
     
-    matches : List[Match] = await db.matches.find({"tournament_id": tournament_id}).to_list(1000)
-    logger.info(f"Found {len(matches)} matches for tournament")
+    # Check if tournament has rounds_per_matchup field to determine if we should filter by completion
+    if "rounds_per_matchup" in tournament:
+        # New tournament format - only count completed matches
+        matches : List[Match] = await db.matches.find({"tournament_id": tournament_id, "completed": True}).to_list(1000)
+        logger.info(f"Found {len(matches)} completed matches for tournament (filtering by completion)")
+        no_matches_message = "No completed matches found for tournament, returning empty stats"
+    else:
+        # Legacy tournament format - count all matches
+        matches : List[Match] = await db.matches.find({"tournament_id": tournament_id}).to_list(1000)
+        logger.info(f"Found {len(matches)} matches for tournament (legacy format - no completion filter)")
+        no_matches_message = "No matches found for tournament, returning empty stats"
     
     if not players:
         logger.warning("No players found in database")
         return []
     
     if not matches:
-        logger.info("No matches found for tournament, returning empty stats")
+        logger.info(no_matches_message)
         # Return players with zero stats
         tournament_stats = []
         for player in players:

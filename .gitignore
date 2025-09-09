@@ -17,3 +17,5 @@ mongo-backup
 
 # Certificates (generated or sensitive)
 certs/
+
+logs/
