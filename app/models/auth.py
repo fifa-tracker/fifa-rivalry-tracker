@@ -47,6 +47,10 @@ class User(UserBase):
     elo_rating: int = 1200  # Default ELO rating
     tournaments_played: int = 0
     tournament_ids: List[str] = []  # List of tournament IDs the user has participated in
+    # Friend system fields
+    friends: List[str] = []  # List of user IDs who are friends
+    friend_requests_sent: List[str] = []  # List of user IDs to whom friend requests were sent
+    friend_requests_received: List[str] = []  # List of user IDs from whom friend requests were received
 
     class Config:
         from_attributes = True

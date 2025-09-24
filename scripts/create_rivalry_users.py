@@ -55,7 +55,11 @@ async def create_user(username: str, email: str, first_name: str, last_name: str
         # ELO rating and tournament fields
         "elo_rating": 1200,
         "tournaments_played": 0,
-        "tournament_ids": []
+        "tournament_ids": [],
+        # Friend system fields
+        "friends": [],
+        "friend_requests_sent": [],
+        "friend_requests_received": []
     }
     
     # Insert user

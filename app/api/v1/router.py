@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from .endpoints import players, matches, tournaments, stats, auth
+from .endpoints import players, matches, tournaments, stats, auth, user
 
 # Create the main API v1 router
 api_router = APIRouter()
@@ -34,6 +34,12 @@ api_router.include_router(
     stats.router, 
     prefix="/stats", 
     tags=["stats"]
+)
+
+api_router.include_router(
+    user.router, 
+    prefix="/user", 
+    tags=["user"]
 )
 
 # Health check endpoint

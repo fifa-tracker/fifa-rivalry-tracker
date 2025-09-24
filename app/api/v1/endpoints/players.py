@@ -50,7 +50,11 @@ async def register_player(player: UserCreate, current_user: UserInDB = Depends(g
         # ELO rating and tournament fields
         "elo_rating": 1200,
         "tournaments_played": 0,
-        "tournament_ids": []
+        "tournament_ids": [],
+        # Friend system fields
+        "friends": [],
+        "friend_requests_sent": [],
+        "friend_requests_received": []
     })
     
     # Remove plain password from data
