@@ -1,9 +1,10 @@
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from app.api.v1.router import api_router
 from app.api.dependencies import client
 from fastapi.middleware.cors import CORSMiddleware
 from app.utils.logging import get_logger
+import time
 
 # Get logger for this module
 logger = get_logger(__name__)
@@ -39,6 +40,26 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Request logging middleware
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    """Log all incoming HTTP requests"""
+    start_time = time.time()
+    
+    # Log request details
+    logger.info(f"🌐 {request.method} {request.url.path} - Client: {request.client.host if request.client else 'unknown'}")
+    
+    # Process the request
+    response = await call_next(request)
+    
+    # Calculate processing time
+    process_time = time.time() - start_time
+    
+    # Log response details
+    logger.info(f"✅ {request.method} {request.url.path} - Status: {response.status_code} - Time: {process_time:.3f}s")
+    
+    return response
 
 # Test the actual connection
 @app.on_event("startup")

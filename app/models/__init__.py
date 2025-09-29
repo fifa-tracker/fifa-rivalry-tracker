@@ -3,6 +3,7 @@ from .player import Player, PlayerDetailedStats
 from .match import MatchCreate, Match, MatchUpdate, HeadToHeadStats
 from .tournament import TournamentCreate, Tournament, TournamentPlayerStats
 from .auth import UserCreate, User, UserLogin, Token, TokenData, UserInDB
+from .user import FriendRequest, FriendResponse, NonFriendPlayer
 from pydantic import BaseModel
 from typing import Generic, TypeVar, List
 
@@ -42,6 +43,11 @@ __all__ = [
     "Token",
     "TokenData",
     "UserInDB",
+    
+    # User models
+    "FriendRequest",
+    "FriendResponse",
+    "NonFriendPlayer",
     
     # Pagination models
     "PaginatedResponse",

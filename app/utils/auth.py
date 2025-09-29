@@ -115,6 +115,10 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         "elo_rating": user.get("elo_rating", 1200),
         "tournaments_played": user.get("tournaments_played", 0),
         "tournament_ids": user.get("tournament_ids", []),
+        # Friend system fields
+        "friends": user.get("friends", []),
+        "friend_requests_sent": user.get("friend_requests_sent", []),
+        "friend_requests_received": user.get("friend_requests_received", []),
     }
     
     return UserInDB(**user_data)
@@ -178,4 +182,8 @@ def user_helper(user: dict) -> dict:
         "elo_rating": user.get("elo_rating", 1200),
         "tournaments_played": user.get("tournaments_played", 0),
         "tournament_ids": user.get("tournament_ids", []),
+        # Friend system fields
+        "friends": user.get("friends", []),
+        "friend_requests_sent": user.get("friend_requests_sent", []),
+        "friend_requests_received": user.get("friend_requests_received", []),
     } 

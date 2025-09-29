@@ -110,9 +110,20 @@ async def create_tournament(tournament: TournamentCreate, current_user: UserInDB
 
 @router.get("/", response_model=List[Tournament])
 async def get_tournaments(current_user: UserInDB = Depends(get_current_active_user)):
-    """Get all tournaments"""
+    """Get tournaments that the current user is part of"""
     db = await get_database()
-    tournaments : List[Tournament] = await db.tournaments.find().to_list(1000)
+    current_user_id = str(current_user.id)
+    
+    # Find tournaments where the current user is either:
+    # 1. The owner of the tournament, OR
+    # 2. A participant in the tournament (their ID is in player_ids)
+    tournaments = await db.tournaments.find({
+        "$or": [
+            {"owner_id": current_user_id},
+            {"player_ids": current_user_id}
+        ]
+    }).to_list(1000)
+    
     return [Tournament(**tournament_helper(t)) for t in tournaments]
 
 @router.get("/{tournament_id}/matches", response_model=PaginatedResponse[Match])
