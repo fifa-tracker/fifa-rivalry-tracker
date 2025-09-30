@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel, Field
 
 
@@ -35,7 +35,18 @@ class MatchUpdate(BaseModel):
     half_length: int = Field(ge=3, le=6, description="Match half length in minutes (3-6 minutes)")
 
 
+class RecentMatch(BaseModel):
+    date: datetime
+    player1_goals: int
+    player2_goals: int
+    tournament_name: Optional[str] = None
+    team1: Optional[str] = None
+    team2: Optional[str] = None
+
+
 class HeadToHeadStats(BaseModel):
+    player1_id: str
+    player2_id: str
     player1_name: str
     player2_name: str
     total_matches: int
@@ -47,4 +58,5 @@ class HeadToHeadStats(BaseModel):
     player1_win_rate: float
     player2_win_rate: float
     player1_avg_goals: float
-    player2_avg_goals: float 
+    player2_avg_goals: float
+    recent_matches: List[RecentMatch] = [] 

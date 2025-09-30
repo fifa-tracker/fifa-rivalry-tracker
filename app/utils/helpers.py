@@ -286,3 +286,112 @@ def calculate_tournament_stats(player_id: str, matches: List[dict]) -> dict:
     stats["goal_difference"] = stats["total_goals_scored"] - stats["total_goals_conceded"]
     
     return stats
+
+
+async def calculate_head_to_head_stats(db, player1_id: str, player2_id: str, player1: dict, player2: dict) -> dict:
+    """
+    Calculate head-to-head statistics between two players.
+    
+    Args:
+        db: Database connection
+        player1_id: ID of the first player
+        player2_id: ID of the second player  
+        player1: Player 1 document from database
+        player2: Player 2 document from database
+        
+    Returns:
+        Dictionary containing head-to-head statistics
+    """
+    # Find all matches between these two players
+    matches = await db.matches.find({
+        "$or": [
+            {"player1_id": player1_id, "player2_id": player2_id},
+            {"player1_id": player2_id, "player2_id": player1_id}
+        ]
+    }).sort("date", -1).to_list(1000)
+    
+    # Initialize stats
+    stats = {
+        "player1_id": player1_id,
+        "player2_id": player2_id,
+        "player1_name": player1.get("username", "Unknown Player"),
+        "player2_name": player2.get("username", "Unknown Player"),
+        "total_matches": 0,
+        "player1_wins": 0,
+        "player2_wins": 0,
+        "draws": 0,
+        "player1_goals": 0,
+        "player2_goals": 0,
+        "player1_win_rate": 0.0,
+        "player2_win_rate": 0.0,
+        "player1_avg_goals": 0.0,
+        "player2_avg_goals": 0.0,
+        "recent_matches": []
+    }
+    
+    # Process each match
+    for match in matches:
+        stats["total_matches"] += 1
+        
+        # Determine which player is player1 in this match
+        is_player1_first = match["player1_id"] == player1_id
+        
+        if is_player1_first:
+            p1_goals = match["player1_goals"]
+            p2_goals = match["player2_goals"]
+        else:
+            p1_goals = match["player2_goals"]
+            p2_goals = match["player1_goals"]
+        
+        # Add goals
+        stats["player1_goals"] += p1_goals
+        stats["player2_goals"] += p2_goals
+        
+        # Determine result
+        if p1_goals > p2_goals:
+            stats["player1_wins"] += 1
+        elif p1_goals < p2_goals:
+            stats["player2_wins"] += 1
+        else:
+            stats["draws"] += 1
+    
+    # Calculate derived statistics
+    if stats["total_matches"] > 0:
+        stats["player1_win_rate"] = round(stats["player1_wins"] / stats["total_matches"], 3)
+        stats["player2_win_rate"] = round(stats["player2_wins"] / stats["total_matches"], 3)
+        stats["player1_avg_goals"] = round(stats["player1_goals"] / stats["total_matches"], 2)
+        stats["player2_avg_goals"] = round(stats["player2_goals"] / stats["total_matches"], 2)
+    
+    # Get recent matches (last 5)
+    recent_matches = []
+    for match in matches[:5]:  # Get last 5 matches
+        # Determine which player is player1 in this match
+        is_player1_first = match["player1_id"] == player1_id
+        
+        if is_player1_first:
+            p1_goals = match["player1_goals"]
+            p2_goals = match["player2_goals"]
+        else:
+            p1_goals = match["player2_goals"]
+            p2_goals = match["player1_goals"]
+        
+        # Get tournament info if available
+        tournament_name = None
+        if match.get("tournament_id"):
+            tournament = await db.tournaments.find_one({"_id": ObjectId(match["tournament_id"])})
+            if tournament:
+                tournament_name = tournament.get("name")
+        
+        recent_match = {
+            "date": match.get("date"),
+            "player1_goals": p1_goals,
+            "player2_goals": p2_goals,
+            "tournament_name": tournament_name,
+            "team1": match.get("team1"),
+            "team2": match.get("team2")
+        }
+        recent_matches.append(recent_match)
+    
+    stats["recent_matches"] = recent_matches
+    
+    return stats

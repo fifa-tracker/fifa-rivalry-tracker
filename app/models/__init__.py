@@ -1,6 +1,6 @@
 # Models package - Export all models for easy importing
 from .player import Player, PlayerDetailedStats
-from .match import MatchCreate, Match, MatchUpdate, HeadToHeadStats
+from .match import MatchCreate, Match, MatchUpdate, HeadToHeadStats, RecentMatch
 from .tournament import TournamentCreate, Tournament, TournamentPlayerStats
 from .auth import UserCreate, User, UserLogin, Token, TokenData, UserInDB
 from .user import FriendRequest, FriendResponse, NonFriendPlayer
@@ -30,6 +30,7 @@ __all__ = [
     "Match",
     "MatchUpdate",
     "HeadToHeadStats",
+    "RecentMatch",
     
     # Tournament models
     "TournamentCreate",

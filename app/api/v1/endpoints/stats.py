@@ -2,12 +2,13 @@ from typing import List
 from fastapi import APIRouter, HTTPException, Depends
 from bson import ObjectId
 
-from app.models import Player, HeadToHeadStats
+from app.models import Player, HeadToHeadStats, RecentMatch
 from app.models.auth import UserInDB
 from app.api.dependencies import get_database
 
 from app.utils.auth import user_helper
 from app.utils.auth import get_current_active_user
+from app.utils.helpers import calculate_head_to_head_stats
 
 router = APIRouter()
 
@@ -28,5 +29,6 @@ async def get_head_to_head_stats(player1_id: str, player2_id: str):
     if not player1 or not player2:
         raise HTTPException(status_code=404, detail="One or both players not found")
 
-    # Add your head-to-head calculation logic here from main.py
-    pass
+    # Calculate head-to-head stats
+    head_to_head_stats = await calculate_head_to_head_stats(db, player1_id, player2_id, player1, player2)
+    return head_to_head_stats
