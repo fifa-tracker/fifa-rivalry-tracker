@@ -54,7 +54,9 @@ async def register_player(player: UserCreate, current_user: UserInDB = Depends(g
         # Friend system fields
         "friends": [],
         "friend_requests_sent": [],
-        "friend_requests_received": []
+        "friend_requests_received": [],
+        # Team tracking fields
+        "last_5_teams": []
     })
     
     # Remove plain password from data

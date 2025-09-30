@@ -51,6 +51,8 @@ class User(UserBase):
     friends: List[str] = []  # List of user IDs who are friends
     friend_requests_sent: List[str] = []  # List of user IDs to whom friend requests were sent
     friend_requests_received: List[str] = []  # List of user IDs from whom friend requests were received
+    # Team tracking fields
+    last_5_teams: List[str] = []  # List of last 5 teams the user has played with
 
     class Config:
         from_attributes = True

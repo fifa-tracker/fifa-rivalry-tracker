@@ -17,6 +17,7 @@ class TestPlayerEndpoints:
         assert data["total_matches"] == 0
         assert data["total_goals_scored"] == 0
         assert data["points"] == 0
+        assert data["last_5_teams"] == []
         assert "id" in data
 
     def test_create_player_duplicate_name(self, client: TestClient, sample_player_data):

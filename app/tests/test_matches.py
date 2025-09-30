@@ -337,6 +337,10 @@ class TestMatchIntegration:
         total_elo_before = initial_player1_elo + initial_player2_elo
         total_elo_after = updated_player1_elo + updated_player2_elo
         assert total_elo_before == total_elo_after
+        
+        # Verify last_5_teams field is updated
+        assert updated_player1["last_5_teams"] == ["Barcelona"]
+        assert updated_player2["last_5_teams"] == ["Real Madrid"]
 
     def test_multiple_matches_stats_and_elo_accumulation(self, client: TestClient, created_players):
         """Test that multiple matches correctly accumulate player statistics"""
@@ -392,4 +396,83 @@ class TestMatchIntegration:
         # Total ELO should still be zero-sum (approximately, allowing for rounding)
         total_elo = final_player1["elo_rating"] + final_player2["elo_rating"]
         expected_total = 2400  # 1200 + 1200
-        assert abs(total_elo - expected_total) < 5  # Allow for small rounding differences 
+        assert abs(total_elo - expected_total) < 5  # Allow for small rounding differences
+
+    def test_last_5_teams_tracking(self, client: TestClient, created_players):
+        """Test that last_5_teams field correctly tracks and limits to 5 unique teams"""
+        player1, player2 = created_players
+        
+        # Play 6 matches with different teams to test the limit
+        teams_player1 = ["Barcelona", "Real Madrid", "Arsenal", "Chelsea", "Liverpool", "Manchester City"]
+        teams_player2 = ["PSG", "Bayern Munich", "Juventus", "AC Milan", "Inter Milan", "Napoli"]
+        
+        for i in range(6):
+            match_data = {
+                "player1_id": player1["id"],
+                "player2_id": player2["id"],
+                "player1_goals": 1,
+                "player2_goals": 0,
+                "tournament_id": "507f1f77bcf86cd799439011",  # Sample tournament ID
+                "team1": teams_player1[i],
+                "team2": teams_player2[i],
+                "half_length": 4
+            }
+            
+            response = client.post("/api/v1/matches/", json=match_data)
+            assert response.status_code == 200
+        
+        # Check that only the last 5 unique teams are kept
+        updated_player1 = client.get(f"/api/v1/players/{player1['id']}").json()
+        updated_player2 = client.get(f"/api/v1/players/{player2['id']}").json()
+        
+        # Player 1 should have the last 5 unique teams (excluding the first one)
+        expected_player1_teams = teams_player1[1:]  # Skip first team
+        assert updated_player1["last_5_teams"] == expected_player1_teams
+        assert len(updated_player1["last_5_teams"]) == 5
+        
+        # Player 2 should have the last 5 unique teams (excluding the first one)
+        expected_player2_teams = teams_player2[1:]  # Skip first team
+        assert updated_player2["last_5_teams"] == expected_player2_teams
+        assert len(updated_player2["last_5_teams"]) == 5
+
+    def test_last_5_teams_unique_behavior(self, client: TestClient, created_players):
+        """Test that last_5_teams field keeps only unique teams and moves duplicates to front"""
+        player1, player2 = created_players
+        
+        # Play matches with some duplicate teams
+        matches = [
+            {"team1": "Barcelona", "team2": "Real Madrid"},
+            {"team1": "Arsenal", "team2": "Chelsea"},
+            {"team1": "Barcelona", "team2": "Liverpool"},  # Barcelona again
+            {"team1": "PSG", "team2": "Bayern Munich"},
+            {"team1": "Barcelona", "team2": "Juventus"},  # Barcelona again
+        ]
+        
+        for match in matches:
+            match_data = {
+                "player1_id": player1["id"],
+                "player2_id": player2["id"],
+                "player1_goals": 1,
+                "player2_goals": 0,
+                "tournament_id": "507f1f77bcf86cd799439011",
+                "team1": match["team1"],
+                "team2": match["team2"],
+                "half_length": 4
+            }
+            
+            response = client.post("/api/v1/matches/", json=match_data)
+            assert response.status_code == 200
+        
+        # Check the final state
+        updated_player1 = client.get(f"/api/v1/players/{player1['id']}").json()
+        updated_player2 = client.get(f"/api/v1/players/{player2['id']}").json()
+        
+        # Player 1 should have unique teams with Barcelona at the front (most recent)
+        # Expected: ["Barcelona", "PSG", "Arsenal"] (Barcelona appears only once, at the front)
+        assert updated_player1["last_5_teams"] == ["Barcelona", "PSG", "Arsenal"]
+        assert len(updated_player1["last_5_teams"]) == 3
+        
+        # Player 2 should have unique teams with Juventus at the front (most recent)
+        # Expected: ["Juventus", "Bayern Munich", "Liverpool", "Chelsea", "Real Madrid"]
+        assert updated_player2["last_5_teams"] == ["Juventus", "Bayern Munich", "Liverpool", "Chelsea", "Real Madrid"]
+        assert len(updated_player2["last_5_teams"]) == 5 

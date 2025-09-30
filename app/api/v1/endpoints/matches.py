@@ -55,10 +55,23 @@ async def record_match(match: MatchCreate, current_user: UserInDB = Depends(get_
     )
     
     # Update player stats and ELO ratings
-    for player, goals_scored, goals_conceded, new_elo in [
-        (player1, match.player1_goals, match.player2_goals, new_player1_elo),
-        (player2, match.player2_goals, match.player1_goals, new_player2_elo),
+    for player, goals_scored, goals_conceded, new_elo, team_played in [
+        (player1, match.player1_goals, match.player2_goals, new_player1_elo, match.team1),
+        (player2, match.player2_goals, match.player1_goals, new_player2_elo, match.team2),
     ]:
+        # Get current last_5_teams list
+        current_teams = player.get("last_5_teams", [])
+        
+        # Remove the team if it already exists (to avoid duplicates)
+        if team_played in current_teams:
+            current_teams.remove(team_played)
+        
+        # Add the new team to the beginning of the list
+        updated_teams = [team_played] + current_teams
+        
+        # Keep only the last 5 unique teams
+        updated_teams = updated_teams[:5]
+        
         update = {
             "$inc": {
                 "total_matches": 1,
@@ -75,7 +88,8 @@ async def record_match(match: MatchCreate, current_user: UserInDB = Depends(get_
                 ),
             },
             "$set": {
-                "elo_rating": new_elo
+                "elo_rating": new_elo,
+                "last_5_teams": updated_teams
             }
         }
         await db.users.update_one({"_id": player["_id"]}, update)
