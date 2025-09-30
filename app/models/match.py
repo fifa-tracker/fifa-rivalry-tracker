@@ -42,6 +42,16 @@ class RecentMatch(BaseModel):
     tournament_name: Optional[str] = None
     team1: Optional[str] = None
     team2: Optional[str] = None
+    opponent_id: Optional[str] = None
+    opponent_username: Optional[str] = None
+    opponent_first_name: Optional[str] = None
+    opponent_last_name: Optional[str] = None
+    # Player identification fields
+    current_player_id: Optional[str] = None  # The player we're getting stats for
+    current_player_username: Optional[str] = None
+    current_player_goals: Optional[int] = None  # Goals scored by current player
+    opponent_goals: Optional[int] = None  # Goals scored by opponent
+    match_result: Optional[str] = None  # "win", "loss", or "draw" from current player's perspective
 
 
 class HeadToHeadStats(BaseModel):
@@ -59,4 +69,25 @@ class HeadToHeadStats(BaseModel):
     player2_win_rate: float
     player1_avg_goals: float
     player2_avg_goals: float
-    recent_matches: List[RecentMatch] = [] 
+    recent_matches: List[RecentMatch] = []
+
+
+class UserStatsWithMatches(BaseModel):
+    """User stats along with their last 5 matches"""
+    id: str
+    username: str
+    email: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    total_matches: int
+    total_goals_scored: int
+    total_goals_conceded: int
+    goal_difference: int
+    wins: int
+    losses: int
+    draws: int
+    points: int
+    elo_rating: int
+    tournaments_played: int
+    last_5_teams: List[str] = []
+    last_5_matches: List[RecentMatch] = [] 

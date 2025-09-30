@@ -4,9 +4,9 @@ from bson import ObjectId
 from itertools import groupby
 from datetime import datetime
 
-from app.models import Player, PlayerDetailedStats, Match
+from app.models import Player, PlayerDetailedStats, Match, UserStatsWithMatches, RecentMatch
 from app.models.auth import UserInDB, UserCreate, UserUpdate
-from app.api.dependencies import get_database
+from app.api.dependencies import db
 from app.utils.helpers import match_helper
 from app.utils.auth import get_current_active_user, user_helper, get_password_hash
 
@@ -15,7 +15,6 @@ router = APIRouter()
 @router.post("/", response_model=Player)
 async def register_player(player: UserCreate, current_user: UserInDB = Depends(get_current_active_user)):
     """Register a new player (user)"""
-    db = await get_database()
     existing_player = await db.users.find_one({"username": player.username})
     if existing_player:
         raise HTTPException(
@@ -70,30 +69,103 @@ async def register_player(player: UserCreate, current_user: UserInDB = Depends(g
 @router.get("/", response_model=List[Player])
 async def get_players(current_user: UserInDB = Depends(get_current_active_user)):
     """Get all active players (excluding deleted ones)"""
-    db = await get_database()
     players = await db.users.find({"is_deleted": {"$ne": True}}).to_list(1000)
     return [user_helper(player) for player in players]
 
 
-@router.get("/{player_id}", response_model=Player)
+@router.get("/{player_id}", response_model=UserStatsWithMatches)
 async def get_player(player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
-    """Get a specific player by ID (including deleted players)"""
-    db = await get_database()
+    """Get a specific player by ID with their last 5 matches (including deleted players)"""
     try:
         player = await db.users.find_one({"_id": ObjectId(player_id)})
         if not player:
             raise HTTPException(status_code=404, detail="Player not found")
-        return user_helper(player)
+        
+        # Get player's last 5 matches
+        user_matches = await db.matches.find({
+            "$or": [
+                {"player1_id": player_id},
+                {"player2_id": player_id}
+            ]
+        }).sort("date", -1).limit(5).to_list(5)
+        
+        # Convert matches to RecentMatch format
+        recent_matches = []
+        for match in user_matches:
+            # Get tournament name if available
+            tournament_name = None
+            if match.get("tournament_id"):
+                tournament = await db.tournaments.find_one({"_id": ObjectId(match["tournament_id"])})
+                if tournament:
+                    tournament_name = tournament.get("name")
+            
+        # Get opponent information
+        opponent_id = match["player2_id"] if match["player1_id"] == player_id else match["player1_id"]
+        opponent = await db.users.find_one({"_id": ObjectId(opponent_id)})
+        
+        # Determine current player's goals and opponent's goals
+        current_player_goals = match["player1_goals"] if match["player1_id"] == player_id else match["player2_goals"]
+        opponent_goals = match["player2_goals"] if match["player1_id"] == player_id else match["player1_goals"]
+        
+        # Determine match result from current player's perspective
+        if current_player_goals > opponent_goals:
+            match_result = "win"
+        elif current_player_goals < opponent_goals:
+            match_result = "loss"
+        else:
+            match_result = "draw"
+        
+        recent_match = RecentMatch(
+            date=match["date"],
+            player1_goals=match["player1_goals"],
+            player2_goals=match["player2_goals"],
+            tournament_name=tournament_name,
+            team1=match.get("team1"),
+            team2=match.get("team2"),
+            opponent_id=opponent_id,
+            opponent_username=opponent.get("username") if opponent else None,
+            opponent_first_name=opponent.get("first_name") if opponent else None,
+            opponent_last_name=opponent.get("last_name") if opponent else None,
+            current_player_id=player_id,
+            current_player_username=player.get("username"),
+            current_player_goals=current_player_goals,
+            opponent_goals=opponent_goals,
+            match_result=match_result
+        )
+        recent_matches.append(recent_match)
+        
+        # Create UserStatsWithMatches response
+        user_stats = UserStatsWithMatches(
+            id=str(player["_id"]),
+            username=player["username"],
+            email=player["email"],
+            first_name=player.get("first_name"),
+            last_name=player.get("last_name"),
+            total_matches=player.get("total_matches", 0),
+            total_goals_scored=player.get("total_goals_scored", 0),
+            total_goals_conceded=player.get("total_goals_conceded", 0),
+            goal_difference=player.get("goal_difference", 0),
+            wins=player.get("wins", 0),
+            losses=player.get("losses", 0),
+            draws=player.get("draws", 0),
+            points=player.get("points", 0),
+            elo_rating=player.get("elo_rating", 1200),
+            tournaments_played=player.get("tournaments_played", 0),
+            last_5_teams=player.get("last_5_teams", []),
+            last_5_matches=recent_matches
+        )
+        
+        return user_stats
+        
     except Exception as e:
         if "Invalid ObjectId" in str(e):
             raise HTTPException(status_code=400, detail="Invalid player ID format")
-        raise HTTPException(status_code=404, detail="Player not found")
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.put("/{player_id}", response_model=Player)
 async def update_player(player_id: str, player: UserUpdate, current_user: UserInDB = Depends(get_current_active_user)):
     """Update a player's information (partial update - only provided fields will be updated)"""
-    db = await get_database()
     # Check if player exists
     existing_player = await db.users.find_one({"_id": ObjectId(player_id)})
     if not existing_player:
@@ -148,7 +220,6 @@ async def update_player(player_id: str, player: UserUpdate, current_user: UserIn
 @router.delete("/{player_id}", response_model=dict)
 async def delete_player(player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Mark a player as deleted instead of actually deleting them"""
-    db = await get_database()
     try:
         # Check if player exists
         player = await db.users.find_one({"_id": ObjectId(player_id)})
@@ -179,10 +250,9 @@ async def delete_player(player_id: str, current_user: UserInDB = Depends(get_cur
         raise
 
 
-@router.get("/{player_id}/stats", response_model=PlayerDetailedStats)
+@router.get("/{player_id}/stats", response_model=UserStatsWithMatches)
 async def get_player_detailed_stats(player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
-    """Get detailed statistics for a specific player (including deleted players)"""
-    db = await get_database()
+    """Get detailed statistics for a specific player with their last 5 matches (including deleted players)"""
     player : Player = await db.users.find_one({"_id": ObjectId(player_id)})
     if not player:
         raise HTTPException(status_code=404, detail="Player not found")
@@ -305,13 +375,86 @@ async def get_player_detailed_stats(player_id: str, current_user: UserInDB = Dep
         }
     )
 
-    return PlayerDetailedStats(**stats)
+    # Get player's last 5 matches
+    user_matches = await db.matches.find({
+        "$or": [
+            {"player1_id": player_id},
+            {"player2_id": player_id}
+        ]
+    }).sort("date", -1).limit(5).to_list(5)
+    
+    # Convert matches to RecentMatch format
+    recent_matches = []
+    for match in user_matches:
+        # Get tournament name if available
+        tournament_name = None
+        if match.get("tournament_id"):
+            tournament = await db.tournaments.find_one({"_id": ObjectId(match["tournament_id"])})
+            if tournament:
+                tournament_name = tournament.get("name")
+        
+        # Get opponent information
+        opponent_id = match["player2_id"] if match["player1_id"] == player_id else match["player1_id"]
+        opponent = await db.users.find_one({"_id": ObjectId(opponent_id)})
+        
+        # Determine current player's goals and opponent's goals
+        current_player_goals = match["player1_goals"] if match["player1_id"] == player_id else match["player2_goals"]
+        opponent_goals = match["player2_goals"] if match["player1_id"] == player_id else match["player1_goals"]
+        
+        # Determine match result from current player's perspective
+        if current_player_goals > opponent_goals:
+            match_result = "win"
+        elif current_player_goals < opponent_goals:
+            match_result = "loss"
+        else:
+            match_result = "draw"
+        
+        recent_match = RecentMatch(
+            date=match["date"],
+            player1_goals=match["player1_goals"],
+            player2_goals=match["player2_goals"],
+            tournament_name=tournament_name,
+            team1=match.get("team1"),
+            team2=match.get("team2"),
+            opponent_id=opponent_id,
+            opponent_username=opponent.get("username") if opponent else None,
+            opponent_first_name=opponent.get("first_name") if opponent else None,
+            opponent_last_name=opponent.get("last_name") if opponent else None,
+            current_player_id=player_id,
+            current_player_username=player.get("username"),
+            current_player_goals=current_player_goals,
+            opponent_goals=opponent_goals,
+            match_result=match_result
+        )
+        recent_matches.append(recent_match)
+    
+    # Create UserStatsWithMatches response
+    user_stats = UserStatsWithMatches(
+        id=str(player["_id"]),
+        username=player["username"],
+        email=player["email"],
+        first_name=player.get("first_name"),
+        last_name=player.get("last_name"),
+        total_matches=player.get("total_matches", 0),
+        total_goals_scored=player.get("total_goals_scored", 0),
+        total_goals_conceded=player.get("total_goals_conceded", 0),
+        goal_difference=player.get("goal_difference", 0),
+        wins=player.get("wins", 0),
+        losses=player.get("losses", 0),
+        draws=player.get("draws", 0),
+        points=player.get("points", 0),
+        elo_rating=player.get("elo_rating", 1200),
+        tournaments_played=player.get("tournaments_played", 0),
+        last_5_teams=player.get("last_5_teams", []),
+        last_5_matches=recent_matches
+    )
+    
+    return user_stats
 
 
 @router.get("/{player_id}/matches")
 async def get_player_matches(player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Get all matches for a specific player (including deleted players)"""
-    db = await get_database()
     
     # Get player info
     player : Player = await db.users.find_one({"_id": ObjectId(player_id)})

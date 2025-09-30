@@ -1,7 +1,7 @@
 # Models package - Export all models for easy importing
 from .player import Player, PlayerDetailedStats
-from .match import MatchCreate, Match, MatchUpdate, HeadToHeadStats, RecentMatch
-from .tournament import TournamentCreate, Tournament, TournamentPlayerStats
+from .match import MatchCreate, Match, MatchUpdate, HeadToHeadStats, RecentMatch, UserStatsWithMatches
+from .tournament import TournamentCreate, Tournament, TournamentPlayerStats, TournamentPlayer
 from .auth import UserCreate, User, UserLogin, Token, TokenData, UserInDB
 from .user import FriendRequest, FriendResponse, NonFriendPlayer
 from pydantic import BaseModel
@@ -31,11 +31,13 @@ __all__ = [
     "MatchUpdate",
     "HeadToHeadStats",
     "RecentMatch",
+    "UserStatsWithMatches",
     
     # Tournament models
     "TournamentCreate",
     "Tournament",
     "TournamentPlayerStats",
+    "TournamentPlayer",
     
     # Auth models
     "UserCreate",

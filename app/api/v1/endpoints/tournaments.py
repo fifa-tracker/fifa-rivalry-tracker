@@ -6,7 +6,7 @@ from datetime import datetime
 import math
 import time
 
-from app.models import TournamentCreate, Tournament, Match, Player, TournamentPlayerStats, PaginatedResponse, MatchUpdate
+from app.models import TournamentCreate, Tournament, Match, Player, TournamentPlayerStats, TournamentPlayer, PaginatedResponse, MatchUpdate
 from app.models.auth import UserInDB
 from app.api.dependencies import get_database
 from app.utils.helpers import match_helper, calculate_tournament_stats, generate_round_robin_matches, generate_missing_matches
@@ -37,6 +37,70 @@ def tournament_helper(tournament : Tournament):
         result["rounds_per_matchup"] = 2
     
     return result
+
+async def get_player_last_5_matches(db, player_id: str, tournament_id: str = None) -> List[str]:
+    """Get the last 5 match results for a player as simple characters: W (win), L (loss), D (draw), - (no match)"""
+    try:
+        # Build query - get matches where player is either player1 or player2
+        # Consider matches completed if they have goals scored (regardless of completed field)
+        query = {
+            "$and": [
+                {
+                    "$or": [
+                        {"player1_id": player_id},
+                        {"player2_id": player_id}
+                    ]
+                },
+                {
+                    "$or": [
+                        {"completed": True},
+                        {"player1_goals": {"$exists": True, "$gte": 0}},
+                        {"player2_goals": {"$exists": True, "$gte": 0}}
+                    ]
+                }
+            ]
+        }
+        
+        # If tournament_id is provided, filter by tournament
+        if tournament_id:
+            query["tournament_id"] = tournament_id
+        
+        # Get matches sorted by date (most recent first)
+        matches_cursor = db.matches.find(query).sort("date", -1).limit(5)
+        matches = await matches_cursor.to_list(5)
+        
+        # Convert matches to simple result characters
+        results = []
+        for match in matches:
+            player1_id = match.get("player1_id")
+            player2_id = match.get("player2_id")
+            player1_goals = match.get("player1_goals", 0)
+            player2_goals = match.get("player2_goals", 0)
+            
+            # Determine match result from current player's perspective
+            if player1_id == player_id:
+                current_player_goals = player1_goals
+                opponent_goals = player2_goals
+            else:
+                current_player_goals = player2_goals
+                opponent_goals = player1_goals
+            
+            if current_player_goals > opponent_goals:
+                results.append("W")  # Win
+            elif current_player_goals < opponent_goals:
+                results.append("L")  # Loss
+            else:
+                results.append("D")  # Draw
+        
+        # Pad with '-' if less than 5 matches
+        while len(results) < 5:
+            results.append("-")
+        
+        return results
+        
+    except Exception as e:
+        logger.error(f"Error getting last 5 matches for player {player_id}: {e}")
+        return ["-", "-", "-", "-", "-"]  # Return default if error
 
 class PlayerIdRequest(BaseModel):
     player_id: str
@@ -445,7 +509,7 @@ async def add_player_to_tournament(tournament_id: str, player_request: PlayerIdR
     updated_tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
     return Tournament(**tournament_helper(updated_tournament))
 
-@router.get("/{tournament_id}/players", response_model=List[Player])
+@router.get("/{tournament_id}/players", response_model=List[TournamentPlayer])
 async def get_tournament_players(tournament_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Get all players in a tournament"""
     db = await get_database()
@@ -464,14 +528,14 @@ async def get_tournament_players(tournament_id: str, current_user: UserInDB = De
         player_object_ids = [ObjectId(pid) if isinstance(pid, str) else pid for pid in player_ids]
         players = await db.users.find({"_id": {"$in": player_object_ids}}).to_list(1000)
         
-        # Convert to Player objects with proper ID conversion
+        # Convert to TournamentPlayer objects with proper ID conversion (excluding email)
         result = []
         for player in players:
             player_dict = {
                 "id": str(player["_id"]),
-                **{k: v for k, v in player.items() if k != "_id"}
+                **{k: v for k, v in player.items() if k != "_id" and k != "email"}
             }
-            result.append(Player(**player_dict))
+            result.append(TournamentPlayer(**player_dict))
         
         return result
     except Exception as e:
@@ -623,10 +687,12 @@ async def get_tournament_stats(tournament_id: str, current_user: UserInDB = Depe
         # Return players with zero stats
         tournament_stats = []
         for player in players:
+            # Get last 5 matches for this player (not filtered by tournament)
+            last_5_matches = await get_player_last_5_matches(db, str(player["_id"]))
+            
             player_stats = TournamentPlayerStats(
                 id=str(player["_id"]),
                 username=player["username"],
-                email=player["email"],
                 first_name=player.get("first_name"),
                 last_name=player.get("last_name"),
                 total_matches=0,
@@ -636,7 +702,8 @@ async def get_tournament_stats(tournament_id: str, current_user: UserInDB = Depe
                 wins=0,
                 losses=0,
                 draws=0,
-                points=0
+                points=0,
+                last_5_matches=last_5_matches
             )
             tournament_stats.append(player_stats)
         return tournament_stats
@@ -648,11 +715,13 @@ async def get_tournament_stats(tournament_id: str, current_user: UserInDB = Depe
         logger.info(f"Calculating stats for player {player['username']} (ID: {player_id})")
         stats = calculate_tournament_stats(player_id, matches)
         
+        # Get last 5 matches for this player (filtered by tournament)
+        last_5_matches = await get_player_last_5_matches(db, player_id, tournament_id)
+        
         # Create player stats object with tournament-specific data
         player_stats = TournamentPlayerStats(
             id=player_id,
             username=player["username"],
-            email=player["email"],
             first_name=player.get("first_name"),
             last_name=player.get("last_name"),
             total_matches=stats["total_matches"],
@@ -662,7 +731,8 @@ async def get_tournament_stats(tournament_id: str, current_user: UserInDB = Depe
             wins=stats["wins"],
             losses=stats["losses"],
             draws=stats["draws"],
-            points=stats["points"]
+            points=stats["points"],
+            last_5_matches=last_5_matches
         )
         
         tournament_stats.append(player_stats)
