@@ -101,7 +101,10 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         "created_at": user.get("created_at", datetime.utcnow()),
         "updated_at": user.get("updated_at", datetime.utcnow()),
         "deleted_at": user.get("deleted_at"),
-        "hashed_password": user["hashed_password"],
+        "hashed_password": user.get("hashed_password"),
+        # OAuth fields
+        "oauth_provider": user.get("oauth_provider", "local"),
+        "oauth_id": user.get("oauth_id"),
         # Player statistics fields
         "total_matches": user.get("total_matches", 0),
         "total_goals_scored": user.get("total_goals_scored", 0),
@@ -169,6 +172,9 @@ def user_helper(user: dict) -> dict:
         "created_at": user.get("created_at", datetime.utcnow()),
         "updated_at": user.get("updated_at", datetime.utcnow()),
         "deleted_at": user.get("deleted_at"),
+        # OAuth fields
+        "oauth_provider": user.get("oauth_provider", "local"),
+        "oauth_id": user.get("oauth_id"),
         # Player statistics fields
         "total_matches": user.get("total_matches", 0),
         "total_goals_scored": user.get("total_goals_scored", 0),

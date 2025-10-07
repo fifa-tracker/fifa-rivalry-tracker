@@ -1,6 +1,13 @@
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, Dict, List, Union
 from datetime import datetime
+from enum import Enum
+
+
+class OAuthProvider(str, Enum):
+    """OAuth provider types"""
+    GOOGLE = "google"
+    LOCAL = "local"
 
 
 class UserBase(BaseModel):
@@ -12,6 +19,16 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+
+
+class GoogleOAuthUser(BaseModel):
+    """Google OAuth user data"""
+    google_id: str
+    email: EmailStr
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    picture: Optional[str] = None
+    verified_email: bool = False
 
 
 class UserUpdate(BaseModel):
@@ -34,6 +51,9 @@ class User(UserBase):
     created_at: datetime
     updated_at: datetime
     deleted_at: Optional[datetime] = None
+    # OAuth fields
+    oauth_provider: Optional[OAuthProvider] = OAuthProvider.LOCAL
+    oauth_id: Optional[str] = None  # Google ID, etc.
     # Player statistics fields
     total_matches: int = 0
     total_goals_scored: int = 0
@@ -59,7 +79,7 @@ class User(UserBase):
 
 
 class UserInDB(User):
-    hashed_password: str
+    hashed_password: Optional[str] = None  # Optional for OAuth users
 
 
 class UserDetailedStats(BaseModel):
@@ -97,4 +117,10 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: Optional[str] = None
-    user_id: Optional[str] = None 
+    user_id: Optional[str] = None
+
+
+class GoogleOAuthCallback(BaseModel):
+    """Google OAuth callback data"""
+    code: str
+    state: Optional[str] = None 

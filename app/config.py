@@ -65,6 +65,12 @@ class Settings:
     USERNAME_MIN_LENGTH: int = 3
     USERNAME_MAX_LENGTH: int = 50
     
+    # Google OAuth
+    GOOGLE_CLIENT_ID: str = get_env_var("GOOGLE_CLIENT_ID", "")
+    GOOGLE_CLIENT_SECRET: str = get_env_var("GOOGLE_CLIENT_SECRET", "")
+    GOOGLE_REDIRECT_URI: str = get_env_var("GOOGLE_REDIRECT_URI", "http://localhost:8000/api/v1/auth/google/callback")
+    FRONTEND_URL: str = get_env_var("FRONTEND_URL", "http://localhost:3000")
+    
     # ELO Rating
     DEFAULT_ELO_RATING: int = 1200
     ELO_K_FACTOR: int = 32
