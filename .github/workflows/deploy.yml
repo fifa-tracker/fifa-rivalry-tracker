@@ -37,6 +37,9 @@ jobs:
           ENVIRONMENT=production
           MONGO_URI=${{ secrets.MONGO_URI }}
           SECRET_KEY=${{ secrets.SECRET_KEY }}
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}
           ACCESS_TOKEN_EXPIRE_MINUTES=43200
           LOG_LEVEL=INFO
           EOF
