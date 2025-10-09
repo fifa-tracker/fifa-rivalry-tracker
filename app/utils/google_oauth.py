@@ -115,6 +115,8 @@ def generate_google_auth_url(state: Optional[str] = None) -> str:
     """
     Generate Google OAuth authorization URL
     """
+    from urllib.parse import urlencode
+    
     auth_url = "https://accounts.google.com/o/oauth2/v2/auth"
     params = {
         "client_id": settings.GOOGLE_CLIENT_ID,
@@ -127,8 +129,8 @@ def generate_google_auth_url(state: Optional[str] = None) -> str:
     if state:
         params["state"] = state
     
-    # Build URL with parameters
-    param_string = "&".join([f"{k}={v}" for k, v in params.items()])
+    # Build URL with properly encoded parameters
+    param_string = urlencode(params)
     return f"{auth_url}?{param_string}"
 
 
