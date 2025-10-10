@@ -40,6 +40,7 @@ jobs:
           GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
           GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}
+          FRONTEND_URL=${{ secrets.FRONTEND_URL }}
           ACCESS_TOKEN_EXPIRE_MINUTES=43200
           LOG_LEVEL=INFO
           EOF
