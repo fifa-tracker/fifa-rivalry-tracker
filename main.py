@@ -54,9 +54,8 @@ async def log_requests(request: Request, call_next):
     
     # Log request details asynchronously (non-blocking)
     request_log = f"🌐 {request.method} {request.url.path} - Client: {request.client.host if request.client else 'unknown'}"
-    asyncio.create_task(
-        asyncio.get_event_loop().run_in_executor(logging_executor, logger.info, request_log)
-    )
+    loop = asyncio.get_event_loop()
+    loop.run_in_executor(logging_executor, logger.info, request_log)
     
     # Process the request
     response = await call_next(request)
@@ -66,9 +65,7 @@ async def log_requests(request: Request, call_next):
     
     # Log response details asynchronously (non-blocking)
     response_log = f"✅ {request.method} {request.url.path} - Status: {response.status_code} - Time: {process_time:.3f}s"
-    asyncio.create_task(
-        asyncio.get_event_loop().run_in_executor(logging_executor, logger.info, response_log)
-    )
+    loop.run_in_executor(logging_executor, logger.info, response_log)
     
     return response
 
