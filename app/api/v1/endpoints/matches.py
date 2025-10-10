@@ -30,18 +30,20 @@ async def record_match(match: MatchCreate, current_user: UserInDB = Depends(get_
     match_dict["date"] = datetime.now()
     new_match = await db.matches.insert_one(match_dict)
 
-    tournament : Tournament = await db.tournaments.find_one({"_id": ObjectId(match.tournament_id)})
-    if not tournament:
-        raise HTTPException(status_code=404, detail="Tournament not found")
+    # Only update tournament if tournament_id is provided
+    if match.tournament_id:
+        tournament : Tournament = await db.tournaments.find_one({"_id": ObjectId(match.tournament_id)})
+        if not tournament:
+            raise HTTPException(status_code=404, detail="Tournament not found")
 
-    # Initialize matches field if it doesn't exist (for backward compatibility)
-    if "matches" not in tournament:
-        tournament["matches"] = []
-    if "matches_count" not in tournament:
-        tournament["matches_count"] = 0
+        # Initialize matches field if it doesn't exist (for backward compatibility)
+        if "matches" not in tournament:
+            tournament["matches"] = []
+        if "matches_count" not in tournament:
+            tournament["matches_count"] = 0
 
-    tournament["matches"].append(new_match.inserted_id)
-    await db.tournaments.update_one({"_id": ObjectId(match.tournament_id)}, {"$set": {"matches": tournament["matches"], "matches_count": tournament["matches_count"] + 1}})
+        tournament["matches"].append(new_match.inserted_id)
+        await db.tournaments.update_one({"_id": ObjectId(match.tournament_id)}, {"$set": {"matches": tournament["matches"], "matches_count": tournament["matches_count"] + 1}})
 
     # Calculate new ELO ratings for both players
     player1_current_elo = player1.get("elo_rating", settings.DEFAULT_ELO_RATING)

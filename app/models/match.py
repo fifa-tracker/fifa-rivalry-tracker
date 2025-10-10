@@ -8,7 +8,7 @@ class MatchCreate(BaseModel):
     player2_id: str
     player1_goals: int
     player2_goals: int
-    tournament_id: str
+    tournament_id: Optional[str] = None
     team1: str
     team2: str
     half_length: int = Field(ge=3, le=6, description="Match half length in minutes (3-6 minutes)")

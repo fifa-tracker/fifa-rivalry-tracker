@@ -75,6 +75,13 @@ async def startup_event():
         logger.error("2. MongoDB Atlas IP whitelist settings")
         logger.error("3. Username and password in connection string")
         logger.error("4. Database name in connection string")
+    
+    # Log Google OAuth configuration
+    logger.info("🔐 Google OAuth Configuration:")
+    logger.info(f"   GOOGLE_CLIENT_ID: {settings.GOOGLE_CLIENT_ID}")
+    logger.info(f"   GOOGLE_CLIENT_SECRET: {'*' * 20}...{settings.GOOGLE_CLIENT_SECRET[-4:] if settings.GOOGLE_CLIENT_SECRET else 'Not set'}")
+    logger.info(f"   GOOGLE_REDIRECT_URI: {settings.GOOGLE_REDIRECT_URI}")
+    logger.info(f"   FRONTEND_URL: {settings.FRONTEND_URL}")
 
 # Root endpoint (public - no authentication required)
 @app.get("/")
