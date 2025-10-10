@@ -5,9 +5,14 @@ from app.api.dependencies import client
 from fastapi.middleware.cors import CORSMiddleware
 from app.utils.logging import get_logger
 import time
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 
 # Get logger for this module
 logger = get_logger(__name__)
+
+# Create thread pool executor for async logging
+logging_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="logging")
 
 from app.config import settings
 
@@ -44,11 +49,14 @@ app.add_middleware(
 # Request logging middleware
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    """Log all incoming HTTP requests"""
+    """Log all incoming HTTP requests with async logging"""
     start_time = time.time()
     
-    # Log request details
-    logger.info(f"🌐 {request.method} {request.url.path} - Client: {request.client.host if request.client else 'unknown'}")
+    # Log request details asynchronously (non-blocking)
+    request_log = f"🌐 {request.method} {request.url.path} - Client: {request.client.host if request.client else 'unknown'}"
+    asyncio.create_task(
+        asyncio.get_event_loop().run_in_executor(logging_executor, logger.info, request_log)
+    )
     
     # Process the request
     response = await call_next(request)
@@ -56,8 +64,11 @@ async def log_requests(request: Request, call_next):
     # Calculate processing time
     process_time = time.time() - start_time
     
-    # Log response details
-    logger.info(f"✅ {request.method} {request.url.path} - Status: {response.status_code} - Time: {process_time:.3f}s")
+    # Log response details asynchronously (non-blocking)
+    response_log = f"✅ {request.method} {request.url.path} - Status: {response.status_code} - Time: {process_time:.3f}s"
+    asyncio.create_task(
+        asyncio.get_event_loop().run_in_executor(logging_executor, logger.info, response_log)
+    )
     
     return response
 
@@ -90,6 +101,14 @@ async def startup_event():
     logger.info(f"   LOG_DATE_FORMAT: {settings.LOG_DATE_FORMAT}")
     logger.info(f"   API_V1_STR: {settings.API_V1_STR}")
     logger.info(f"   PROJECT_NAME: {settings.PROJECT_NAME}")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Cleanup resources on app shutdown"""
+    logger.info("🔄 Shutting down application...")
+    # Shutdown the logging thread pool executor
+    logging_executor.shutdown(wait=True)
+    logger.info("✅ Logging executor shutdown complete")
 
 # Root endpoint (public - no authentication required)
 @app.get("/")
