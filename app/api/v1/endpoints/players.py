@@ -5,7 +5,7 @@ from itertools import groupby
 from datetime import datetime
 
 from app.models import Player, PlayerDetailedStats, Match, UserStatsWithMatches, RecentMatch
-from app.models.auth import UserInDB, UserCreate, UserUpdate
+from app.models.auth import UserInDB, UserCreate, UserUpdate, UserDetailedStats
 from app.api.dependencies import db
 from app.utils.helpers import match_helper
 from app.utils.auth import get_current_active_user, user_helper, get_password_hash
@@ -250,7 +250,7 @@ async def delete_player(player_id: str, current_user: UserInDB = Depends(get_cur
         raise
 
 
-@router.get("/{player_id}/stats", response_model=UserStatsWithMatches)
+@router.get("/{player_id}/stats", response_model=UserDetailedStats)
 async def get_player_detailed_stats(player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Get detailed statistics for a specific player with their last 5 matches (including deleted players)"""
     player : Player = await db.users.find_one({"_id": ObjectId(player_id)})
@@ -428,28 +428,11 @@ async def get_player_detailed_stats(player_id: str, current_user: UserInDB = Dep
         )
         recent_matches.append(recent_match)
     
-    # Create UserStatsWithMatches response
-    user_stats = UserStatsWithMatches(
-        id=str(player["_id"]),
-        username=player["username"],
-        email=player["email"],
-        first_name=player.get("first_name"),
-        last_name=player.get("last_name"),
-        total_matches=player.get("total_matches", 0),
-        total_goals_scored=player.get("total_goals_scored", 0),
-        total_goals_conceded=player.get("total_goals_conceded", 0),
-        goal_difference=player.get("goal_difference", 0),
-        wins=player.get("wins", 0),
-        losses=player.get("losses", 0),
-        draws=player.get("draws", 0),
-        points=player.get("points", 0),
-        elo_rating=player.get("elo_rating", 1200),
-        tournaments_played=player.get("tournaments_played", 0),
-        last_5_teams=player.get("last_5_teams", []),
-        last_5_matches=recent_matches
-    )
+    # Add last_5_matches to stats
+    stats["last_5_matches"] = recent_matches
     
-    return user_stats
+    # Return the detailed stats with calculated averages
+    return stats
 
 
 @router.get("/{player_id}/matches")

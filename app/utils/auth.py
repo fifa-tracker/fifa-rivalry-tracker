@@ -122,6 +122,8 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         "friends": user.get("friends", []),
         "friend_requests_sent": user.get("friend_requests_sent", []),
         "friend_requests_received": user.get("friend_requests_received", []),
+        # Team tracking fields
+        "last_5_teams": user.get("last_5_teams", []),
     }
     
     return UserInDB(**user_data)
@@ -192,4 +194,6 @@ def user_helper(user: dict) -> dict:
         "friends": user.get("friends", []),
         "friend_requests_sent": user.get("friend_requests_sent", []),
         "friend_requests_received": user.get("friend_requests_received", []),
+        # Team tracking fields
+        "last_5_teams": user.get("last_5_teams", []),
     } 

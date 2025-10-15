@@ -3,6 +3,9 @@ from typing import Optional, Dict, List, Union
 from datetime import datetime
 from enum import Enum
 
+# Import RecentMatch for UserDetailedStats
+from .match import RecentMatch
+
 
 class OAuthProvider(str, Enum):
     """OAuth provider types"""
@@ -85,12 +88,13 @@ class UserInDB(User):
 class UserDetailedStats(BaseModel):
     id: str
     username: str
-    email: EmailStr
+    email: str  # Changed from EmailStr to str to match UserStatsWithMatches
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     total_matches: int
     total_goals_scored: int
     total_goals_conceded: int
+    goal_difference: int  # Added from UserStatsWithMatches
     wins: int
     losses: int
     draws: int
@@ -105,6 +109,9 @@ class UserDetailedStats(BaseModel):
     elo_rating: int
     tournaments_played: int
     tournament_ids: List[str]
+    # Additional fields from UserStatsWithMatches
+    last_5_teams: List[str] = []
+    last_5_matches: List[RecentMatch] = []
 
 
 class Token(BaseModel):
