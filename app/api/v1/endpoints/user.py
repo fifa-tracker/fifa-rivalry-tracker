@@ -4,7 +4,7 @@ from bson import ObjectId
 from datetime import datetime
 
 from app.models.auth import User, UserInDB
-from app.models.user import FriendRequest, FriendResponse, NonFriendPlayer
+from app.models.user import FriendRequest, FriendResponse, NonFriendPlayer, UserSearchQuery, UserSearchResult
 from app.api.dependencies import get_database
 from app.utils.auth import get_current_active_user, user_helper
 
@@ -396,3 +396,68 @@ async def get_recent_non_friend_opponents(current_user: UserInDB = Depends(get_c
         ))
     
     return non_friend_opponents
+
+
+@router.post("/search", response_model=List[UserSearchResult])
+async def search_users(
+    search_query: UserSearchQuery,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Fuzzy search for users by username, first name, or last name"""
+    db = await get_database()
+    
+    # Create a regex pattern for case-insensitive partial matching
+    search_pattern = f".*{search_query.query}.*"
+    
+    # Build the search query for MongoDB
+    search_filter = {
+        "$and": [
+            {"_id": {"$ne": ObjectId(current_user.id)}},  # Exclude current user
+            {"is_deleted": {"$ne": True}},  # Exclude deleted users
+            {
+                "$or": [
+                    {"username": {"$regex": search_pattern, "$options": "i"}},
+                    {"first_name": {"$regex": search_pattern, "$options": "i"}},
+                    {"last_name": {"$regex": search_pattern, "$options": "i"}},
+                    {"email": {"$regex": search_pattern, "$options": "i"}}
+                ]
+            }
+        ]
+    }
+    
+    # Execute the search query
+    users_cursor = db.users.find(search_filter).limit(search_query.limit)
+    users = await users_cursor.to_list(length=search_query.limit)
+    
+    # Convert to response format
+    search_results = []
+    for user in users:
+        user_id = str(user["_id"])
+        
+        # Build full name if available
+        full_name = None
+        if user.get("first_name") and user.get("last_name"):
+            full_name = f"{user['first_name']} {user['last_name']}"
+        elif user.get("first_name"):
+            full_name = user["first_name"]
+        elif user.get("last_name"):
+            full_name = user["last_name"]
+        
+        # Check friendship status
+        is_friend = user_id in current_user.friends
+        friend_request_sent = user_id in current_user.friend_requests_sent
+        friend_request_received = user_id in current_user.friend_requests_received
+        
+        search_results.append(UserSearchResult(
+            id=user_id,
+            username=user["username"],
+            first_name=user.get("first_name"),
+            last_name=user.get("last_name"),
+            full_name=full_name,
+            email=user["email"],
+            is_friend=is_friend,
+            friend_request_sent=friend_request_sent,
+            friend_request_received=friend_request_received
+        ))
+    
+    return search_results
