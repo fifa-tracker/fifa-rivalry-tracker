@@ -88,7 +88,6 @@ class UserInDB(User):
 class UserDetailedStats(BaseModel):
     id: str
     username: str
-    email: str  # Changed from EmailStr to str to match UserStatsWithMatches
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     total_matches: int
@@ -118,7 +117,6 @@ class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
     expires_in: int
-    email: str
     username: str
 
 

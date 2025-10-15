@@ -160,7 +160,6 @@ async def login(user_data: UserLogin):
         "access_token": access_token,
         "token_type": "bearer",
         "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
-        "email": user["email"],
         "username": user["username"]
     }
 
@@ -185,7 +184,6 @@ async def refresh_token(current_user: User = Depends(get_current_active_user)):
         "access_token": access_token,
         "token_type": "bearer",
         "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
-        "email": current_user.email,
         "username": current_user.username
     }
 
@@ -239,7 +237,6 @@ async def google_callback(code: str, state: str = None):
         success_params = urlencode({
             "success": "true",
             "token": jwt_token,
-            "email": user["email"],
             "username": user["username"]
         })
         return RedirectResponse(url=f"{settings.FRONTEND_URL}/auth/callback?{success_params}")
@@ -297,7 +294,6 @@ async def google_callback_post(callback_data: GoogleOAuthCallback):
             "access_token": jwt_token,
             "token_type": "bearer",
             "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
-            "email": user["email"],
             "username": user["username"]
         }
         
@@ -354,7 +350,6 @@ async def google_verify_token(token_data: dict):
             "access_token": jwt_token,
             "token_type": "bearer",
             "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
-            "email": user["email"],
             "username": user["username"]
         }
         

@@ -454,7 +454,6 @@ async def search_users(
             first_name=user.get("first_name"),
             last_name=user.get("last_name"),
             full_name=full_name,
-            email=user["email"],
             is_friend=is_friend,
             friend_request_sent=friend_request_sent,
             friend_request_received=friend_request_received

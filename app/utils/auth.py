@@ -165,7 +165,6 @@ def user_helper(user: dict) -> dict:
     return {
         "id": str(user["_id"]),
         "username": "Deleted Player" if is_deleted else user["username"],
-        "email": user["email"] if not is_deleted else "deleted@example.com",
         "first_name": user.get("first_name"),
         "last_name": user.get("last_name"),
         "is_active": user.get("is_active", True),

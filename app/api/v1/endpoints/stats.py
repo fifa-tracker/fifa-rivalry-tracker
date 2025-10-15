@@ -74,7 +74,6 @@ async def get_stats(current_user: UserInDB = Depends(get_current_active_user)):
     user_stats = UserStatsWithMatches(
         id=str(current_user.id),
         username=current_user.username,
-        email=current_user.email,
         first_name=current_user.first_name,
         last_name=current_user.last_name,
         total_matches=current_user.total_matches,

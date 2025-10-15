@@ -76,7 +76,6 @@ class UserStatsWithMatches(BaseModel):
     """User stats along with their last 5 matches"""
     id: str
     username: str
-    email: str
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     total_matches: int

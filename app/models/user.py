@@ -32,7 +32,6 @@ class UserSearchResult(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     full_name: Optional[str] = None
-    email: str
     is_friend: bool = False
     friend_request_sent: bool = False
     friend_request_received: bool = False

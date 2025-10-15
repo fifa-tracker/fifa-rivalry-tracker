@@ -138,7 +138,6 @@ async def get_player(player_id: str, current_user: UserInDB = Depends(get_curren
         user_stats = UserStatsWithMatches(
             id=str(player["_id"]),
             username=player["username"],
-            email=player["email"],
             first_name=player.get("first_name"),
             last_name=player.get("last_name"),
             total_matches=player.get("total_matches", 0),
