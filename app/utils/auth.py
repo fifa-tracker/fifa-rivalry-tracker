@@ -162,9 +162,17 @@ def user_helper(user: dict) -> dict:
     # Check if user is deleted
     is_deleted = user.get("is_deleted", False)
     
+    # Get email or provide a default valid email
+    email = user.get("email")
+    if not email or email == "":
+        # Generate a default email based on username for users without email
+        username = user.get("username", "unknown")
+        email = f"{username}@fifa-tracker.local"
+    
     return {
         "id": str(user["_id"]),
         "username": "Deleted Player" if is_deleted else user["username"],
+        "email": email,
         "first_name": user.get("first_name"),
         "last_name": user.get("last_name"),
         "is_active": user.get("is_active", True),
