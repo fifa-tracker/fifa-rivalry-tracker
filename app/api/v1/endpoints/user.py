@@ -4,7 +4,7 @@ from bson import ObjectId
 from datetime import datetime
 
 from app.models.auth import User, UserInDB
-from app.models.user import FriendRequest, FriendResponse, NonFriendPlayer, UserSearchQuery, UserSearchResult
+from app.models.user import FriendRequest, FriendResponse, NonFriendPlayer, UserSearchQuery, UserSearchResult, Friend
 from app.api.dependencies import get_database
 from app.utils.auth import get_current_active_user, user_helper
 
@@ -266,7 +266,7 @@ async def remove_friend(
     )
 
 
-@router.get("/friends", response_model=List[User])
+@router.get("/friends", response_model=List[Friend])
 async def get_friends(current_user: UserInDB = Depends(get_current_active_user)):
     """Get list of current user's friends"""
     db = await get_database()
@@ -279,7 +279,15 @@ async def get_friends(current_user: UserInDB = Depends(get_current_active_user))
     friends_cursor = db.users.find({"_id": {"$in": friend_ids}})
     friends = await friends_cursor.to_list(length=None)
     
-    return [User(**user_helper(friend)) for friend in friends]
+    return [
+        Friend(
+            id=str(friend["_id"]),
+            username=friend["username"],
+            first_name=friend.get("first_name"),
+            last_name=friend.get("last_name")
+        )
+        for friend in friends
+    ]
 
 
 @router.get("/friend-requests", response_model=dict)

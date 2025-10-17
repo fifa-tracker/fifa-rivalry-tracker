@@ -26,6 +26,13 @@ class UserSearchQuery(BaseModel):
     limit: Optional[int] = Field(default=10, ge=1, le=50, description="Maximum number of results to return")
 
 
+class Friend(BaseModel):
+    id: str
+    username: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+
+
 class UserSearchResult(BaseModel):
     id: str
     username: str
