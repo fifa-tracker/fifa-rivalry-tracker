@@ -738,8 +738,8 @@ async def get_tournament_stats(tournament_id: str, current_user: UserInDB = Depe
         tournament_stats.append(player_stats)
         logger.info(f"Player {player['username']} tournament stats: {stats}")
 
-    # Sort by points in descending order (highest points first)
-    tournament_stats.sort(key=lambda x: x.points, reverse=True)
+    # Sort by points (descending), then goal difference (descending), then goals scored (descending)
+    tournament_stats.sort(key=lambda x: (x.points, x.goal_difference, x.total_goals_scored), reverse=True)
     
     return tournament_stats
 

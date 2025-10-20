@@ -107,9 +107,28 @@ async def get_matches(current_user: UserInDB = Depends(get_current_active_user))
     logger.debug(f"Retrieved {len(matches)} matches")
     return [Match(**await match_helper(match, db)) for match in matches]
 
+@router.get("/{match_id}", response_model=Match)
+async def get_match_by_id(match_id: str, current_user: UserInDB = Depends(get_current_active_user)):
+    """Get a specific match by ID"""
+    try:
+        db = await get_database()
+        match = await db.matches.find_one({"_id": ObjectId(match_id)})
+        if not match:
+            raise HTTPException(status_code=404, detail="Match not found")
+        
+        logger.debug(f"Retrieved match {match_id}")
+        return Match(**await match_helper(match, db))
+    
+    except Exception as e:
+        logger.error(f"Error retrieving match {match_id}: {str(e)}")
+        if "Invalid ObjectId" in str(e):
+            raise HTTPException(status_code=400, detail="Invalid ID format")
+        raise HTTPException(status_code=400, detail=str(e))
+
 @router.put("/{match_id}", response_model=Match)
 async def update_match(match_id: str, match_update: MatchUpdate, current_user: UserInDB = Depends(get_current_active_user)):
     """Update a match"""
+    print(match_update)
     try:
         db = await get_database()
         match : Match = await db.matches.find_one({"_id": ObjectId(match_id)})
@@ -134,7 +153,10 @@ async def update_match(match_id: str, match_update: MatchUpdate, current_user: U
         update_data = {
             "player1_goals": match_update.player1_goals,
             "player2_goals": match_update.player2_goals,
+            "team1": match_update.team1,
+            "team2": match_update.team2,
             "half_length": match_update.half_length,
+            "completed": match_update.completed,
         }
         
         update_result = await db.matches.update_one(

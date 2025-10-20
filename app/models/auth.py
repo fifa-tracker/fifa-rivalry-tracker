@@ -14,7 +14,7 @@ class OAuthProvider(str, Enum):
 
 
 class UserBase(BaseModel):
-    username: str
+    username: str = Field(..., max_length=14, description="Username must be 14 characters or less")
     email: EmailStr
     first_name: Optional[str] = None
     last_name: Optional[str] = None
@@ -35,14 +35,14 @@ class GoogleOAuthUser(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    username: Optional[str] = None
+    username: Optional[str] = Field(None, max_length=14, description="Username must be 14 characters or less")
     email: Optional[EmailStr] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None
 
 
 class UserLogin(BaseModel):
-    username: str = Field(..., description="Username or email address")
+    username: str = Field(..., max_length=14, description="Username or email address (max 14 characters)")
     password: str
 
 
@@ -87,7 +87,7 @@ class UserInDB(User):
 
 class UserDetailedStats(BaseModel):
     id: str
-    username: str
+    username: str = Field(..., max_length=14, description="Username must be 14 characters or less")
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     total_matches: int
@@ -117,11 +117,11 @@ class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
     expires_in: int
-    username: str
+    username: str = Field(..., max_length=14, description="Username must be 14 characters or less")
 
 
 class TokenData(BaseModel):
-    username: Optional[str] = None
+    username: Optional[str] = Field(None, max_length=14, description="Username must be 14 characters or less")
     user_id: Optional[str] = None
 
 

@@ -32,7 +32,10 @@ class Match(BaseModel):
 class MatchUpdate(BaseModel):
     player1_goals: int
     player2_goals: int
+    team1: Optional[str] = None
+    team2: Optional[str] = None
     half_length: int = Field(ge=3, le=6, description="Match half length in minutes (3-6 minutes)")
+    completed: bool = False
 
 
 class RecentMatch(BaseModel):
