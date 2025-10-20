@@ -22,8 +22,8 @@ class Match(BaseModel):
     player1_goals: int
     player2_goals: int
     date: datetime
-    team1: Optional[str] = None
-    team2: Optional[str] = None
+    team1: str
+    team2: str
     tournament_name: Optional[str] = None
     half_length: int
     completed: bool = False

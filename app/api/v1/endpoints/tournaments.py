@@ -288,6 +288,7 @@ async def get_tournament_matches(
             "team1": match.get("team1", "Unknown"),
             "team2": match.get("team2", "Unknown"),
             "half_length": match.get("half_length", 4),
+            "completed": match.get("completed", False),  # Include completed status
             "tournament_name": tournament["name"] if tournament else None
         }
         

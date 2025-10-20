@@ -185,6 +185,7 @@ async def match_helper(match : Match, db) -> dict:
             "team1": match.get("team1", "Unknown"),
             "team2": match.get("team2", "Unknown"),
             "half_length": match.get("half_length", 4),  # Default to 4 minutes if not set
+            "completed": match.get("completed", False),  # Include completed status
         }
         
         # Add tournament info if available

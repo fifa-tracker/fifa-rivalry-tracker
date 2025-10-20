@@ -145,8 +145,13 @@ async def update_match(match_id: str, match_update: MatchUpdate, current_user: U
         player1_goals_diff  = match_update.player1_goals - match["player1_goals"]
         player2_goals_diff = match_update.player2_goals - match["player2_goals"]
         
-        # Check if there are any actual changes
-        if player1_goals_diff == 0 and player2_goals_diff == 0:
+        # Check if there are any actual changes (goals, teams, half_length, or completed status)
+        has_goal_changes = player1_goals_diff != 0 or player2_goals_diff != 0
+        has_team_changes = (match_update.team1 != match.get("team1", "")) or (match_update.team2 != match.get("team2", ""))
+        has_half_length_change = match_update.half_length != match.get("half_length", 0)
+        has_completed_change = match_update.completed != match.get("completed", False)
+        
+        if not (has_goal_changes or has_team_changes or has_half_length_change or has_completed_change):
             return Match(**await match_helper(match, db))
         
         # Update match
