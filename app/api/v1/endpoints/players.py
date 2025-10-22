@@ -81,12 +81,13 @@ async def get_player(player_id: str, current_user: UserInDB = Depends(get_curren
         if not player:
             raise HTTPException(status_code=404, detail="Player not found")
         
-        # Get player's last 5 matches
+        # Get player's last 5 completed matches
         user_matches = await db.matches.find({
             "$or": [
                 {"player1_id": player_id},
                 {"player2_id": player_id}
-            ]
+            ],
+            "completed": True
         }).sort("date", -1).limit(5).to_list(5)
         
         # Convert matches to RecentMatch format
@@ -374,12 +375,13 @@ async def get_player_detailed_stats(player_id: str, current_user: UserInDB = Dep
         }
     )
 
-    # Get player's last 5 matches
+    # Get player's last 5 completed matches
     user_matches = await db.matches.find({
         "$or": [
             {"player1_id": player_id},
             {"player2_id": player_id}
-        ]
+        ],
+        "completed": True
     }).sort("date", -1).limit(5).to_list(5)
     
     # Convert matches to RecentMatch format
