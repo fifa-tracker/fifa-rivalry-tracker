@@ -19,7 +19,10 @@ class Settings:
     DEBUG: bool = ENVIRONMENT == "development"
     
     # Database
-    MONGO_URI: str = get_env_var("MONGO_URI") or get_env_var(f"MONGO_URI_{ENVIRONMENT.upper()}")
+    MONGO_URI: str = (
+        get_env_var("MONGO_URI_LOCAL") if ENVIRONMENT == "development" 
+        else get_env_var("MONGO_URI") or get_env_var(f"MONGO_URI_{ENVIRONMENT.upper()}")
+    )
     DATABASE_NAME: str = "fifa_rivalry"
     
     # JWT Authentication
