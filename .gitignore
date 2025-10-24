@@ -8,6 +8,7 @@ __pycache__/
 
 # Database and backups
 mongo-backup
+backups/
 
 # Test cache
 .pytest_cache/
