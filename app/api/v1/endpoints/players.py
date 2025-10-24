@@ -4,7 +4,7 @@ from bson import ObjectId
 from itertools import groupby
 from datetime import datetime
 
-from app.models import Player, PlayerDetailedStats, Match, UserStatsWithMatches, RecentMatch
+from app.models import User, UserDetailedStats, Match, UserStatsWithMatches, RecentMatch
 from app.models.auth import UserInDB, UserCreate, UserUpdate, UserDetailedStats
 from app.models.response import success_response, success_list_response, StandardResponse, StandardListResponse
 from app.api.dependencies import db
@@ -13,7 +13,7 @@ from app.utils.auth import get_current_active_user, user_helper, get_password_ha
 
 router = APIRouter()
 
-@router.post("/", response_model=StandardResponse[Player])
+@router.post("/", response_model=StandardResponse[User])
 async def register_player(player: UserCreate, current_user: UserInDB = Depends(get_current_active_user)):
     """Register a new player (user)"""
     existing_player = await db.users.find_one({"username": player.username})
@@ -66,11 +66,11 @@ async def register_player(player: UserCreate, current_user: UserInDB = Depends(g
     created_player = await db.users.find_one({"_id": new_player.inserted_id})
     return success_response(
         data=user_helper(created_player),
-        message="Player registered successfully"
+        message="User registered successfully"
     )
 
 
-@router.get("/", response_model=StandardListResponse[Player])
+@router.get("/", response_model=StandardListResponse[User])
 async def get_players(current_user: UserInDB = Depends(get_current_active_user)):
     """Get all active players (excluding deleted ones)"""
     players = await db.users.find({"is_deleted": {"$ne": True}}).to_list(1000)
@@ -87,7 +87,7 @@ async def get_player(player_id: str, current_user: UserInDB = Depends(get_curren
     try:
         player = await db.users.find_one({"_id": ObjectId(player_id)})
         if not player:
-            raise HTTPException(status_code=404, detail="Player not found")
+            raise HTTPException(status_code=404, detail="User not found")
         
         # Get player's last 5 completed matches
         user_matches = await db.matches.find({
@@ -165,7 +165,7 @@ async def get_player(player_id: str, current_user: UserInDB = Depends(get_curren
         
         return success_response(
             data=user_stats,
-            message="Player information retrieved successfully"
+            message="User information retrieved successfully"
         )
         
     except Exception as e:
@@ -174,13 +174,13 @@ async def get_player(player_id: str, current_user: UserInDB = Depends(get_curren
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.put("/{player_id}", response_model=StandardResponse[Player])
+@router.put("/{player_id}", response_model=StandardResponse[User])
 async def update_player(player_id: str, player: UserUpdate, current_user: UserInDB = Depends(get_current_active_user)):
     """Update a player's information (partial update - only provided fields will be updated)"""
     # Check if player exists
     existing_player = await db.users.find_one({"_id": ObjectId(player_id)})
     if not existing_player:
-        raise HTTPException(status_code=404, detail="Player not found")
+        raise HTTPException(status_code=404, detail="User not found")
     
     # Check if player is deleted
     if existing_player.get("is_deleted", False):
@@ -221,13 +221,13 @@ async def update_player(player_id: str, player: UserUpdate, current_user: UserIn
     )
 
     if update_result.modified_count == 0:
-        raise HTTPException(status_code=400, detail="Player update failed")
+        raise HTTPException(status_code=400, detail="User update failed")
 
     # Get updated player
     updated_player = await db.users.find_one({"_id": ObjectId(player_id)})
     return success_response(
         data=user_helper(updated_player),
-        message="Player updated successfully"
+        message="User updated successfully"
     )
 
 
@@ -239,7 +239,7 @@ async def delete_player(player_id: str, current_user: UserInDB = Depends(get_cur
         player = await db.users.find_one({"_id": ObjectId(player_id)})
         
         if not player:
-            raise HTTPException(status_code=404, detail="Player not found")
+            raise HTTPException(status_code=404, detail="User not found")
 
         # Mark player as deleted instead of actually deleting
         update_data = {
@@ -255,11 +255,11 @@ async def delete_player(player_id: str, current_user: UserInDB = Depends(get_cur
         )
         
         if update_result.modified_count == 0:
-            raise HTTPException(status_code=400, detail="Player deletion failed")
+            raise HTTPException(status_code=400, detail="User deletion failed")
 
         return success_response(
-            data={"message": "Player marked as deleted successfully"},
-            message="Player marked as deleted successfully"
+            data={"message": "User marked as deleted successfully"},
+            message="User marked as deleted successfully"
         )
     except Exception as e:
         if "Invalid ObjectId" in str(e):
@@ -270,9 +270,9 @@ async def delete_player(player_id: str, current_user: UserInDB = Depends(get_cur
 @router.get("/{player_id}/stats", response_model=StandardResponse[UserDetailedStats])
 async def get_player_detailed_stats(player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Get detailed statistics for a specific player with their last 5 matches (including deleted players)"""
-    player : Player = await db.users.find_one({"_id": ObjectId(player_id)})
+    player : User = await db.users.find_one({"_id": ObjectId(player_id)})
     if not player:
-        raise HTTPException(status_code=404, detail="Player not found")
+        raise HTTPException(status_code=404, detail="User not found")
     
     # Get all matches for this player
     matches: List[Match] = await db.matches.find({
@@ -291,7 +291,7 @@ async def get_player_detailed_stats(player_id: str, current_user: UserInDB = Dep
             if match["player1_id"] == player_id
             else match["player1_id"]
         )
-        opponent : Player = await db.users.find_one({"_id": ObjectId(opponent_id)})
+        opponent : User = await db.users.find_one({"_id": ObjectId(opponent_id)})
 
         if match["player1_id"] == player_id:
             if match["player1_goals"] > match["player2_goals"]:
@@ -452,7 +452,7 @@ async def get_player_detailed_stats(player_id: str, current_user: UserInDB = Dep
     # Return the detailed stats with calculated averages
     return success_response(
         data=stats,
-        message="Player detailed statistics retrieved successfully"
+        message="User detailed statistics retrieved successfully"
     )
 
 
@@ -461,9 +461,9 @@ async def get_player_matches(player_id: str, current_user: UserInDB = Depends(ge
     """Get all matches for a specific player (including deleted players)"""
     
     # Get player info
-    player : Player = await db.users.find_one({"_id": ObjectId(player_id)})
+    player : User = await db.users.find_one({"_id": ObjectId(player_id)})
     if not player:
-        raise HTTPException(status_code=404, detail="Player not found")
+        raise HTTPException(status_code=404, detail="User not found")
     
     matches = (
         await db.matches.find(

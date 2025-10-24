@@ -2,7 +2,7 @@ from typing import List, Union
 from fastapi import APIRouter, HTTPException, Depends
 from bson import ObjectId
 
-from app.models import Player, HeadToHeadStats, RecentMatch, UserStatsWithMatches
+from app.models import User, HeadToHeadStats, RecentMatch, UserStatsWithMatches
 from app.models.auth import UserInDB
 from app.models.response import success_response, StandardResponse
 from app.api.dependencies import get_database

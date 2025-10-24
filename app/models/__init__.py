@@ -1,5 +1,5 @@
 # Models package - Export all models for easy importing
-from .player import Player, PlayerDetailedStats
+from .player import User, UserDetailedStats
 from .match import MatchCreate, Match, MatchUpdate, HeadToHeadStats, RecentMatch, UserStatsWithMatches
 from .tournament import TournamentCreate, Tournament, TournamentPlayerStats, TournamentPlayer
 from .auth import UserCreate, User, UserLogin, Token, TokenData, UserInDB, UserDetailedStats
@@ -23,8 +23,8 @@ class PaginatedResponse(BaseModel, Generic[T]):
 
 __all__ = [
     # Player models
-    "Player", 
-    "PlayerDetailedStats",
+    "User", 
+    "UserDetailedStats",
     
     # Match models
     "MatchCreate",

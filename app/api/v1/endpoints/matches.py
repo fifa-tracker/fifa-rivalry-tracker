@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from bson import ObjectId
 from datetime import datetime
 
-from app.models import MatchCreate, Match, MatchUpdate, Player, Tournament
+from app.models import MatchCreate, Match, MatchUpdate, User, Tournament
 from app.models.auth import UserInDB
 from app.models.response import success_response, success_list_response, StandardResponse, StandardListResponse
 from app.api.dependencies import get_database
@@ -21,8 +21,8 @@ router = APIRouter()
 async def record_match(match: MatchCreate, current_user: UserInDB = Depends(get_current_active_user)):
     """Record a new match"""
     db = await get_database()
-    player1 : Player = await db.users.find_one({"_id": ObjectId(match.player1_id)})
-    player2 : Player = await db.users.find_one({"_id": ObjectId(match.player2_id)})
+    player1 : User = await db.users.find_one({"_id": ObjectId(match.player1_id)})
+    player2 : User = await db.users.find_one({"_id": ObjectId(match.player2_id)})
 
     if not player1 or not player2:
         raise HTTPException(status_code=404, detail="One or both players not found")
@@ -187,8 +187,8 @@ async def update_match(match_id: str, match_update: MatchUpdate, current_user: U
             raise HTTPException(status_code=400, detail="Match update failed - match not found")
         
         # Get current player data for ELO calculation
-        player1 : Player = await db.users.find_one({"_id": ObjectId(match["player1_id"])})
-        player2 : Player = await db.users.find_one({"_id": ObjectId(match["player2_id"])})
+        player1 : User = await db.users.find_one({"_id": ObjectId(match["player1_id"])})
+        player2 : User = await db.users.find_one({"_id": ObjectId(match["player2_id"])})
         
         if not player1 or not player2:
             raise HTTPException(status_code=404, detail="One or both players not found")
@@ -221,7 +221,7 @@ async def update_match(match_id: str, match_update: MatchUpdate, current_user: U
             if not ObjectId.is_valid(player_id):
                 continue
             
-            player : Player = await db.users.find_one({"_id": ObjectId(player_id)})
+            player : User = await db.users.find_one({"_id": ObjectId(player_id)})
             if not player:
                 continue
             
@@ -313,8 +313,8 @@ async def delete_match(match_id: str, current_user: UserInDB = Depends(get_curre
                     )
 
         # Get current player data for ELO calculation
-        player1 : Player = await db.users.find_one({"_id": ObjectId(match["player1_id"])})
-        player2 : Player = await db.users.find_one({"_id": ObjectId(match["player2_id"])})
+        player1 : User = await db.users.find_one({"_id": ObjectId(match["player1_id"])})
+        player2 : User = await db.users.find_one({"_id": ObjectId(match["player2_id"])})
         
         if not player1 or not player2:
             raise HTTPException(status_code=404, detail="One or both players not found")
@@ -339,7 +339,7 @@ async def delete_match(match_id: str, current_user: UserInDB = Depends(get_curre
             if not ObjectId.is_valid(player_id):
                 continue
                 
-            player : Player = await db.users.find_one({"_id": ObjectId(player_id)})
+            player : User = await db.users.find_one({"_id": ObjectId(player_id)})
             if not player:
                 continue
             

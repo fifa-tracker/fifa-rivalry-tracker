@@ -1,6 +1,6 @@
 from datetime import datetime
 from bson import ObjectId
-from app.models import Player, Match, Tournament
+from app.models import User, Match, Tournament
 from typing import List
 from app.utils.logging import get_logger
 import time
@@ -159,8 +159,8 @@ async def match_helper(match : Match, db) -> dict:
         
         # Find players
         players_start = time.time()
-        player1 : Player = await db.users.find_one({"_id": ObjectId(player1_id)})
-        player2 : Player = await db.users.find_one({"_id": ObjectId(player2_id)})
+        player1 : User = await db.users.find_one({"_id": ObjectId(player1_id)})
+        player2 : User = await db.users.find_one({"_id": ObjectId(player2_id)})
         players_time = time.time()
         logger.info(f"Player queries completed in {(players_time - players_start) * 1000:.2f}ms - match_id: {match_id}, player1_id: {player1_id}, player2_id: {player2_id}")
         
@@ -297,8 +297,8 @@ async def calculate_head_to_head_stats(db, player1_id: str, player2_id: str, pla
         db: Database connection
         player1_id: ID of the first player
         player2_id: ID of the second player  
-        player1: Player 1 document from database
-        player2: Player 2 document from database
+        player1: User 1 document from database
+        player2: User 2 document from database
         
     Returns:
         Dictionary containing head-to-head statistics

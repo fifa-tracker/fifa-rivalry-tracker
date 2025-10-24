@@ -6,7 +6,7 @@ from datetime import datetime
 import math
 import time
 
-from app.models import TournamentCreate, Tournament, Match, Player, TournamentPlayerStats, TournamentPlayer, PaginatedResponse, MatchUpdate
+from app.models import TournamentCreate, Tournament, Match, User, TournamentPlayerStats, TournamentPlayer, PaginatedResponse, MatchUpdate
 from app.models.auth import UserInDB
 from app.models.response import success_response, success_list_response, success_paginated_response, StandardResponse, StandardListResponse, StandardPaginatedResponse
 from app.api.dependencies import get_database
@@ -676,7 +676,7 @@ async def get_tournament_stats(tournament_id: str, current_user: UserInDB = Depe
     # Convert string IDs to ObjectIds for database query
     try:
         player_object_ids = [ObjectId(pid) if isinstance(pid, str) else pid for pid in player_ids]
-        players : List[Player] = await db.users.find({"_id": {"$in": player_object_ids}}).to_list(1000)
+        players : List[User] = await db.users.find({"_id": {"$in": player_object_ids}}).to_list(1000)
         logger.info(f"Found {len(players)} players in database")
     except Exception as e:
         logger.error(f"Error converting player IDs: {e}")
