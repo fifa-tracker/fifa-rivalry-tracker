@@ -4,6 +4,7 @@ from bson import ObjectId
 
 from app.models import Player, HeadToHeadStats, RecentMatch, UserStatsWithMatches
 from app.models.auth import UserInDB
+from app.models.response import success_response, StandardResponse
 from app.api.dependencies import get_database
 
 from app.utils.auth import user_helper
@@ -12,7 +13,7 @@ from app.utils.helpers import calculate_head_to_head_stats
 
 router = APIRouter()
 
-@router.get("/", response_model=UserStatsWithMatches)
+@router.get("/", response_model=StandardResponse[UserStatsWithMatches])
 async def get_stats(current_user: UserInDB = Depends(get_current_active_user)):
     """Get current user's stats along with their last 5 matches"""
     db = await get_database()
@@ -90,9 +91,12 @@ async def get_stats(current_user: UserInDB = Depends(get_current_active_user)):
         last_5_matches=recent_matches
     )
     
-    return user_stats
+    return success_response(
+        data=user_stats,
+        message="User statistics retrieved successfully"
+    )
 
-@router.get("/head-to-head/{player1_id}/{player2_id}", response_model=HeadToHeadStats)
+@router.get("/head-to-head/{player1_id}/{player2_id}", response_model=StandardResponse[HeadToHeadStats])
 async def get_head_to_head_stats(player1_id: str, player2_id: str):
     """Get head-to-head statistics between two players"""
     db = await get_database()
@@ -104,4 +108,7 @@ async def get_head_to_head_stats(player1_id: str, player2_id: str):
 
     # Calculate head-to-head stats
     head_to_head_stats = await calculate_head_to_head_stats(db, player1_id, player2_id, player1, player2)
-    return head_to_head_stats
+    return success_response(
+        data=head_to_head_stats,
+        message="Head-to-head statistics retrieved successfully"
+    )

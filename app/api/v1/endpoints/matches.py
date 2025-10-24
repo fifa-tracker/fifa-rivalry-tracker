@@ -5,6 +5,7 @@ from datetime import datetime
 
 from app.models import MatchCreate, Match, MatchUpdate, Player, Tournament
 from app.models.auth import UserInDB
+from app.models.response import success_response, success_list_response, StandardResponse, StandardListResponse
 from app.api.dependencies import get_database
 from app.utils.helpers import match_helper, get_result
 from app.utils.auth import get_current_active_user
@@ -16,7 +17,7 @@ logger = get_logger(__name__)
 
 router = APIRouter()
 
-@router.post("/", response_model=Match)
+@router.post("/", response_model=StandardResponse[Match])
 async def record_match(match: MatchCreate, current_user: UserInDB = Depends(get_current_active_user)):
     """Record a new match"""
     db = await get_database()
@@ -97,17 +98,24 @@ async def record_match(match: MatchCreate, current_user: UserInDB = Depends(get_
         await db.users.update_one({"_id": player["_id"]}, update)
 
     created_match = await db.matches.find_one({"_id": new_match.inserted_id})
-    return Match(**await match_helper(created_match, db))
+    return success_response(
+        data=Match(**await match_helper(created_match, db)),
+        message="Match recorded successfully"
+    )
 
-@router.get("/", response_model=List[Match])
+@router.get("/", response_model=StandardListResponse[Match])
 async def get_matches(current_user: UserInDB = Depends(get_current_active_user)):
     """Get all matches"""
     db = await get_database()
     matches = await db.matches.find().sort("date", -1).to_list(1000)
     logger.debug(f"Retrieved {len(matches)} matches")
-    return [Match(**await match_helper(match, db)) for match in matches]
+    processed_matches = [Match(**await match_helper(match, db)) for match in matches]
+    return success_list_response(
+        items=processed_matches,
+        message=f"Retrieved {len(processed_matches)} matches"
+    )
 
-@router.get("/{match_id}", response_model=Match)
+@router.get("/{match_id}", response_model=StandardResponse[Match])
 async def get_match_by_id(match_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Get a specific match by ID"""
     try:
@@ -117,7 +125,10 @@ async def get_match_by_id(match_id: str, current_user: UserInDB = Depends(get_cu
             raise HTTPException(status_code=404, detail="Match not found")
         
         logger.debug(f"Retrieved match {match_id}")
-        return Match(**await match_helper(match, db))
+        return success_response(
+            data=Match(**await match_helper(match, db)),
+            message="Match retrieved successfully"
+        )
     
     except Exception as e:
         logger.error(f"Error retrieving match {match_id}: {str(e)}")
@@ -125,7 +136,7 @@ async def get_match_by_id(match_id: str, current_user: UserInDB = Depends(get_cu
             raise HTTPException(status_code=400, detail="Invalid ID format")
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.put("/{match_id}", response_model=Match)
+@router.put("/{match_id}", response_model=StandardResponse[Match])
 async def update_match(match_id: str, match_update: MatchUpdate, current_user: UserInDB = Depends(get_current_active_user)):
     """Update a match"""
     print(match_update)
@@ -152,7 +163,10 @@ async def update_match(match_id: str, match_update: MatchUpdate, current_user: U
         has_completed_change = match_update.completed != match.get("completed", False)
         
         if not (has_goal_changes or has_team_changes or has_half_length_change or has_completed_change):
-            return Match(**await match_helper(match, db))
+            return success_response(
+                data=Match(**await match_helper(match, db)),
+                message="No changes detected, match unchanged"
+            )
         
         # Update match
         update_data = {
@@ -257,7 +271,10 @@ async def update_match(match_id: str, match_update: MatchUpdate, current_user: U
         if not updated_match:
             raise HTTPException(status_code=404, detail="Updated match not found")
 
-        return Match(**await match_helper(updated_match, db))
+        return success_response(
+            data=Match(**await match_helper(updated_match, db)),
+            message="Match updated successfully"
+        )
 
     except Exception as e:
         logger.error(f"Error updating match: {str(e)}")
@@ -265,7 +282,7 @@ async def update_match(match_id: str, match_update: MatchUpdate, current_user: U
             raise HTTPException(status_code=400, detail="Invalid ID format")
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.delete("/{match_id}", response_model=dict)
+@router.delete("/{match_id}", response_model=StandardResponse[dict])
 async def delete_match(match_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Delete a match and update tournament and player statistics"""
     try:
@@ -390,7 +407,10 @@ async def delete_match(match_id: str, current_user: UserInDB = Depends(get_curre
             raise HTTPException(status_code=400, detail="Match deletion failed")
 
         logger.info(f"Successfully deleted match {match_id} and updated statistics")
-        return {"message": "Match deleted successfully"}
+        return success_response(
+            data={"message": "Match deleted successfully"},
+            message="Match deleted successfully"
+        )
 
     except Exception as e:
         logger.error(f"Error deleting match {match_id}: {str(e)}")

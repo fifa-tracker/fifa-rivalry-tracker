@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from urllib.parse import urlencode
 
 from app.models.auth import UserCreate, User, UserLogin, Token, GoogleOAuthCallback
+from app.models.response import success_response, StandardResponse
 from app.utils.auth import (
     get_password_hash, 
     verify_password, 
@@ -31,7 +32,7 @@ class UsernameCheck(BaseModel):
     username: str
 
 
-@router.post("/check-username")
+@router.post("/check-username", response_model=StandardResponse[dict])
 async def check_username_exists(username_data: UsernameCheck):
     """Check if a username already exists"""
     db = await get_database()
@@ -39,13 +40,16 @@ async def check_username_exists(username_data: UsernameCheck):
     # Check if username already exists
     existing_user = await db.users.find_one({"username": username_data.username})
     
-    return {
-        "username": username_data.username,
-        "exists": existing_user is not None
-    }
+    return success_response(
+        data={
+            "username": username_data.username,
+            "exists": existing_user is not None
+        },
+        message="Username availability checked"
+    )
 
 
-@router.post("/register", response_model=User)
+@router.post("/register", response_model=StandardResponse[User])
 async def register_user(user: UserCreate):
     """Register a new user"""
     db = await get_database()
@@ -105,10 +109,13 @@ async def register_user(user: UserCreate):
     # Get created user
     created_user = await db.users.find_one({"_id": result.inserted_id})
     
-    return User(**user_helper(created_user))
+    return success_response(
+        data=User(**user_helper(created_user)),
+        message="User registered successfully"
+    )
 
 
-@router.post("/login", response_model=Token)
+@router.post("/login", response_model=StandardResponse[Token])
 async def login(user_data: UserLogin):
     """Login to get access token"""
     db = await get_database()
@@ -156,21 +163,27 @@ async def login(user_data: UserLogin):
         expires_delta=access_token_expires
     )
     
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
-        "username": user["username"]
-    }
+    return success_response(
+        data={
+            "access_token": access_token,
+            "token_type": "bearer",
+            "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
+            "username": user["username"]
+        },
+        message="Login successful"
+    )
 
 
-@router.get("/me", response_model=User)
+@router.get("/me", response_model=StandardResponse[User])
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
     """Get current user information"""
-    return current_user
+    return success_response(
+        data=current_user,
+        message="User information retrieved successfully"
+    )
 
 
-@router.post("/refresh", response_model=Token)
+@router.post("/refresh", response_model=StandardResponse[Token])
 async def refresh_token(current_user: User = Depends(get_current_active_user)):
     """Refresh access token"""
     # Create new access token
@@ -180,19 +193,25 @@ async def refresh_token(current_user: User = Depends(get_current_active_user)):
         expires_delta=access_token_expires
     )
     
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
-        "username": current_user.username
-    }
+    return success_response(
+        data={
+            "access_token": access_token,
+            "token_type": "bearer",
+            "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
+            "username": current_user.username
+        },
+        message="Token refreshed successfully"
+    )
 
 
-@router.get("/google/login")
+@router.get("/google/login", response_model=StandardResponse[dict])
 async def google_login():
     """Initiate Google OAuth login"""
     auth_url = generate_google_auth_url()
-    return {"auth_url": auth_url}
+    return success_response(
+        data={"auth_url": auth_url},
+        message="Google OAuth URL generated"
+    )
 
 
 @router.get("/google/callback")
@@ -247,7 +266,7 @@ async def google_callback(code: str, state: str = None):
         return RedirectResponse(url=f"{settings.FRONTEND_URL}/auth/callback?{error_params}")
 
 
-@router.post("/google/callback", response_model=Token)
+@router.post("/google/callback", response_model=StandardResponse[Token])
 async def google_callback_post(callback_data: GoogleOAuthCallback):
     """Handle Google OAuth callback via POST (for programmatic access)"""
     db = await get_database()
@@ -290,12 +309,15 @@ async def google_callback_post(callback_data: GoogleOAuthCallback):
             expires_delta=access_token_expires
         )
         
-        return {
-            "access_token": jwt_token,
-            "token_type": "bearer",
-            "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
-            "username": user["username"]
-        }
+        return success_response(
+            data={
+                "access_token": jwt_token,
+                "token_type": "bearer",
+                "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
+                "username": user["username"]
+            },
+            message="Google OAuth login successful"
+        )
         
     except HTTPException:
         raise
@@ -306,7 +328,7 @@ async def google_callback_post(callback_data: GoogleOAuthCallback):
         )
 
 
-@router.post("/google/verify", response_model=Token)
+@router.post("/google/verify", response_model=StandardResponse[Token])
 async def google_verify_token(token_data: dict):
     """Verify Google ID token and create session"""
     db = await get_database()
@@ -346,12 +368,15 @@ async def google_verify_token(token_data: dict):
             expires_delta=access_token_expires
         )
         
-        return {
-            "access_token": jwt_token,
-            "token_type": "bearer",
-            "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
-            "username": user["username"]
-        }
+        return success_response(
+            data={
+                "access_token": jwt_token,
+                "token_type": "bearer",
+                "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # Convert to seconds
+                "username": user["username"]
+            },
+            message="Google token verification successful"
+        )
         
     except HTTPException:
         raise

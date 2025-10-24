@@ -6,13 +6,14 @@ from datetime import datetime
 
 from app.models import Player, PlayerDetailedStats, Match, UserStatsWithMatches, RecentMatch
 from app.models.auth import UserInDB, UserCreate, UserUpdate, UserDetailedStats
+from app.models.response import success_response, success_list_response, StandardResponse, StandardListResponse
 from app.api.dependencies import db
 from app.utils.helpers import match_helper
 from app.utils.auth import get_current_active_user, user_helper, get_password_hash
 
 router = APIRouter()
 
-@router.post("/", response_model=Player)
+@router.post("/", response_model=StandardResponse[Player])
 async def register_player(player: UserCreate, current_user: UserInDB = Depends(get_current_active_user)):
     """Register a new player (user)"""
     existing_player = await db.users.find_one({"username": player.username})
@@ -63,17 +64,24 @@ async def register_player(player: UserCreate, current_user: UserInDB = Depends(g
     
     new_player = await db.users.insert_one(player_data)
     created_player = await db.users.find_one({"_id": new_player.inserted_id})
-    return user_helper(created_player)
+    return success_response(
+        data=user_helper(created_player),
+        message="Player registered successfully"
+    )
 
 
-@router.get("/", response_model=List[Player])
+@router.get("/", response_model=StandardListResponse[Player])
 async def get_players(current_user: UserInDB = Depends(get_current_active_user)):
     """Get all active players (excluding deleted ones)"""
     players = await db.users.find({"is_deleted": {"$ne": True}}).to_list(1000)
-    return [user_helper(player) for player in players]
+    processed_players = [user_helper(player) for player in players]
+    return success_list_response(
+        items=processed_players,
+        message=f"Retrieved {len(processed_players)} players"
+    )
 
 
-@router.get("/{player_id}", response_model=UserStatsWithMatches)
+@router.get("/{player_id}", response_model=StandardResponse[UserStatsWithMatches])
 async def get_player(player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Get a specific player by ID with their last 5 matches (including deleted players)"""
     try:
@@ -155,7 +163,10 @@ async def get_player(player_id: str, current_user: UserInDB = Depends(get_curren
             last_5_matches=recent_matches
         )
         
-        return user_stats
+        return success_response(
+            data=user_stats,
+            message="Player information retrieved successfully"
+        )
         
     except Exception as e:
         if "Invalid ObjectId" in str(e):
@@ -163,7 +174,7 @@ async def get_player(player_id: str, current_user: UserInDB = Depends(get_curren
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.put("/{player_id}", response_model=Player)
+@router.put("/{player_id}", response_model=StandardResponse[Player])
 async def update_player(player_id: str, player: UserUpdate, current_user: UserInDB = Depends(get_current_active_user)):
     """Update a player's information (partial update - only provided fields will be updated)"""
     # Check if player exists
@@ -214,10 +225,13 @@ async def update_player(player_id: str, player: UserUpdate, current_user: UserIn
 
     # Get updated player
     updated_player = await db.users.find_one({"_id": ObjectId(player_id)})
-    return user_helper(updated_player)
+    return success_response(
+        data=user_helper(updated_player),
+        message="Player updated successfully"
+    )
 
 
-@router.delete("/{player_id}", response_model=dict)
+@router.delete("/{player_id}", response_model=StandardResponse[dict])
 async def delete_player(player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Mark a player as deleted instead of actually deleting them"""
     try:
@@ -243,14 +257,17 @@ async def delete_player(player_id: str, current_user: UserInDB = Depends(get_cur
         if update_result.modified_count == 0:
             raise HTTPException(status_code=400, detail="Player deletion failed")
 
-        return {"message": "Player marked as deleted successfully"}
+        return success_response(
+            data={"message": "Player marked as deleted successfully"},
+            message="Player marked as deleted successfully"
+        )
     except Exception as e:
         if "Invalid ObjectId" in str(e):
             raise HTTPException(status_code=400, detail="Invalid player ID format")
         raise
 
 
-@router.get("/{player_id}/stats", response_model=UserDetailedStats)
+@router.get("/{player_id}/stats", response_model=StandardResponse[UserDetailedStats])
 async def get_player_detailed_stats(player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Get detailed statistics for a specific player with their last 5 matches (including deleted players)"""
     player : Player = await db.users.find_one({"_id": ObjectId(player_id)})
@@ -433,10 +450,13 @@ async def get_player_detailed_stats(player_id: str, current_user: UserInDB = Dep
     stats["last_5_matches"] = recent_matches
     
     # Return the detailed stats with calculated averages
-    return stats
+    return success_response(
+        data=stats,
+        message="Player detailed statistics retrieved successfully"
+    )
 
 
-@router.get("/{player_id}/matches")
+@router.get("/{player_id}/matches", response_model=StandardListResponse[Match])
 async def get_player_matches(player_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Get all matches for a specific player (including deleted players)"""
     
@@ -459,4 +479,7 @@ async def get_player_matches(player_id: str, current_user: UserInDB = Depends(ge
         match_data = await match_helper(match, db)
         matches_with_names.append(match_data)
 
-    return matches_with_names
+    return success_list_response(
+        items=matches_with_names,
+        message=f"Retrieved {len(matches_with_names)} matches for player"
+    )

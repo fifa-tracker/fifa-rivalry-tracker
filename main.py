@@ -1,9 +1,12 @@
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from app.api.v1.router import api_router
 from app.api.dependencies import client
 from fastapi.middleware.cors import CORSMiddleware
 from app.utils.logging import get_logger
+from app.models.response import success_response, error_response
 import time
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
@@ -25,6 +28,35 @@ app = FastAPI(
 
 # Include API router
 app.include_router(api_router, prefix=settings.API_V1_STR)
+
+# Global exception handlers
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """Handle HTTP exceptions with standardized response format"""
+    logger.error(f"HTTP Exception: {exc.status_code} - {exc.detail}")
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=error_response(message=exc.detail).model_dump()
+    )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """Handle validation errors with standardized response format"""
+    logger.error(f"Validation Error: {exc.errors()}")
+    error_message = "Validation error: " + "; ".join([f"{error['loc']}: {error['msg']}" for error in exc.errors()])
+    return JSONResponse(
+        status_code=422,
+        content=error_response(message=error_message).model_dump()
+    )
+
+@app.exception_handler(Exception)
+async def general_exception_handler(request: Request, exc: Exception):
+    """Handle unexpected exceptions with standardized response format"""
+    logger.error(f"Unexpected error: {str(exc)}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content=error_response(message="Internal server error").model_dump()
+    )
 
 # Log CORS configuration for debugging
 logger.info(f"CORS Origins configured: {settings.CORS_ORIGINS}")
@@ -110,27 +142,36 @@ async def shutdown_event():
 # Root endpoint (public - no authentication required)
 @app.get("/")
 async def root():
-    return {
-        "message": settings.PROJECT_NAME, 
-        "version": settings.PROJECT_VERSION,
-        "docs": "/docs",
-        "cors_origins": settings.CORS_ORIGINS,
-        "authentication": {
-            "register": f"{settings.API_V1_STR}/auth/register",
-            "login": f"{settings.API_V1_STR}/auth/login"
-        }
-    }
+    return success_response(
+        data={
+            "message": settings.PROJECT_NAME, 
+            "version": settings.PROJECT_VERSION,
+            "docs": "/docs",
+            "cors_origins": settings.CORS_ORIGINS,
+            "authentication": {
+                "register": f"{settings.API_V1_STR}/auth/register",
+                "login": f"{settings.API_V1_STR}/auth/login"
+            }
+        },
+        message="FIFA Rivalry Tracker API is running"
+    )
 
 # CORS debug endpoint
 @app.get("/cors-debug")
 async def cors_debug():
-    return {
-        "cors_origins": settings.CORS_ORIGINS,
-        "environment": settings.ENVIRONMENT,
-        "debug": settings.DEBUG
-    }
+    return success_response(
+        data={
+            "cors_origins": settings.CORS_ORIGINS,
+            "environment": settings.ENVIRONMENT,
+            "debug": settings.DEBUG
+        },
+        message="CORS configuration retrieved"
+    )
 
 # Simple CORS test endpoint
 @app.get("/cors-test")
 async def cors_test():
-    return {"message": "CORS is working!", "timestamp": "2024-01-01T00:00:00Z"}
+    return success_response(
+        data={"message": "CORS is working!", "timestamp": "2024-01-01T00:00:00Z"},
+        message="CORS test successful"
+    )

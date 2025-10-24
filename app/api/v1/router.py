@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from app.models.response import success_response
 
 from .endpoints import players, matches, tournaments, stats, auth, user
 
@@ -45,4 +46,7 @@ api_router.include_router(
 # Health check endpoint
 @api_router.get("/", tags=["health"])
 async def health_check():
-    return {"message": "FIFA Rivalry Tracker API v1"}
+    return success_response(
+        data={"message": "FIFA Rivalry Tracker API v1"},
+        message="API health check successful"
+    )

@@ -2,8 +2,9 @@
 from .player import Player, PlayerDetailedStats
 from .match import MatchCreate, Match, MatchUpdate, HeadToHeadStats, RecentMatch, UserStatsWithMatches
 from .tournament import TournamentCreate, Tournament, TournamentPlayerStats, TournamentPlayer
-from .auth import UserCreate, User, UserLogin, Token, TokenData, UserInDB
-from .user import FriendRequest, FriendResponse, NonFriendPlayer
+from .auth import UserCreate, User, UserLogin, Token, TokenData, UserInDB, UserDetailedStats
+from .user import FriendRequest, FriendResponse, NonFriendPlayer, UserSearchQuery, UserSearchResult, Friend
+from .response import StandardResponse, StandardListResponse, StandardPaginatedResponse, success_response, success_list_response, success_paginated_response, error_response
 from pydantic import BaseModel
 from typing import Generic, TypeVar, List
 
@@ -46,11 +47,24 @@ __all__ = [
     "Token",
     "TokenData",
     "UserInDB",
+    "UserDetailedStats",
     
     # User models
     "FriendRequest",
     "FriendResponse",
     "NonFriendPlayer",
+    "UserSearchQuery",
+    "UserSearchResult",
+    "Friend",
+    
+    # Response models
+    "StandardResponse",
+    "StandardListResponse", 
+    "StandardPaginatedResponse",
+    "success_response",
+    "success_list_response",
+    "success_paginated_response",
+    "error_response",
     
     # Pagination models
     "PaginatedResponse",

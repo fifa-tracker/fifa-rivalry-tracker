@@ -8,6 +8,7 @@ import time
 
 from app.models import TournamentCreate, Tournament, Match, Player, TournamentPlayerStats, TournamentPlayer, PaginatedResponse, MatchUpdate
 from app.models.auth import UserInDB
+from app.models.response import success_response, success_list_response, success_paginated_response, StandardResponse, StandardListResponse, StandardPaginatedResponse
 from app.api.dependencies import get_database
 from app.utils.helpers import match_helper, calculate_tournament_stats, generate_round_robin_matches, generate_missing_matches
 from app.utils.auth import get_current_active_user
@@ -113,7 +114,7 @@ class TournamentUpdate(BaseModel):
     completed: Optional[bool] = None
     rounds_per_matchup: Optional[int] = Field(None, ge=1, description="Number of times each player plays against each other")
 
-@router.post("/", response_model=Tournament)
+@router.post("/", response_model=StandardResponse[Tournament])
 async def create_tournament(tournament: TournamentCreate, current_user: UserInDB = Depends(get_current_active_user)):
     """Create a new tournament with automatic round-robin match generation"""
     db = await get_database()
@@ -170,9 +171,12 @@ async def create_tournament(tournament: TournamentCreate, current_user: UserInDB
     
     # Get the final tournament with all data
     created_tournament = await db.tournaments.find_one({"_id": new_tournament.inserted_id})
-    return Tournament(**tournament_helper(created_tournament))
+    return success_response(
+        data=Tournament(**tournament_helper(created_tournament)),
+        message="Tournament created successfully"
+    )
 
-@router.get("/", response_model=List[Tournament])
+@router.get("/", response_model=StandardListResponse[Tournament])
 async def get_tournaments(current_user: UserInDB = Depends(get_current_active_user)):
     """Get tournaments that the current user is part of"""
     db = await get_database()
@@ -188,9 +192,13 @@ async def get_tournaments(current_user: UserInDB = Depends(get_current_active_us
         ]
     }).to_list(1000)
     
-    return [Tournament(**tournament_helper(t)) for t in tournaments]
+    processed_tournaments = [Tournament(**tournament_helper(t)) for t in tournaments]
+    return success_list_response(
+        items=processed_tournaments,
+        message=f"Retrieved {len(processed_tournaments)} tournaments"
+    )
 
-@router.get("/{tournament_id}/matches", response_model=PaginatedResponse[Match])
+@router.get("/{tournament_id}/matches", response_model=StandardPaginatedResponse[Match])
 async def get_tournament_matches(
     tournament_id: str, 
     page: int = Query(1, ge=1, description="Page number (1-based)"),
@@ -305,24 +313,28 @@ async def get_tournament_matches(
     total_time = time.time()
     logger.info(f"Tournament matches request completed in {(total_time - start_time) * 1000:.2f}ms - tournament_id: {tournament_id}, page: {page}, total_matches: {total_matches}, returned_matches: {len(processed_matches)}")
     
-    return PaginatedResponse[Match](
+    return success_paginated_response(
         items=processed_matches,
         total=total_matches,
         page=page,
         page_size=page_size,
         total_pages=total_pages,
         has_next=has_next,
-        has_previous=has_previous
+        has_previous=has_previous,
+        message=f"Retrieved {len(processed_matches)} matches (page {page} of {total_pages})"
     )
 
-@router.get("/{tournament_id}/", response_model=Tournament)
+@router.get("/{tournament_id}/", response_model=StandardResponse[Tournament])
 async def get_tournament(tournament_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Get a specific tournament"""
     db = await get_database()
     tournament : Tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
     if not tournament:
         raise HTTPException(status_code=404, detail="Tournament not found")
-    return Tournament(**tournament_helper(tournament))
+    return success_response(
+        data=Tournament(**tournament_helper(tournament)),
+        message="Tournament retrieved successfully"
+    )
 
 @router.put("/{tournament_id}/", response_model=Tournament)
 async def update_tournament(tournament_id: str, tournament_update: TournamentUpdate, current_user: UserInDB = Depends(get_current_active_user)):
@@ -397,7 +409,7 @@ async def update_tournament(tournament_id: str, tournament_update: TournamentUpd
     updated_tournament = await db.tournaments.find_one({"_id": ObjectId(tournament_id)})
     return Tournament(**tournament_helper(updated_tournament))
 
-@router.delete("/{tournament_id}/", response_model=dict)
+@router.delete("/{tournament_id}/", response_model=StandardResponse[dict])
 async def delete_tournament(tournament_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Delete a tournament and all its associated matches"""
     db = await get_database()
@@ -425,7 +437,10 @@ async def delete_tournament(tournament_id: str, current_user: UserInDB = Depends
     await db.tournaments.delete_one({"_id": ObjectId(tournament_id)})
     logger.info(f"Deleted tournament {tournament_id} by user {current_user_id}")
     
-    return {"message": "Tournament and all associated matches deleted successfully"}
+    return success_response(
+        data={"message": "Tournament and all associated matches deleted successfully"},
+        message="Tournament and all associated matches deleted successfully"
+    )
 
 @router.post("/{tournament_id}/players", response_model=Tournament)
 async def add_player_to_tournament(tournament_id: str, player_request: PlayerIdRequest, current_user: UserInDB = Depends(get_current_active_user)):

@@ -5,13 +5,14 @@ from datetime import datetime
 
 from app.models.auth import User, UserInDB
 from app.models.user import FriendRequest, FriendResponse, NonFriendPlayer, UserSearchQuery, UserSearchResult, Friend
+from app.models.response import success_response, success_list_response, StandardResponse, StandardListResponse
 from app.api.dependencies import get_database
 from app.utils.auth import get_current_active_user, user_helper
 
 router = APIRouter()
 
 
-@router.post("/send-friend-request", response_model=FriendResponse)
+@router.post("/send-friend-request", response_model=StandardResponse[FriendResponse])
 async def send_friend_request(
     friend_request: FriendRequest,
     current_user: UserInDB = Depends(get_current_active_user)
@@ -82,10 +83,13 @@ async def send_friend_request(
         }
     )
     
-    return FriendResponse(
-        message="Friend request sent successfully",
-        friend_id=friend_request.friend_id,
-        friend_username=friend["username"]
+    return success_response(
+        data=FriendResponse(
+            message="Friend request sent successfully",
+            friend_id=friend_request.friend_id,
+            friend_username=friend["username"]
+        ),
+        message="Friend request sent successfully"
     )
 
 
@@ -266,20 +270,23 @@ async def remove_friend(
     )
 
 
-@router.get("/friends", response_model=List[Friend])
+@router.get("/friends", response_model=StandardListResponse[Friend])
 async def get_friends(current_user: UserInDB = Depends(get_current_active_user)):
     """Get list of current user's friends"""
     db = await get_database()
     
     if not current_user.friends:
-        return []
+        return success_list_response(
+            items=[],
+            message="No friends found"
+        )
     
     # Get friend objects
     friend_ids = [ObjectId(friend_id) for friend_id in current_user.friends]
     friends_cursor = db.users.find({"_id": {"$in": friend_ids}})
     friends = await friends_cursor.to_list(length=None)
     
-    return [
+    friend_list = [
         Friend(
             id=str(friend["_id"]),
             username=friend["username"],
@@ -288,9 +295,14 @@ async def get_friends(current_user: UserInDB = Depends(get_current_active_user))
         )
         for friend in friends
     ]
+    
+    return success_list_response(
+        items=friend_list,
+        message=f"Retrieved {len(friend_list)} friends"
+    )
 
 
-@router.get("/friend-requests", response_model=dict)
+@router.get("/friend-requests", response_model=StandardResponse[dict])
 async def get_friend_requests(current_user: UserInDB = Depends(get_current_active_user)):
     """Get pending friend requests (sent and received)"""
     db = await get_database()
@@ -328,13 +340,16 @@ async def get_friend_requests(current_user: UserInDB = Depends(get_current_activ
             for user in received_users
         ]
     
-    return {
-        "sent_requests": sent_requests,
-        "received_requests": received_requests
-    }
+    return success_response(
+        data={
+            "sent_requests": sent_requests,
+            "received_requests": received_requests
+        },
+        message="Friend requests retrieved successfully"
+    )
 
 
-@router.get("/recent-non-friend-opponents", response_model=List[NonFriendPlayer])
+@router.get("/recent-non-friend-opponents", response_model=StandardListResponse[NonFriendPlayer])
 async def get_recent_non_friend_opponents(current_user: UserInDB = Depends(get_current_active_user)):
     """Get usernames and names of people you played with in the last 10 matches but are not friends with"""
     db = await get_database()
@@ -350,7 +365,10 @@ async def get_recent_non_friend_opponents(current_user: UserInDB = Depends(get_c
     )
     
     if not recent_matches:
-        return []
+        return success_list_response(
+            items=[],
+            message="No recent matches found"
+        )
     
     # Extract opponent IDs from the matches
     opponent_ids = set()
@@ -364,7 +382,10 @@ async def get_recent_non_friend_opponents(current_user: UserInDB = Depends(get_c
     non_friend_opponent_ids = opponent_ids - set(current_user.friends)
     
     if not non_friend_opponent_ids:
-        return []
+        return success_list_response(
+            items=[],
+            message="No non-friend opponents found"
+        )
     
     # Get opponent user details
     opponent_objects = await db.users.find(
@@ -403,10 +424,13 @@ async def get_recent_non_friend_opponents(current_user: UserInDB = Depends(get_c
             friend_request_sent=friend_request_sent
         ))
     
-    return non_friend_opponents
+    return success_list_response(
+        items=non_friend_opponents,
+        message=f"Retrieved {len(non_friend_opponents)} non-friend opponents"
+    )
 
 
-@router.post("/search", response_model=List[UserSearchResult])
+@router.post("/search", response_model=StandardListResponse[UserSearchResult])
 async def search_users(
     search_query: UserSearchQuery,
     current_user: UserInDB = Depends(get_current_active_user)
@@ -467,4 +491,7 @@ async def search_users(
             friend_request_received=friend_request_received
         ))
     
-    return search_results
+    return success_list_response(
+        items=search_results,
+        message=f"Found {len(search_results)} users matching search criteria"
+    )
