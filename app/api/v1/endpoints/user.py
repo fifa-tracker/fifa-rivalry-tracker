@@ -2,15 +2,512 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends, status
 from bson import ObjectId
 from datetime import datetime
+from itertools import groupby
 
-from app.models.auth import User, UserInDB
+from app.models.auth import User, UserInDB, UserCreate, UserUpdate
 from app.models.user import FriendRequest, FriendResponse, NonFriendPlayer, UserSearchQuery, UserSearchResult, Friend
+from app.models import UserDetailedStats, Match, UserStatsWithMatches, RecentMatch
 from app.models.response import success_response, success_list_response, StandardResponse, StandardListResponse
 from app.api.dependencies import get_database
-from app.utils.auth import get_current_active_user, user_helper
+from app.utils.auth import get_current_active_user, user_helper, get_password_hash
+from app.utils.helpers import match_helper
 
 router = APIRouter()
 
+
+# User Management Endpoints (moved from players.py)
+
+@router.post("/register", response_model=StandardResponse[User])
+async def register_user(user: UserCreate, current_user: UserInDB = Depends(get_current_active_user)):
+    """Register a new user"""
+    db = await get_database()
+    
+    # Check if username already exists
+    existing_user = await db.users.find_one({"username": user.username})
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username already registered"
+        )
+    
+    # Check if email already exists
+    existing_email = await db.users.find_one({"email": user.email})
+    if existing_email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered"
+        )
+    
+    # Create user document
+    user_data = user.dict()
+    user_data.update({
+        "hashed_password": get_password_hash(user.password),
+        "is_active": True,
+        "is_superuser": False,
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow(),
+        # Initialize player statistics
+        "total_matches": 0,
+        "total_goals_scored": 0,
+        "total_goals_conceded": 0,
+        "goal_difference": 0,
+        "wins": 0,
+        "losses": 0,
+        "draws": 0,
+        "points": 0,
+        # ELO rating and tournament fields
+        "elo_rating": 1200,
+        "tournaments_played": 0,
+        "tournament_ids": [],
+        # Friend system fields
+        "friends": [],
+        "friend_requests_sent": [],
+        "friend_requests_received": [],
+        # Team tracking fields
+        "last_5_teams": []
+    })
+    
+    # Remove plain password from data
+    del user_data["password"]
+    
+    # Insert user into database
+    result = await db.users.insert_one(user_data)
+    
+    # Get created user
+    created_user = await db.users.find_one({"_id": result.inserted_id})
+    
+    return success_response(
+        data=User(**user_helper(created_user)),
+        message="User registered successfully"
+    )
+
+
+@router.get("/", response_model=StandardListResponse[User])
+async def get_users(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get all active users (excluding deleted ones)"""
+    db = await get_database()
+    users = await db.users.find({"is_deleted": {"$ne": True}}).to_list(1000)
+    processed_users = [user_helper(user) for user in users]
+    return success_list_response(
+        items=processed_users,
+        message=f"Retrieved {len(processed_users)} users"
+    )
+
+
+@router.get("/{user_id}", response_model=StandardResponse[UserStatsWithMatches])
+async def get_user(user_id: str, current_user: UserInDB = Depends(get_current_active_user)):
+    """Get a specific user by ID with their last 5 matches (including deleted users)"""
+    db = await get_database()
+    
+    try:
+        user = await db.users.find_one({"_id": ObjectId(user_id)})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Get user's last 5 completed matches
+        user_matches = await db.matches.find({
+            "$or": [
+                {"player1_id": user_id},
+                {"player2_id": user_id}
+            ],
+            "completed": True
+        }).sort("date", -1).limit(5).to_list(5)
+        
+        # Convert matches to RecentMatch format
+        recent_matches = []
+        for match in user_matches:
+            # Get tournament name if available
+            tournament_name = None
+            if match.get("tournament_id"):
+                tournament = await db.tournaments.find_one({"_id": ObjectId(match["tournament_id"])})
+                if tournament:
+                    tournament_name = tournament.get("name")
+            
+            # Get opponent information
+            opponent_id = match["player2_id"] if match["player1_id"] == user_id else match["player1_id"]
+            opponent = await db.users.find_one({"_id": ObjectId(opponent_id)})
+            
+            # Determine current user's goals and opponent's goals
+            current_user_goals = match["player1_goals"] if match["player1_id"] == user_id else match["player2_goals"]
+            opponent_goals = match["player2_goals"] if match["player1_id"] == user_id else match["player1_goals"]
+            
+            # Determine match result from current user's perspective
+            if current_user_goals > opponent_goals:
+                match_result = "win"
+            elif current_user_goals < opponent_goals:
+                match_result = "loss"
+            else:
+                match_result = "draw"
+            
+            recent_match = RecentMatch(
+                date=match["date"],
+                player1_goals=match["player1_goals"],
+                player2_goals=match["player2_goals"],
+                tournament_name=tournament_name,
+                team1=match.get("team1"),
+                team2=match.get("team2"),
+                opponent_id=opponent_id,
+                opponent_username=opponent.get("username") if opponent else None,
+                opponent_first_name=opponent.get("first_name") if opponent else None,
+                opponent_last_name=opponent.get("last_name") if opponent else None,
+                current_player_id=user_id,
+                current_player_username=user.get("username"),
+                current_player_goals=current_user_goals,
+                opponent_goals=opponent_goals,
+                match_result=match_result
+            )
+            recent_matches.append(recent_match)
+        
+        # Create UserStatsWithMatches response
+        user_stats = UserStatsWithMatches(
+            id=str(user["_id"]),
+            username=user["username"],
+            first_name=user.get("first_name"),
+            last_name=user.get("last_name"),
+            total_matches=user.get("total_matches", 0),
+            total_goals_scored=user.get("total_goals_scored", 0),
+            total_goals_conceded=user.get("total_goals_conceded", 0),
+            goal_difference=user.get("goal_difference", 0),
+            wins=user.get("wins", 0),
+            losses=user.get("losses", 0),
+            draws=user.get("draws", 0),
+            points=user.get("points", 0),
+            elo_rating=user.get("elo_rating", 1200),
+            tournaments_played=user.get("tournaments_played", 0),
+            last_5_teams=user.get("last_5_teams", []),
+            last_5_matches=recent_matches
+        )
+        
+        return success_response(
+            data=user_stats,
+            message="User information retrieved successfully"
+        )
+        
+    except Exception as e:
+        if "Invalid ObjectId" in str(e):
+            raise HTTPException(status_code=400, detail="Invalid user ID format")
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.put("/{user_id}", response_model=StandardResponse[User])
+async def update_user(user_id: str, user: UserUpdate, current_user: UserInDB = Depends(get_current_active_user)):
+    """Update a user's information (partial update - only provided fields will be updated)"""
+    db = await get_database()
+    
+    # Check if user exists
+    existing_user = await db.users.find_one({"_id": ObjectId(user_id)})
+    if not existing_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Check if user is deleted
+    if existing_user.get("is_deleted", False):
+        raise HTTPException(status_code=400, detail="Cannot update a deleted user")
+
+    # Check if new username already exists (if different from current)
+    if user.username is not None and user.username != existing_user.get("username"):
+        existing_username = await db.users.find_one({"username": user.username})
+        if existing_username:
+            raise HTTPException(status_code=400, detail="Username already exists")
+
+    # Check if new email already exists (if different from current)
+    if user.email is not None and user.email != existing_user.get("email"):
+        existing_email = await db.users.find_one({"email": user.email})
+        if existing_email:
+            raise HTTPException(status_code=400, detail="Email already exists")
+
+    # Update user data
+    update_data = {}
+    if user.username is not None:
+        update_data["username"] = user.username
+    if user.email is not None:
+        update_data["email"] = user.email
+    if user.first_name is not None:
+        update_data["first_name"] = user.first_name
+    if user.last_name is not None:
+        update_data["last_name"] = user.last_name
+
+    # Check if any fields are being updated
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields to update")
+
+    update_data["updated_at"] = datetime.utcnow()
+    
+    update_result = await db.users.update_one(
+        {"_id": ObjectId(user_id)},
+        {"$set": update_data}
+    )
+
+    if update_result.modified_count == 0:
+        raise HTTPException(status_code=400, detail="User update failed")
+
+    # Get updated user
+    updated_user = await db.users.find_one({"_id": ObjectId(user_id)})
+    return success_response(
+        data=user_helper(updated_user),
+        message="User updated successfully"
+    )
+
+
+@router.delete("/{user_id}", response_model=StandardResponse[dict])
+async def delete_user(user_id: str, current_user: UserInDB = Depends(get_current_active_user)):
+    """Mark a user as deleted instead of actually deleting them"""
+    db = await get_database()
+    
+    try:
+        # Check if user exists
+        user = await db.users.find_one({"_id": ObjectId(user_id)})
+        
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        # Mark user as deleted instead of actually deleting
+        update_data = {
+            "is_active": False,
+            "is_deleted": True,
+            "deleted_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        update_result = await db.users.update_one(
+            {"_id": ObjectId(user_id)},
+            {"$set": update_data}
+        )
+        
+        if update_result.modified_count == 0:
+            raise HTTPException(status_code=400, detail="User deletion failed")
+
+        return success_response(
+            data={"message": "User marked as deleted successfully"},
+            message="User marked as deleted successfully"
+        )
+    except Exception as e:
+        if "Invalid ObjectId" in str(e):
+            raise HTTPException(status_code=400, detail="Invalid user ID format")
+        raise
+
+
+@router.get("/{user_id}/stats", response_model=StandardResponse[UserDetailedStats])
+async def get_user_detailed_stats(user_id: str, current_user: UserInDB = Depends(get_current_active_user)):
+    """Get detailed statistics for a specific user with their last 5 matches (including deleted users)"""
+    db = await get_database()
+    
+    user : User = await db.users.find_one({"_id": ObjectId(user_id)})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Get all matches for this user
+    matches: List[Match] = await db.matches.find({
+        "$or": [
+            {"player1_id": user_id},
+            {"player2_id": user_id}
+        ]
+    }).sort("date", 1).to_list(1000)
+
+    wins_against = {}
+    losses_against = {}
+
+    for match in matches:
+        opponent_id = (
+            match["player2_id"]
+            if match["player1_id"] == user_id
+            else match["player1_id"]
+        )
+        opponent : User = await db.users.find_one({"_id": ObjectId(opponent_id)})
+
+        if match["player1_id"] == user_id:
+            if match["player1_goals"] > match["player2_goals"]:
+                wins_against[opponent["username"]] = (
+                    wins_against.get(opponent["username"], 0) + 1
+                )
+            elif match["player1_goals"] < match["player2_goals"]:
+                losses_against[opponent["username"]] = (
+                    losses_against.get(opponent["username"], 0) + 1
+                )
+        else:
+            if match["player2_goals"] > match["player1_goals"]:
+                wins_against[opponent["username"]] = (
+                    wins_against.get(opponent["username"], 0) + 1
+                )
+            elif match["player2_goals"] < match["player1_goals"]:
+                losses_against[opponent["username"]] = (
+                    losses_against.get(opponent["username"], 0) + 1
+                )
+
+    highest_wins = (
+        max(wins_against.items(), key=lambda x: x[1]) if wins_against else None
+    )
+    highest_losses = (
+        max(losses_against.items(), key=lambda x: x[1]) if losses_against else None
+    )
+
+    # Calculate winrate over time (per day)
+    total_matches = 0
+    total_wins = 0
+    daily_winrate = []
+
+    # Convert match dates to datetime objects if they're strings
+    for match in matches:
+        if isinstance(match["date"], str):
+            match["date"] = datetime.fromisoformat(match["date"])
+
+    # Group matches by date
+    for date, day_matches in groupby(matches, key=lambda x: x["date"].date()):
+        day_matches = list(day_matches)
+        for match in day_matches:
+            total_matches += 1
+            is_player1 = match["player1_id"] == user_id
+            player_goals = (
+                match["player1_goals"] if is_player1 else match["player2_goals"]
+            )
+            opponent_goals = (
+                match["player2_goals"] if is_player1 else match["player1_goals"]
+            )
+
+            if player_goals > opponent_goals:
+                total_wins += 1
+
+        winrate = total_wins / total_matches if total_matches > 0 else 0
+        # Convert date to datetime at midnight
+        date_dt = datetime.combine(date, datetime.min.time())
+        daily_winrate.append({"date": date_dt, "winrate": winrate})
+
+    # Calculate tournament participation
+    tournaments_played = 0
+    tournament_ids = []
+    
+    # Find all tournaments where this user is a participant
+    tournaments = await db.tournaments.find({
+        "player_ids": {"$in": [user_id]}
+    }).to_list(1000)
+    
+    tournaments_played = len(tournaments)
+    tournament_ids = [str(t["_id"]) for t in tournaments]
+    
+    stats = user_helper(user)
+    stats.update(
+        {
+            "win_rate": (
+                user["wins"] / user["total_matches"]
+                if user["total_matches"] > 0
+                else 0
+            ),
+            "average_goals_scored": (
+                user["total_goals_scored"] / user["total_matches"]
+                if user["total_matches"] > 0
+                else 0
+            ),
+            "average_goals_conceded": (
+                user["total_goals_conceded"] / user["total_matches"]
+                if user["total_matches"] > 0
+                else 0
+            ),
+            "highest_wins_against": (
+                {highest_wins[0]: highest_wins[1]} if highest_wins else None
+            ),
+            "highest_losses_against": (
+                {highest_losses[0]: highest_losses[1]} if highest_losses else None
+            ),
+            "winrate_over_time": daily_winrate,
+            "tournaments_played": tournaments_played,
+            "tournament_ids": tournament_ids,
+        }
+    )
+
+    # Get user's last 5 completed matches
+    user_matches = await db.matches.find({
+        "$or": [
+            {"player1_id": user_id},
+            {"player2_id": user_id}
+        ],
+        "completed": True
+    }).sort("date", -1).limit(5).to_list(5)
+    
+    # Convert matches to RecentMatch format
+    recent_matches = []
+    for match in user_matches:
+        # Get tournament name if available
+        tournament_name = None
+        if match.get("tournament_id"):
+            tournament = await db.tournaments.find_one({"_id": ObjectId(match["tournament_id"])})
+            if tournament:
+                tournament_name = tournament.get("name")
+        
+        # Get opponent information
+        opponent_id = match["player2_id"] if match["player1_id"] == user_id else match["player1_id"]
+        opponent = await db.users.find_one({"_id": ObjectId(opponent_id)})
+        
+        # Determine current user's goals and opponent's goals
+        current_user_goals = match["player1_goals"] if match["player1_id"] == user_id else match["player2_goals"]
+        opponent_goals = match["player2_goals"] if match["player1_id"] == user_id else match["player1_goals"]
+        
+        # Determine match result from current user's perspective
+        if current_user_goals > opponent_goals:
+            match_result = "win"
+        elif current_user_goals < opponent_goals:
+            match_result = "loss"
+        else:
+            match_result = "draw"
+        
+        recent_match = RecentMatch(
+            date=match["date"],
+            player1_goals=match["player1_goals"],
+            player2_goals=match["player2_goals"],
+            tournament_name=tournament_name,
+            team1=match.get("team1"),
+            team2=match.get("team2"),
+            opponent_id=opponent_id,
+            opponent_username=opponent.get("username") if opponent else None,
+            opponent_first_name=opponent.get("first_name") if opponent else None,
+            opponent_last_name=opponent.get("last_name") if opponent else None,
+            current_player_id=user_id,
+            current_player_username=user.get("username"),
+            current_player_goals=current_user_goals,
+            opponent_goals=opponent_goals,
+            match_result=match_result
+        )
+        recent_matches.append(recent_match)
+    
+    # Add last_5_matches to stats
+    stats["last_5_matches"] = recent_matches
+    
+    # Return the detailed stats with calculated averages
+    return success_response(
+        data=stats,
+        message="User detailed statistics retrieved successfully"
+    )
+
+
+@router.get("/{user_id}/matches", response_model=StandardListResponse[Match])
+async def get_user_matches(user_id: str, current_user: UserInDB = Depends(get_current_active_user)):
+    """Get all matches for a specific user (including deleted users)"""
+    db = await get_database()
+    
+    # Get user info
+    user : User = await db.users.find_one({"_id": ObjectId(user_id)})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    matches = (
+        await db.matches.find(
+            {"$or": [{"player1_id": user_id}, {"player2_id": user_id}]}
+        )
+        .sort("date", -1)
+        .to_list(1000)
+    )
+
+    # Return matches with user names
+    matches_with_names = []
+    for match in matches:
+        match_data = await match_helper(match, db)
+        matches_with_names.append(match_data)
+
+    return success_list_response(
+        items=matches_with_names,
+        message=f"Retrieved {len(matches_with_names)} matches for user"
+    )
+
+
+# Social Features Endpoints
 
 @router.post("/send-friend-request", response_model=StandardResponse[FriendResponse])
 async def send_friend_request(

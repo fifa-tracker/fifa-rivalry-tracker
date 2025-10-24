@@ -278,8 +278,8 @@ class TestMatchIntegration:
         player1, player2 = created_players
         
         # Get initial player stats
-        initial_player1 = client.get(f"/api/v1/players/{player1['id']}").json()
-        initial_player2 = client.get(f"/api/v1/players/{player2['id']}").json()
+        initial_player1 = client.get(f"/api/v1/user/{player1['id']}").json()
+        initial_player2 = client.get(f"/api/v1/user/{player2['id']}").json()
         
         assert initial_player1["total_matches"] == 0
         assert initial_player2["total_matches"] == 0
@@ -304,8 +304,8 @@ class TestMatchIntegration:
         assert match_response.status_code == 200
         
         # Check updated player stats
-        updated_player1 = client.get(f"/api/v1/players/{player1['id']}").json()
-        updated_player2 = client.get(f"/api/v1/players/{player2['id']}").json()
+        updated_player1 = client.get(f"/api/v1/user/{player1['id']}").json()
+        updated_player2 = client.get(f"/api/v1/user/{player2['id']}").json()
         
         # Player 1 should have won
         assert updated_player1["total_matches"] == 1
@@ -368,8 +368,8 @@ class TestMatchIntegration:
             assert response.status_code == 200
         
         # Check final stats
-        final_player1 = client.get(f"/api/v1/players/{player1['id']}").json()
-        final_player2 = client.get(f"/api/v1/players/{player2['id']}").json()
+        final_player1 = client.get(f"/api/v1/user/{player1['id']}").json()
+        final_player2 = client.get(f"/api/v1/user/{player2['id']}").json()
         
         # Player 1: 1 win, 1 loss, 1 draw
         assert final_player1["total_matches"] == 3
@@ -422,8 +422,8 @@ class TestMatchIntegration:
             assert response.status_code == 200
         
         # Check that only the last 5 unique teams are kept
-        updated_player1 = client.get(f"/api/v1/players/{player1['id']}").json()
-        updated_player2 = client.get(f"/api/v1/players/{player2['id']}").json()
+        updated_player1 = client.get(f"/api/v1/user/{player1['id']}").json()
+        updated_player2 = client.get(f"/api/v1/user/{player2['id']}").json()
         
         # Player 1 should have the last 5 unique teams (excluding the first one)
         expected_player1_teams = teams_player1[1:]  # Skip first team
@@ -464,8 +464,8 @@ class TestMatchIntegration:
             assert response.status_code == 200
         
         # Check the final state
-        updated_player1 = client.get(f"/api/v1/players/{player1['id']}").json()
-        updated_player2 = client.get(f"/api/v1/players/{player2['id']}").json()
+        updated_player1 = client.get(f"/api/v1/user/{player1['id']}").json()
+        updated_player2 = client.get(f"/api/v1/user/{player2['id']}").json()
         
         # Player 1 should have unique teams with Barcelona at the front (most recent)
         # Expected: ["Barcelona", "PSG", "Arsenal"] (Barcelona appears only once, at the front)

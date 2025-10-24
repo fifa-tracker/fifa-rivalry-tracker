@@ -187,8 +187,8 @@ class TestStatsIntegration:
         player1, player2 = created_players
         
         # Get player stats from different endpoints
-        individual_player1 = client.get(f"/api/v1/players/{player1['id']}").json()
-        individual_player2 = client.get(f"/api/v1/players/{player2['id']}").json()
+        individual_player1 = client.get(f"/api/v1/user/{player1['id']}").json()
+        individual_player2 = client.get(f"/api/v1/user/{player2['id']}").json()
         
         stats_response = client.get("/api/v1/stats/").json()
         
@@ -213,7 +213,7 @@ class TestStatsIntegration:
         
         created_players = []
         for player_data in players_data:
-            response = client.post("/api/v1/players/", json=player_data)
+            response = client.post("/api/v1/user/register", json=player_data)
             assert response.status_code == 200
             created_players.append(response.json())
         
