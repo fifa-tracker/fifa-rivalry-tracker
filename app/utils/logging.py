@@ -99,6 +99,11 @@ def setup_logging(
                 "handlers": ["console"],
                 "propagate": False
             },
+            "uvicorn.access": {  # Disable uvicorn access logging
+                "level": "WARNING",
+                "handlers": ["console"],
+                "propagate": False
+            },
             "fastapi": {  # FastAPI logger
                 "level": "INFO",
                 "handlers": ["console"],

@@ -10,6 +10,7 @@ from app.models.response import success_response, error_response
 import time
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import asynccontextmanager
 
 # Get logger for this module
 logger = get_logger(__name__)
@@ -19,11 +20,50 @@ logging_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="logging
 
 from app.config import settings
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    try:
+        # This will actually test the connection
+        await client.admin.command('ping')
+        logger.info("✅ MongoDB Atlas connection successful!")
+    except Exception as e:
+        logger.error(f"❌ MongoDB Atlas connection failed: {str(e)}")
+        logger.error("Please check:")
+        logger.error("1. Your internet connection")
+        logger.error("2. MongoDB Atlas IP whitelist settings")
+        logger.error("3. Username and password in connection string")
+        logger.error("4. Database name in connection string")
+    
+    # Log Google OAuth configuration
+    logger.info("🔐 Google OAuth Configuration:")
+    logger.info(f"   GOOGLE_CLIENT_ID: {settings.GOOGLE_CLIENT_ID}")
+    logger.info(f"   GOOGLE_CLIENT_SECRET: {'*' * 20}...{settings.GOOGLE_CLIENT_SECRET[-4:] if settings.GOOGLE_CLIENT_SECRET else 'Not set'}")
+    logger.info(f"   GOOGLE_REDIRECT_URI: {settings.GOOGLE_REDIRECT_URI}")
+    logger.info(f"   FRONTEND_URL: {settings.FRONTEND_URL}")
+    logger.info(f"   MONGO_URI: {settings.MONGO_URI}")
+    logger.info(f"   ACCESS_TOKEN_EXPIRE_MINUTES: {settings.ACCESS_TOKEN_EXPIRE_MINUTES}")
+    logger.info(f"   LOG_LEVEL: {settings.LOG_LEVEL}")
+    logger.info(f"   LOG_FORMAT: {settings.LOG_FORMAT}")
+    logger.info(f"   LOG_FILE: {settings.LOG_FILE}")
+    logger.info(f"   LOG_DATE_FORMAT: {settings.LOG_DATE_FORMAT}")
+    logger.info(f"   API_V1_STR: {settings.API_V1_STR}")
+    logger.info(f"   PROJECT_NAME: {settings.PROJECT_NAME}")
+    
+    yield
+    
+    # Shutdown
+    logger.info("🔄 Shutting down application...")
+    # Shutdown the logging thread pool executor
+    logging_executor.shutdown(wait=True)
+    logger.info("✅ Logging executor shutdown complete")
+
 # Create FastAPI app
 app = FastAPI(
     title=settings.PROJECT_NAME,
     description=settings.PROJECT_DESCRIPTION,
-    version=settings.PROJECT_VERSION
+    version=settings.PROJECT_VERSION,
+    lifespan=lifespan
 )
 
 # Include API router
@@ -101,43 +141,6 @@ async def log_requests(request: Request, call_next):
     
     return response
 
-# Test the actual connection
-@app.on_event("startup")
-async def startup_event():
-    try:
-        # This will actually test the connection
-        await client.admin.command('ping')
-        logger.info("✅ MongoDB Atlas connection successful!")
-    except Exception as e:
-        logger.error(f"❌ MongoDB Atlas connection failed: {str(e)}")
-        logger.error("Please check:")
-        logger.error("1. Your internet connection")
-        logger.error("2. MongoDB Atlas IP whitelist settings")
-        logger.error("3. Username and password in connection string")
-        logger.error("4. Database name in connection string")
-    
-    # Log Google OAuth configuration
-    logger.info("🔐 Google OAuth Configuration:")
-    logger.info(f"   GOOGLE_CLIENT_ID: {settings.GOOGLE_CLIENT_ID}")
-    logger.info(f"   GOOGLE_CLIENT_SECRET: {'*' * 20}...{settings.GOOGLE_CLIENT_SECRET[-4:] if settings.GOOGLE_CLIENT_SECRET else 'Not set'}")
-    logger.info(f"   GOOGLE_REDIRECT_URI: {settings.GOOGLE_REDIRECT_URI}")
-    logger.info(f"   FRONTEND_URL: {settings.FRONTEND_URL}")
-    logger.info(f"   MONGO_URI: {settings.MONGO_URI}")
-    logger.info(f"   ACCESS_TOKEN_EXPIRE_MINUTES: {settings.ACCESS_TOKEN_EXPIRE_MINUTES}")
-    logger.info(f"   LOG_LEVEL: {settings.LOG_LEVEL}")
-    logger.info(f"   LOG_FORMAT: {settings.LOG_FORMAT}")
-    logger.info(f"   LOG_FILE: {settings.LOG_FILE}")
-    logger.info(f"   LOG_DATE_FORMAT: {settings.LOG_DATE_FORMAT}")
-    logger.info(f"   API_V1_STR: {settings.API_V1_STR}")
-    logger.info(f"   PROJECT_NAME: {settings.PROJECT_NAME}")
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Cleanup resources on app shutdown"""
-    logger.info("🔄 Shutting down application...")
-    # Shutdown the logging thread pool executor
-    logging_executor.shutdown(wait=True)
-    logger.info("✅ Logging executor shutdown complete")
 
 # Root endpoint (public - no authentication required)
 @app.get("/")

@@ -94,6 +94,403 @@ async def get_users(current_user: UserInDB = Depends(get_current_active_user)):
     )
 
 
+# Social Features Endpoints - must come before /{user_id} to avoid route conflicts
+
+@router.post("/send-friend-request", response_model=StandardResponse[FriendResponse])
+async def send_friend_request(
+    friend_request: FriendRequest,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Send a friend request to another user"""
+    db = await get_database()
+    
+    # Check if the friend exists
+    try:
+        friend = await db.users.find_one({"_id": ObjectId(friend_request.friend_id)})
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid friend ID format"
+        )
+    
+    if not friend:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Check if trying to send request to self
+    if friend["_id"] == current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot send friend request to yourself"
+        )
+    
+    friend_id = str(friend["_id"])
+    
+    # Check if already friends
+    if friend_id in current_user.friends:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You are already friends with this user"
+        )
+    
+    # Check if friend request already sent
+    if friend_id in current_user.friend_requests_sent:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Friend request already sent to this user"
+        )
+    
+    # Check if friend request already received from this user
+    if friend_id in current_user.friend_requests_received:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This user has already sent you a friend request"
+        )
+    
+    # Add friend request to current user's sent list
+    await db.users.update_one(
+        {"_id": ObjectId(current_user.id)},
+        {
+            "$addToSet": {"friend_requests_sent": friend_id},
+            "$set": {"updated_at": datetime.utcnow()}
+        }
+    )
+    
+    # Add friend request to friend's received list
+    await db.users.update_one(
+        {"_id": ObjectId(friend_id)},
+        {
+            "$addToSet": {"friend_requests_received": current_user.id},
+            "$set": {"updated_at": datetime.utcnow()}
+        }
+    )
+    
+    return success_response(
+        data=FriendResponse(
+            message="Friend request sent successfully",
+            friend_id=friend_request.friend_id,
+            friend_username=friend["username"]
+        ),
+        message="Friend request sent successfully"
+    )
+
+
+@router.post("/accept-friend-request", response_model=FriendResponse)
+async def accept_friend_request(
+    friend_request: FriendRequest,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Accept a friend request from another user"""
+    db = await get_database()
+    
+    # Check if the friend exists
+    try:
+        friend = await db.users.find_one({"_id": ObjectId(friend_request.friend_id)})
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid friend ID format"
+        )
+    
+    if not friend:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    friend_id = str(friend["_id"])
+    
+    # Check if friend request was received from this user
+    if friend_id not in current_user.friend_requests_received:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No friend request received from this user"
+        )
+    
+    # Check if already friends
+    if friend_id in current_user.friends:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You are already friends with this user"
+        )
+    
+    # Add friend to both users' friends list
+    await db.users.update_one(
+        {"_id": ObjectId(current_user.id)},
+        {
+            "$addToSet": {"friends": friend_id},
+            "$pull": {"friend_requests_received": friend_id},
+            "$set": {"updated_at": datetime.utcnow()}
+        }
+    )
+    
+    await db.users.update_one(
+        {"_id": ObjectId(friend_id)},
+        {
+            "$addToSet": {"friends": current_user.id},
+            "$pull": {"friend_requests_sent": current_user.id},
+            "$set": {"updated_at": datetime.utcnow()}
+        }
+    )
+    
+    return FriendResponse(
+        message="Friend request accepted successfully",
+        friend_id=friend_request.friend_id,
+        friend_username=friend["username"]
+    )
+
+
+@router.post("/reject-friend-request", response_model=FriendResponse)
+async def reject_friend_request(
+    friend_request: FriendRequest,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Reject a friend request from another user"""
+    db = await get_database()
+    
+    # Check if the friend exists
+    try:
+        friend = await db.users.find_one({"_id": ObjectId(friend_request.friend_id)})
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid friend ID format"
+        )
+    
+    if not friend:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    friend_id = str(friend["_id"])
+    
+    # Check if friend request was received from this user
+    if friend_id not in current_user.friend_requests_received:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No friend request received from this user"
+        )
+    
+    # Remove friend request from both users
+    await db.users.update_one(
+        {"_id": ObjectId(current_user.id)},
+        {
+            "$pull": {"friend_requests_received": friend_id},
+            "$set": {"updated_at": datetime.utcnow()}
+        }
+    )
+    
+    await db.users.update_one(
+        {"_id": ObjectId(friend_id)},
+        {
+            "$pull": {"friend_requests_sent": current_user.id},
+            "$set": {"updated_at": datetime.utcnow()}
+        }
+    )
+    
+    return FriendResponse(
+        message="Friend request rejected successfully",
+        friend_id=friend_request.friend_id,
+        friend_username=friend["username"]
+    )
+
+
+@router.delete("/remove-friend", response_model=FriendResponse)
+async def remove_friend(
+    friend_request: FriendRequest,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Remove a friend from your friends list"""
+    db = await get_database()
+    
+    # Check if the friend exists
+    try:
+        friend = await db.users.find_one({"_id": ObjectId(friend_request.friend_id)})
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid friend ID format"
+        )
+    
+    if not friend:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    friend_id = str(friend["_id"])
+    
+    # Check if they are friends
+    if friend_id not in current_user.friends:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You are not friends with this user"
+        )
+    
+    # Remove friend from both users' friends list
+    await db.users.update_one(
+        {"_id": ObjectId(current_user.id)},
+        {
+            "$pull": {"friends": friend_id},
+            "$set": {"updated_at": datetime.utcnow()}
+        }
+    )
+    
+    await db.users.update_one(
+        {"_id": ObjectId(friend_id)},
+        {
+            "$pull": {"friends": current_user.id},
+            "$set": {"updated_at": datetime.utcnow()}
+        }
+    )
+    
+    return FriendResponse(
+        message="Friend removed successfully",
+        friend_id=friend_request.friend_id,
+        friend_username=friend["username"]
+    )
+
+
+@router.get("/friends", response_model=StandardListResponse[Friend])
+async def get_friends(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get list of current user's friends"""
+    db = await get_database()
+    
+    if not current_user.friends:
+        return success_list_response(
+            items=[],
+            message="No friends found"
+        )
+    
+    # Get friend objects
+    friend_ids = [ObjectId(friend_id) for friend_id in current_user.friends]
+    friends_cursor = db.users.find({"_id": {"$in": friend_ids}})
+    friends = await friends_cursor.to_list(length=None)
+    
+    friend_list = [
+        Friend(
+            id=str(friend["_id"]),
+            username=friend["username"],
+            first_name=friend.get("first_name"),
+            last_name=friend.get("last_name")
+        )
+        for friend in friends
+    ]
+    
+    return success_list_response(
+        items=friend_list,
+        message=f"Retrieved {len(friend_list)} friends"
+    )
+
+
+@router.get("/friend-requests", response_model=StandardResponse[dict])
+async def get_friend_requests(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get pending friend requests (sent and received)"""
+    db = await get_database()
+    
+    # Get sent friend requests
+    sent_requests = []
+    if current_user.friend_requests_sent:
+        sent_ids = [ObjectId(friend_id) for friend_id in current_user.friend_requests_sent]
+        sent_cursor = db.users.find({"_id": {"$in": sent_ids}})
+        sent_users = await sent_cursor.to_list(length=None)
+        sent_requests = [
+            {
+                "friend_id": str(user["_id"]),
+                "username": user["username"],
+                "first_name": user.get("first_name"),
+                "last_name": user.get("last_name")
+            }
+            for user in sent_users
+        ]
+    
+    # Get received friend requests
+    received_requests = []
+    if current_user.friend_requests_received:
+        received_ids = [ObjectId(friend_id) for friend_id in current_user.friend_requests_received]
+        received_cursor = db.users.find({"_id": {"$in": received_ids}})
+        received_users = await received_cursor.to_list(length=None)
+        received_requests = [
+            {
+                "friend_id": str(user["_id"]),
+                "username": user["username"],
+                "first_name": user.get("first_name"),
+                "last_name": user.get("last_name")
+            }
+            for user in received_users
+        ]
+    
+    return success_response(
+        data={
+            "sent_requests": sent_requests,
+            "received_requests": received_requests
+        },
+        message="Friend requests retrieved successfully"
+    )
+
+
+@router.get("/recent-non-friend-opponents", response_model=StandardListResponse[NonFriendPlayer])
+async def get_recent_non_friend_opponents(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get usernames and names of people you played with in the last 10 matches but are not friends with"""
+    db = await get_database()
+    
+    # Get the last 10 matches where the current user participated
+    recent_matches = (
+        await db.matches.find(
+            {"$or": [{"player1_id": current_user.id}, {"player2_id": current_user.id}]}
+        )
+        .sort("date", -1)
+        .limit(10)
+        .to_list(10)
+    )
+    
+    if not recent_matches:
+        return success_list_response(
+            items=[],
+            message="No recent matches found"
+        )
+    
+    # Extract opponent IDs from the matches
+    opponent_ids = set()
+    for match in recent_matches:
+        if match["player1_id"] == current_user.id:
+            opponent_ids.add(match["player2_id"])
+        else:
+            opponent_ids.add(match["player1_id"])
+    
+    # Remove current user's friends from opponent IDs
+    non_friend_opponent_ids = opponent_ids - set(current_user.friends)
+    
+    if not non_friend_opponent_ids:
+        return success_list_response(
+            items=[],
+            message="No non-friend opponents found"
+        )
+    
+    # Get opponent details
+    opponent_objects = await db.users.find(
+        {"_id": {"$in": [ObjectId(oid) for oid in non_friend_opponent_ids]}}
+    ).to_list(length=None)
+    
+    opponents = [
+        NonFriendPlayer(
+            id=str(opponent["_id"]),
+            username=opponent["username"],
+            first_name=opponent.get("first_name"),
+            last_name=opponent.get("last_name")
+        )
+        for opponent in opponent_objects
+    ]
+    
+    return success_list_response(
+        items=opponents,
+        message=f"Retrieved {len(opponents)} recent non-friend opponents"
+    )
+
+
 @router.get("/{user_id}", response_model=StandardResponse[UserStatsWithMatches])
 async def get_user(user_id: str, current_user: UserInDB = Depends(get_current_active_user)):
     """Get a specific user by ID with their last 5 matches (including deleted users)"""
@@ -822,7 +1219,6 @@ async def get_friend_requests(current_user: UserInDB = Depends(get_current_activ
     
     # Get received friend requests
     received_requests = []
-    print(f"Received requests: {{\n    'id': '{current_user.id}',\n    'username': '{current_user.username}',\n    'friend_requests_received': {current_user.friend_requests_received}\n}}")
     if current_user.friend_requests_received:
         received_ids = [ObjectId(friend_id) for friend_id in current_user.friend_requests_received]
         received_cursor = db.users.find({"_id": {"$in": received_ids}})
