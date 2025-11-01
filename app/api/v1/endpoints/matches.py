@@ -7,7 +7,7 @@ from app.models import MatchCreate, Match, MatchUpdate, User, Tournament
 from app.models.auth import UserInDB
 from app.models.response import success_response, success_list_response, StandardResponse, StandardListResponse
 from app.api.dependencies import get_database
-from app.utils.helpers import match_helper, get_result
+from app.utils.helpers import match_helper, get_result, update_user_detailed_stats_cache
 from app.utils.auth import get_current_active_user
 from app.utils.logging import get_logger
 from app.utils.elo import calculate_elo_ratings
@@ -96,6 +96,10 @@ async def record_match(match: MatchCreate, current_user: UserInDB = Depends(get_
             }
         }
         await db.users.update_one({"_id": player["_id"]}, update)
+
+    # Update cache for both players
+    await update_user_detailed_stats_cache(match.player1_id, db)
+    await update_user_detailed_stats_cache(match.player2_id, db)
 
     created_match = await db.matches.find_one({"_id": new_match.inserted_id})
     return success_response(
@@ -266,6 +270,10 @@ async def update_match(match_id: str, match_update: MatchUpdate, current_user: U
             if update_result.modified_count == 0:
                 raise HTTPException(status_code=400, detail="Player update failed")
 
+        # Update cache for both players
+        await update_user_detailed_stats_cache(match["player1_id"], db)
+        await update_user_detailed_stats_cache(match["player2_id"], db)
+
         # Fetch updated match
         updated_match = await db.matches.find_one({"_id": ObjectId(match_id)})
         if not updated_match:
@@ -405,6 +413,10 @@ async def delete_match(match_id: str, current_user: UserInDB = Depends(get_curre
         delete_result = await db.matches.delete_one({"_id": ObjectId(match_id)})
         if delete_result.deleted_count == 0:
             raise HTTPException(status_code=400, detail="Match deletion failed")
+
+        # Update cache for both players
+        await update_user_detailed_stats_cache(match["player1_id"], db)
+        await update_user_detailed_stats_cache(match["player2_id"], db)
 
         logger.info(f"Successfully deleted match {match_id} and updated statistics")
         return success_response(

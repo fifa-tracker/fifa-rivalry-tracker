@@ -1,10 +1,10 @@
 from datetime import datetime
 from bson import ObjectId
-from app.models import User, Match, Tournament
-from typing import List
+from app.models import User, Match, Tournament, RecentMatch
+from typing import List, Dict, Any
 from app.utils.logging import get_logger
-import time
-import itertools
+from app.utils.auth import user_helper
+from itertools import groupby
 
 logger = get_logger(__name__)
 
@@ -396,3 +396,235 @@ async def calculate_head_to_head_stats(db, player1_id: str, player2_id: str, pla
     stats["recent_matches"] = recent_matches
     
     return stats
+
+
+async def calculate_user_detailed_stats(user_id: str, db) -> Dict[str, Any]:
+    """
+    Calculate detailed statistics for a user.
+    This function performs all the expensive calculations for user detailed stats.
+    
+    Args:
+        user_id: The ID of the user to calculate stats for
+        db: Database connection
+        
+    Returns:
+        Dictionary containing all the detailed stats matching UserDetailedStats model
+    """
+    # Get user
+    user = await db.users.find_one({"_id": ObjectId(user_id)})
+    if not user:
+        raise ValueError(f"User not found: {user_id}")
+    
+    # Get all matches for this user
+    matches = await db.matches.find({
+        "$or": [
+            {"player1_id": user_id},
+            {"player2_id": user_id}
+        ]
+    }).sort("date", 1).to_list(1000)
+    
+    # Calculate wins/losses against each opponent
+    wins_against = {}
+    losses_against = {}
+    
+    for match in matches:
+        opponent_id = (
+            match["player2_id"]
+            if match["player1_id"] == user_id
+            else match["player1_id"]
+        )
+        opponent = await db.users.find_one({"_id": ObjectId(opponent_id)})
+        
+        if not opponent:
+            continue
+        
+        if match["player1_id"] == user_id:
+            if match["player1_goals"] > match["player2_goals"]:
+                wins_against[opponent["username"]] = (
+                    wins_against.get(opponent["username"], 0) + 1
+                )
+            elif match["player1_goals"] < match["player2_goals"]:
+                losses_against[opponent["username"]] = (
+                    losses_against.get(opponent["username"], 0) + 1
+                )
+        else:
+            if match["player2_goals"] > match["player1_goals"]:
+                wins_against[opponent["username"]] = (
+                    wins_against.get(opponent["username"], 0) + 1
+                )
+            elif match["player2_goals"] < match["player1_goals"]:
+                losses_against[opponent["username"]] = (
+                    losses_against.get(opponent["username"], 0) + 1
+                )
+    
+    highest_wins = (
+        max(wins_against.items(), key=lambda x: x[1]) if wins_against else None
+    )
+    highest_losses = (
+        max(losses_against.items(), key=lambda x: x[1]) if losses_against else None
+    )
+    
+    # Calculate winrate over time (per day)
+    total_matches = 0
+    total_wins = 0
+    daily_winrate = []
+    
+    # Convert match dates to datetime objects if they're strings
+    for match in matches:
+        if isinstance(match["date"], str):
+            match["date"] = datetime.fromisoformat(match["date"])
+    
+    # Group matches by date
+    for date, day_matches in groupby(matches, key=lambda x: x["date"].date()):
+        day_matches = list(day_matches)
+        for match in day_matches:
+            total_matches += 1
+            is_player1 = match["player1_id"] == user_id
+            player_goals = (
+                match["player1_goals"] if is_player1 else match["player2_goals"]
+            )
+            opponent_goals = (
+                match["player2_goals"] if is_player1 else match["player1_goals"]
+            )
+            
+            if player_goals > opponent_goals:
+                total_wins += 1
+        
+        winrate = total_wins / total_matches if total_matches > 0 else 0
+        # Convert date to datetime at midnight
+        date_dt = datetime.combine(date, datetime.min.time())
+        daily_winrate.append({"date": date_dt, "winrate": winrate})
+    
+    # Calculate tournament participation
+    tournaments = await db.tournaments.find({
+        "player_ids": {"$in": [user_id]}
+    }).to_list(1000)
+    
+    tournaments_played = len(tournaments)
+    tournament_ids = [str(t["_id"]) for t in tournaments]
+    
+    # Build stats dictionary
+    stats = user_helper(user)
+    stats.update({
+        "win_rate": (
+            user["wins"] / user["total_matches"]
+            if user["total_matches"] > 0
+            else 0
+        ),
+        "average_goals_scored": (
+            user["total_goals_scored"] / user["total_matches"]
+            if user["total_matches"] > 0
+            else 0
+        ),
+        "average_goals_conceded": (
+            user["total_goals_conceded"] / user["total_matches"]
+            if user["total_matches"] > 0
+            else 0
+        ),
+        "highest_wins_against": (
+            {highest_wins[0]: highest_wins[1]} if highest_wins else None
+        ),
+        "highest_losses_against": (
+            {highest_losses[0]: highest_losses[1]} if highest_losses else None
+        ),
+        "winrate_over_time": daily_winrate,
+        "tournaments_played": tournaments_played,
+        "tournament_ids": tournament_ids,
+    })
+    
+    # Get user's last 5 completed matches
+    user_matches = await db.matches.find({
+        "$or": [
+            {"player1_id": user_id},
+            {"player2_id": user_id}
+        ],
+        "completed": True
+    }).sort("date", -1).limit(5).to_list(5)
+    
+    # Convert matches to RecentMatch format
+    recent_matches = []
+    for match in user_matches:
+        # Get tournament name if available
+        tournament_name = None
+        if match.get("tournament_id"):
+            tournament = await db.tournaments.find_one({"_id": ObjectId(match["tournament_id"])})
+            if tournament:
+                tournament_name = tournament.get("name")
+        
+        # Get opponent information
+        opponent_id = match["player2_id"] if match["player1_id"] == user_id else match["player1_id"]
+        opponent = await db.users.find_one({"_id": ObjectId(opponent_id)})
+        
+        # Determine current user's goals and opponent's goals
+        current_user_goals = match["player1_goals"] if match["player1_id"] == user_id else match["player2_goals"]
+        opponent_goals = match["player2_goals"] if match["player1_id"] == user_id else match["player1_goals"]
+        
+        # Determine match result from current user's perspective
+        if current_user_goals > opponent_goals:
+            match_result = "win"
+        elif current_user_goals < opponent_goals:
+            match_result = "loss"
+        else:
+            match_result = "draw"
+        
+        recent_match = RecentMatch(
+            date=match["date"],
+            player1_goals=match["player1_goals"],
+            player2_goals=match["player2_goals"],
+            tournament_name=tournament_name,
+            team1=match.get("team1"),
+            team2=match.get("team2"),
+            opponent_id=opponent_id,
+            opponent_username=opponent.get("username") if opponent else None,
+            opponent_first_name=opponent.get("first_name") if opponent else None,
+            opponent_last_name=opponent.get("last_name") if opponent else None,
+            current_player_id=user_id,
+            current_player_username=user.get("username"),
+            current_player_goals=current_user_goals,
+            opponent_goals=opponent_goals,
+            match_result=match_result
+        )
+        recent_matches.append(recent_match)
+    
+    # Add last_5_matches to stats
+    stats["last_5_matches"] = recent_matches
+    
+    return stats
+
+
+async def update_user_detailed_stats_cache(user_id: str, db) -> None:
+    """
+    Update the detailed stats cache for a user.
+    This function calculates and stores the cache in the database.
+    
+    Args:
+        user_id: The ID of the user to update cache for
+        db: Database connection
+    """
+    try:
+        stats = await calculate_user_detailed_stats(user_id, db)
+        
+        # Convert RecentMatch objects to dicts for storage
+        stats_for_cache = stats.copy()
+        if "last_5_matches" in stats_for_cache and stats_for_cache["last_5_matches"]:
+            stats_for_cache["last_5_matches"] = [
+                match.model_dump() if hasattr(match, "model_dump") 
+                else match.dict() if hasattr(match, "dict")
+                else dict(match) if hasattr(match, "__dict__")
+                else match
+                for match in stats["last_5_matches"]
+            ]
+        
+        # Store in cache
+        await db.users.update_one(
+            {"_id": ObjectId(user_id)},
+            {
+                "$set": {
+                    "detailed_stats_cache": stats_for_cache,
+                    "cache_updated_at": datetime.utcnow()
+                }
+            }
+        )
+    except (ValueError, Exception) as e:
+        # Log error but don't raise - cache update shouldn't break match operations
+        logger.error(f"Failed to update cache for user {user_id}: {str(e)}")
